@@ -3,7 +3,6 @@
 import {
     EnchantCategory,
     EnchantItem,
-    type MaterialPointTypeRange, // 여기서 가져옵니다
 } from './EnchantBase';
 
 import { enchantStates } from './state';
@@ -12,7 +11,8 @@ import {
     EnchantEquipmentTypes,
     EnchantStepTypes,
     StatTypes,
-    type StatNormalTypes
+    type StatNormalTypes,
+    type MaterialPointTypeRange // enums에서 가져오는지 확인
 } from './enums';
 
 import { calcPotentialExtraRate } from './utils';
@@ -73,7 +73,6 @@ class EnchantEquipment {
         this.isOriginalElement = false;
     }
 
-    // [수정 1] _categorys: 사용하지 않는 변수에 _를 붙여 에러 방지
     clone(_categorys: EnchantCategory[]) {
         const newEq = new EnchantEquipment();
         newEq.basePotential = this.basePotential;
@@ -100,8 +99,29 @@ class EnchantEquipment {
         return stepIdx < 0 ? [] : this._steps.slice(0, stepIdx + 1);
     }
 
+    // ▼▼▼ [필수] 이 Getter가 있어야 에러가 안 납니다 ▼▼▼
+    get firstStep(): EnchantStep | null {
+        return this.steps()[0] || null;
+    }
+
     get lastStep(): EnchantStep | null {
         return this._steps.length > 0 ? this._steps[this._steps.length - 1] : null;
+    }
+
+    // ▼▼▼ [필수] 이 Getter가 있어야 에러가 안 납니다 ▼▼▼
+    get operationStepsQuantity(): number {
+        if (!this.lastStep) {
+            return 0;
+        }
+        return this.steps(this.lastStep.index).reduce((cur, step) => {
+            if (!step.firstStat) {
+                return cur;
+            }
+            if (step.type === EnchantStepTypes.Each) {
+                return cur + Math.ceil(step.firstStat.value / step.step);
+            }
+            return cur + 1;
+        }, 0);
     }
 
     appendStep(): EnchantStep {
@@ -246,7 +266,6 @@ class EnchantStep {
         return potential >= 0 ? Math.floor(potential) : Math.ceil(potential);
     }
 
-    // [수정 2] _autoFix: 사용하지 않는 변수에 _ 붙임
     optimizeType(_autoFix: number) {
         return 0;
     }
@@ -374,7 +393,6 @@ class EnchantStepStat extends EnchantStat {
         };
     }
 
-    // [수정 3] 삭제 전 index 확인 추가
     remove(): void {
         if (this.index > -1) {
             this._parent.stats.splice(this.index, 1);

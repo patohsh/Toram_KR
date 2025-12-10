@@ -34,3 +34,5 @@ export enum AutoFindNegaitveStatsTypes {
     SuccessRate = 'success-rate',
     Material = 'material',
 }
+
+export type MaterialPointTypeRange = 0 | 1 | 2 | 3 | 4 | 5;

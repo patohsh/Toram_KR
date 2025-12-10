@@ -1,4 +1,6 @@
-﻿import { enchantStates } from './state';
+﻿// src/lib/Enchant/EnchantBase.ts
+
+import { enchantStates } from './state';
 
 // ▼▼▼ 수정된 부분: 직접 정의하지 않고 enums에서 가져옵니다 ▼▼▼
 import {
@@ -11,7 +13,7 @@ import {
 
 // 의존성 모의
 const markRaw = <T>(obj: T): T => obj;
-const computeFormula = (formula: string, vars: any) => 10;
+const computeFormula = (_formula: string, _vars: any) => 10;
 
 // Grimoire 객체
 export const Grimoire = {
@@ -24,7 +26,9 @@ export const Grimoire = {
 };
 
 // ▼▼▼ MaterialPointTypeRange는 여기서 쓰이므로 여기에 둡니다 (혹은 enums로 옮겨도 됨) ▼▼▼
-export type MaterialPointTypeRange = 0 | 1 | 2 | 3 | 4 | 5;
+// (주의: enums.ts에도 정의되어 있다면 여기서는 지우거나 export를 하지 말아야 충돌이 안 납니다.)
+// 만약 enums.ts에 이미 정의되어 있다면 아래 줄은 삭제하세요.
+// export type MaterialPointTypeRange = 0 | 1 | 2 | 3 | 4 | 5; 
 
 // ==========================================
 // 4. 인터페이스 및 타입

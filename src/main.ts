@@ -1170,7 +1170,7 @@ const REGISTLET_CATEGORIES = [
 ];
 
 const LEVEL_RANGES = {
-    "All": (lv: any) => true,
+    "All": true,
     "0~30": (lv: any) => checkLevelRange(lv, 0, 30),
     "30~100": (lv: any) => checkLevelRange(lv, 30, 100),
     "100~150": (lv: any) => checkLevelRange(lv, 100, 150),
