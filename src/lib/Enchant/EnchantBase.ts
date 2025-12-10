@@ -179,4 +179,4 @@ class EnchantItemConditionalProperties {
     }
 }
 
-export { EnchantCategory, EnchantItem };
+export { EnchantCategory, EnchantItem, MaterialPointTypeRange };
