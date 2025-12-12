@@ -9,7 +9,6 @@ import {
 
 // ▼▼▼ 수정됨: StatTypes의 경로를 올바르게 변경했습니다 ▼▼▼
 import { StatTypes } from './lib/Enchant/enums';
-
 import { EnchantDoll } from './lib/Enchant/EnchantDoll';
 import { EnchantStat } from './lib/Enchant/EnchantBuild';
 import { enchantConfig } from './lib/Enchant/state';
@@ -144,7 +143,7 @@ function renderHomePage() {
           <div class="menu-text">레지스트릿</div>
         </div>
 
-        <div class="menu-card" id="go-cooking">
+        <div class="menu-card" id="go-food">
           <div class="menu-icon">🍳</div>
           <div class="menu-text">요리 주소</div>
         </div>
@@ -153,6 +152,17 @@ function renderHomePage() {
           <div class="menu-icon">🛡️</div>
           <div class="menu-text">장비 검색</div>
         </div>
+
+        <div class="menu-card" id="go-guide">
+          <div class="menu-icon">📖</div>
+          <div class="menu-text">뉴비 가이드</div>
+        </div>
+
+        <div class="menu-card" id="go-info">
+          <div class="menu-icon">⭐</div>
+          <div class="menu-text">정보</div>
+        </div>
+
       </div>
     </div>
   `;
@@ -165,8 +175,11 @@ function renderHomePage() {
     // 신규 이벤트 바인딩
     document.getElementById('go-ability')?.addEventListener('click', renderAbilityPage);
     document.getElementById('go-registlet')?.addEventListener('click', renderRegistletPage);
-    document.getElementById('go-cooking')?.addEventListener('click', renderCookingPage);
+    document.getElementById('go-food')?.addEventListener('click', renderFoodPage);
     document.getElementById('go-equip')?.addEventListener('click', renderEquipmentPage);
+    document.getElementById('go-guide')?.addEventListener('click', renderGuidePage);
+    document.getElementById('go-info')?.addEventListener('click', renderInfoPage);
+
 }
 
 // --- [Page 2] 크리스타 페이지 (기능 구현 완료) ---
@@ -1340,24 +1353,172 @@ function filterRegistlets() {
     `;
     }).join('');
 }
-// --- [Page 6] 요리 주소 검색 ---
-function renderCookingPage() {
+// =================================================
+// [Page 6] 요리 주소 검색 (Food Code)
+// =================================================
+
+const FOOD_CATEGORIES = [
+    "전체 보기",
+    "HP / MP / AMPR",
+    "기본 스탯",
+    "공격 관련",
+    "속성 데미지 (유리)",
+    "내성 / 방어 / 회피",
+    "속성 내성",
+    "기타"
+];
+
+let foodData: any[] = [];
+
+function renderFoodPage() {
     app.innerHTML = `
     <div class="nav-bar">
       <button class="btn-home" id="back-home">🏠 Home</button>
       <h2 style="margin:0 0 0 15px; border:none;">🍳 요리 주소 검색</h2>
     </div>
-    <div class="container" style="text-align:center; padding:50px;">
-      <h3>준비 중입니다 (Construction)</h3>
-      <p>요리 버프 및 주소 코드를 준비 중입니다.</p>
+
+    <div class="reg-search-container">
+      <!-- 1. 카테고리 필터 (버튼형) -->
+      <div class="reg-cat-group" id="food-cat-filters">
+        ${FOOD_CATEGORIES.map((cat, idx) => `
+          <input type="radio" name="food-cat" id="f-cat-${idx}" value="${cat}" ${idx === 0 ? 'checked' : ''}>
+          <label for="f-cat-${idx}">${cat}</label>
+        `).join('')}
+      </div>
+
+      <hr style="border:0; border-top:1px solid var(--border-color); margin:20px 0;">
+
+      <!-- 2. 검색어 입력 -->
+      <div class="reg-control-row" style="justify-content:center;">
+        <input type="text" id="food-search-input" class="search-input" placeholder="요리 이름 검색..." style="width:100%; max-width:400px;">
+      </div>
+    </div>
+
+    <!-- 결과 리스트 -->
+    <div id="food-results" class="food-list-container">
+      <div style="text-align:center; padding:20px; color:#888;">데이터 로딩 중...</div>
     </div>
   `;
+
     document.getElementById('back-home')?.addEventListener('click', renderHomePage);
+
+    // 이벤트 연결
+    document.querySelectorAll('input[name="food-cat"]').forEach(el => {
+        el.addEventListener('change', filterFoodCodes);
+    });
+
+    document.getElementById('food-search-input')?.addEventListener('input', filterFoodCodes);
+
+    loadFoodData();
+}
+async function loadFoodData() {
+    const container = document.getElementById('food-results')!;
+
+    if (foodData.length > 0) {
+        filterFoodCodes();
+        return;
+    }
+
+    try {
+        const res = await fetch('FoodCode.js');
+        if (!res.ok) throw new Error('File not found');
+        const text = await res.text();
+
+        // 1. "const FoodCode =" 부분 찾기
+        const eqIndex = text.indexOf('=');
+        if (eqIndex === -1) throw new Error('Invalid JS format');
+
+        // 2. 등호 뒤의 객체 내용만 추출 ({ ... })
+        let jsonContent = text.substring(eqIndex + 1).trim();
+
+        // 3. 끝에 세미콜론(;) 제거
+        if (jsonContent.endsWith(';')) {
+            jsonContent = jsonContent.slice(0, -1);
+        }
+
+        // 4. 문자열을 실제 자바스크립트 객체로 변환
+        const dataObj = new Function(`return ${jsonContent}`)();
+
+        // 5. 객체 내부의 'items' 배열을 가져옴
+        if (dataObj && Array.isArray(dataObj.items)) {
+            foodData = dataObj.items; // ★ 여기가 핵심 수정 포인트
+            filterFoodCodes();
+        } else {
+            throw new Error('Data structure mismatch: .items array not found');
+        }
+
+    } catch (err) {
+        console.error('Food Data Load Error:', err);
+        container.innerHTML = `<div style="text-align:center; color:#ff4444;">
+      데이터 로딩 실패<br>
+      <span style="font-size:0.8rem; color:#aaa;">${err}</span>
+    </div>`;
+    }
+}
+function filterFoodCodes() {
+    const container = document.getElementById('food-results');
+    if (!container) return;
+
+    const searchInput = document.getElementById('food-search-input') as HTMLInputElement;
+    const keyword = searchInput.value.trim().toLowerCase();
+
+    const catRadio = document.querySelector('input[name="food-cat"]:checked') as HTMLInputElement;
+    const selectedCat = catRadio ? catRadio.value : "전체 보기";
+
+    const filtered = foodData.filter((item: any) => {
+        // 카테고리 필터
+        if (selectedCat !== "전체 보기" && item.category !== selectedCat) return false;
+
+        // 검색어 필터
+        if (keyword) {
+            const matchName = item.name.toLowerCase().includes(keyword);
+            const matchEn = item.name_en ? item.name_en.toLowerCase().includes(keyword) : false;
+            return matchName || matchEn;
+        }
+        return true;
+    });
+
+    if (filtered.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:20px; color:#888;">검색 결과가 없습니다.</div>`;
+        return;
+    }
+
+    container.innerHTML = filtered.map((item: any) => {
+        // 코드 버튼 생성
+        const codesHtml = item.codes.map((codeObj: any) => `
+      <button class="code-btn" onclick="copyToClipboard('${codeObj.code}')">
+        <span class="code-val">${codeObj.code}</span>
+        <span class="code-lv">Lv ${codeObj.lv}</span>
+      </button>
+    `).join('');
+
+        return `
+      <div class="food-card">
+        <div class="food-header">
+          <span class="food-cat-badge">${item.category}</span>
+          <div class="food-name">
+            ${item.name} <span class="food-en">(${item.name_en})</span>
+          </div>
+        </div>
+        <div class="food-codes">
+          ${codesHtml}
+        </div>
+      </div>
+    `;
+    }).join('');
 }
 
-// --- [Page 7] 장비 검색 ---
+// 전역 함수로 등록 (onclick에서 호출하기 위해)
+(window as any).copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+        alert(`코드 복사 완료: ${text}`);
+    }).catch(err => {
+        console.error('복사 실패:', err);
+    });
+};
+
 // =================================================
-// [Page 7] 장비 & 파밍 검색 (Equipment & Farming)
+// [Page 7] 장비 & 파밍 검색 (Advanced)
 // =================================================
 
 // 1. 일반 장비 카테고리
@@ -1375,29 +1536,56 @@ const EQUIP_CATEGORIES: Record<string, string> = {
     'additional': '추가장비',
     'shield': '방패'
 };
-
-// 2. 파밍 장비 카테고리
+// 2. 파밍 장비 카테고리 (폴더명 : 화면 표시 이름)
 const FARMING_CATEGORIES: Record<string, string> = {
-    'WeaponArmor': '무기 & 옷',
-    'ArrowDagger': '화살 & 단검',
-    'Additional': '추가장비 (파밍)'
+    'Weapon': '무기 (Weapon)',
+    'Armor': '옷 (Armor)',
+    'Arrow': '화살 (Arrow)',
+    'Dagger': '단검 (Dagger)',
+    'Farming_Additional': '추가장비 (Farming_Additional)'
 };
 
+// 3. 파밍용 하위 태그 (Sub-filters)
+const FARMING_TAGS: Record<string, string[]> = {
+    'Weapon': ['전체'],
+    'Armor': ['전체'],
+    'Arrow': [
+        '전체',
+        '무속성', '불속성', '물속성', '바람속성', '땅속성', '빛속성', '어둠속성'
+    ],
+    'Dagger': [
+        '전체',
+        '대장간/드랍', '퀘스트', '필드/보스', '한정/이벤트'
+    ],
+    'Farming_Additional': [
+        '전체', '근거리', '원거리', '마법', '탱커', '발도', '서포터'
+    ]
+};
 // 상태 변수
 let currentEquipData: any[] = [];
 let filteredEquipData: any[] = [];
 let currentCategory = 'Handed_Sword';
-let isFarmingMode = false; // 파밍 모드 여부
+let currentSubTag = '전체';
+let isFarmingMode = false;
 let equipCurrentPage = 1;
 const ITEMS_PER_PAGE = 9;
 
 function renderEquipmentPage() {
-    // 모드에 따라 탭 메뉴 결정
     const categories = isFarmingMode ? FARMING_CATEGORIES : EQUIP_CATEGORIES;
-
-    // 모드 전환 버튼 텍스트/스타일
     const modeBtnText = isFarmingMode ? "🔄 일반 장비 보기" : "🌿 파밍 장비 보기";
     const modeBtnClass = isFarmingMode ? "btn-mode-farming active" : "btn-mode-farming";
+
+    // 파밍 모드일 때만 태그 버튼 표시
+    let tagsHtml = '';
+    if (isFarmingMode && FARMING_TAGS[currentCategory] && FARMING_TAGS[currentCategory].length > 1) {
+        tagsHtml = `<div class="skill-tabs sub-tags" id="farming-sub-tags" style="margin-top:10px;">
+      ${FARMING_TAGS[currentCategory].map(tag => `
+        <button class="skill-tab-btn ${tag === currentSubTag ? 'active' : ''}" data-tag="${tag}">
+          ${tag.replace('화살: ', '').replace('단검: ', '')}
+        </button>
+      `).join('')}
+    </div>`;
+    }
 
     app.innerHTML = `
     <div class="nav-bar">
@@ -1408,12 +1596,11 @@ function renderEquipmentPage() {
     </div>
 
     <div class="container">
-      <!-- 모드 전환 버튼 -->
       <div style="text-align:right; margin-bottom:10px;">
         <button id="btn-toggle-mode" class="${modeBtnClass}">${modeBtnText}</button>
       </div>
 
-      <!-- 카테고리 탭 -->
+      <!-- 메인 카테고리 -->
       <div class="skill-tabs" id="equip-category-tabs">
         ${Object.entries(categories).map(([key, name]) => `
           <button class="skill-tab-btn ${key === currentCategory ? 'active' : ''}" data-cat="${key}">
@@ -1422,131 +1609,188 @@ function renderEquipmentPage() {
         `).join('')}
       </div>
 
-      <!-- 검색창 -->
+      <!-- 파밍용 서브 태그 -->
+      ${tagsHtml}
+
       <div class="search-container" style="background:transparent; border:none; padding:0; margin-bottom:20px;">
         <input type="text" id="equip-search" class="search-input" placeholder="이름 검색 (한글/영어)...">
       </div>
 
-      <!-- 장비 리스트 -->
       <div id="equip-grid" class="equip-grid-container">
         <div style="grid-column:1/-1; text-align:center; padding:50px; color:#888;">데이터 로딩 중...</div>
       </div>
 
-      <!-- 페이지네이션 -->
       <div class="pagination" id="equip-pagination"></div>
     </div>
   `;
 
     document.getElementById('back-home')?.addEventListener('click', renderHomePage);
 
-    // 모드 전환 이벤트
+    // 모드 전환
     document.getElementById('btn-toggle-mode')?.addEventListener('click', () => {
         isFarmingMode = !isFarmingMode;
-        // 모드 변경 시 첫 번째 카테고리로 초기화
         currentCategory = isFarmingMode ? 'WeaponArmor' : 'Handed_Sword';
+        currentSubTag = '전체';
         equipCurrentPage = 1;
-        renderEquipmentPage(); // 재렌더링
+        renderEquipmentPage();
     });
 
-    // 탭 클릭 이벤트
+    // 카테고리 탭 클릭
     document.querySelectorAll('#equip-category-tabs .skill-tab-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const target = e.target as HTMLElement;
-            document.querySelectorAll('#equip-category-tabs .skill-tab-btn').forEach(b => b.classList.remove('active'));
-            target.classList.add('active');
-
             currentCategory = target.dataset.cat!;
-            loadEquipmentData(currentCategory);
+            currentSubTag = '전체';
+            renderEquipmentPage();
         });
     });
 
-    // 검색 이벤트
+    // 서브 태그 클릭
+    document.querySelectorAll('#farming-sub-tags .skill-tab-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const target = e.target as HTMLElement;
+            document.querySelectorAll('#farming-sub-tags .skill-tab-btn').forEach(b => b.classList.remove('active'));
+            target.classList.add('active');
+
+            currentSubTag = target.dataset.tag!;
+            filterEquipment('');
+        });
+    });
+
     document.getElementById('equip-search')?.addEventListener('input', (e) => {
         const keyword = (e.target as HTMLInputElement).value.trim();
         filterEquipment(keyword);
     });
 
-    // 초기 데이터 로드
     loadEquipmentData(currentCategory);
 }
 
-async function loadEquipmentData(folderName: string) {
+async function loadEquipmentData(categoryName: string) {
     const grid = document.getElementById('equip-grid')!;
     const pagination = document.getElementById('equip-pagination')!;
 
     grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:50px;">데이터 로딩 중...</div>';
     pagination.innerHTML = '';
 
-    const rootFolder = isFarmingMode ? 'Farming' : 'Equipment';
-    const filePath = `${rootFolder}/${folderName}/${folderName}.js`;
+    let filePath = '';
+
+    if (isFarmingMode) {
+        // [파밍 모드] 폴더는 'Farming' 하나로 고정!
+        // 파일명만 카테고리 이름(Weapon, Armor...)을 따라감
+        // 구조: public/Farming/Weapon.js
+
+        // 만약 폴더 구조가 public/Farming/WeaponArmor/Weapon.js 라면:
+        // filePath = `Farming/WeaponArmor/${categoryName}.js`;
+
+        // 하지만 "폴더는 합쳐져 있다"고 하셨으므로:
+        // 1. Weapon, Armor -> public/Farming/WeaponArmor/Weapon.js 
+        // 2. Arrow, Dagger -> public/Farming/ArrowDagger/Arrow.js
+        // 3. Additional -> public/Farming/Additional/Additional.js
+
+        let subFolder = '';
+        if (['Weapon', 'Armor'].includes(categoryName)) subFolder = 'WeaponArmor';
+        else if (['Arrow', 'Dagger'].includes(categoryName)) subFolder = 'ArrowDagger';
+        else subFolder = 'Farming_Additional';
+
+        filePath = `Farming/${subFolder}/${categoryName}.js`;
+
+    } else {
+        // [일반 모드] 기존 방식 유지 (폴더명 = 파일명)
+        filePath = `Equipment/${categoryName}/${categoryName}.js`;
+    }
 
     try {
         const res = await fetch(filePath);
         if (!res.ok) throw new Error(`File not found: ${filePath}`);
         const text = await res.text();
 
-        // ★ [강력한 파싱] "const 변수명 =" 부분을 제거하고 순수 객체만 남김
-        // 예: "const Additional = { ... }" -> "{ ... }"
-        // 정규식으로 'const 변수명 =' 패턴을 찾아서 그 뒤부터 끝까지 자름
-
-        // 1. 등호(=)를 찾음
+        // JS 파싱 (기존 로직 유지)
+        // 1. 등호(=) 찾기
         const eqIndex = text.indexOf('=');
-        if (eqIndex === -1) throw new Error("Invalid JS format: No assignment found");
+        if (eqIndex === -1) throw new Error("Invalid JS format");
 
-        // 2. 등호 뒤의 텍스트(객체 부분)만 추출
+        // 2. 객체 부분 추출
         let jsonContent = text.substring(eqIndex + 1).trim();
+        if (jsonContent.endsWith(';')) jsonContent = jsonContent.slice(0, -1);
 
-        // 3. 만약 끝에 세미콜론(;)이 있으면 제거
-        if (jsonContent.endsWith(';')) {
-            jsonContent = jsonContent.slice(0, -1);
-        }
-
-        // 4. 객체로 변환
         const dataObj = new Function(`return ${jsonContent}`)();
 
-        // 5. 데이터 추출 (items 배열 확인)
         let items = [];
         if (dataObj.items && Array.isArray(dataObj.items)) {
             items = dataObj.items;
         } else if (Array.isArray(dataObj)) {
             items = dataObj;
         } else {
-            console.error("Data structure error:", dataObj);
             items = [];
         }
 
         currentEquipData = items.reverse();
 
+        // 로드 후 필터링
         const searchInput = document.getElementById('equip-search') as HTMLInputElement;
         if (searchInput) searchInput.value = '';
         filterEquipment('');
 
     } catch (err) {
-        console.error("Load Error:", err);
+        console.error(err);
         grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:#ff4444;">
-      데이터 로딩 실패<br>
+      데이터 로딩 실패<br>(${filePath})<br>
       <span style="font-size:0.8rem; color:#aaa;">${err}</span>
     </div>`;
     }
 }
 
 function filterEquipment(keyword: string) {
-    if (!keyword) {
-        filteredEquipData = currentEquipData;
-    } else {
-        const lowerKey = keyword.toLowerCase();
-        filteredEquipData = currentEquipData.filter((item: any) => {
-            const name = item.name ? item.name.toLowerCase() : '';
-            const nameEn = item.name_en ? item.name_en.toLowerCase() : '';
-            return name.includes(lowerKey) || nameEn.includes(lowerKey);
+    let filtered = currentEquipData;
+
+    // 1. 태그 필터링 (파밍 모드일 때만)
+    if (isFarmingMode && currentSubTag !== '전체') {
+        filtered = filtered.filter((item: any) => {
+            // 데이터의 category 필드가 존재하는지 확인 후 검사
+            if (!item.category) return false;
+
+            // 태그 이름에서 불필요한 접두사 제거 (UI와 데이터 매칭)
+            // 예: "화살: 불속성" -> "불속성"
+            let tagKey = currentSubTag;
+            if (tagKey.includes(': ')) {
+                tagKey = tagKey.split(': ')[1];
+            }
+
+            // 데이터의 카테고리 문자열에 태그 키워드가 포함되어 있는지 확인
+            return item.category.includes(tagKey);
         });
     }
 
+    // 2. 검색어 필터링 (이름 + 영문명 + ★스탯★)
+    if (keyword) {
+        const lowerKey = keyword.toLowerCase();
+        filtered = filtered.filter((item: any) => {
+            // 이름 검색
+            const name = item.name ? item.name.toLowerCase() : '';
+            const nameEn = item.name_en ? item.name_en.toLowerCase() : '';
+
+            // ★ 스탯 검색 추가
+            let statsText = '';
+            if (item.stats) {
+                if (Array.isArray(item.stats)) {
+                    statsText = item.stats.join(' ').toLowerCase();
+                } else {
+                    statsText = item.stats.toLowerCase();
+                }
+            }
+
+            // 이름이나 스탯 중에 키워드가 있으면 통과
+            return name.includes(lowerKey) || nameEn.includes(lowerKey) || statsText.includes(lowerKey);
+        });
+    }
+
+    filteredEquipData = filtered;
+
+    // 검색 결과가 바뀌었으니 1페이지로 초기화
     equipCurrentPage = 1;
     renderEquipGrid();
     renderPagination();
 }
-
 function renderEquipGrid() {
     const grid = document.getElementById('equip-grid')!;
     grid.innerHTML = '';
@@ -1560,53 +1804,52 @@ function renderEquipGrid() {
     const end = start + ITEMS_PER_PAGE;
     const pageItems = filteredEquipData.slice(start, end);
 
-    // 폴더 경로 설정
-    const rootFolder = isFarmingMode ? 'Farming' : 'Equipment';
+    // 현재 카테고리가 이미지 숨김 대상인지 확인 (화살, 단검, 추가장비)
+    const isNoImageCategory = isFarmingMode && ['Arrow', 'Dagger', 'Additional'].includes(currentCategory);
+
+    // 그리드 스타일 변경 (이미지 없으면 좀 더 촘촘하게 보여주기 위해 클래스 추가 가능)
+    // 여기선 기존 그리드 유지하되 내용물만 바꿈
 
     pageItems.forEach((item: any) => {
         const card = document.createElement('div');
         card.className = 'equip-card';
 
-        // ★ [수정됨] 데이터에 있는 image 속성을 우선 사용
-        let imgFileName = '';
-        if (item.image) {
-            imgFileName = item.image; // 데이터에 "6-image.jpg"가 있으면 그거 사용
-        } else {
-            // 없으면 id 기반으로 추측
-            imgFileName = item.id ? `${item.id}.png` : 'unknown.png';
-        }
-
-        const basePath = `${rootFolder}/${currentCategory}/${imgFileName}`;
-
-        // 스탯 텍스트 처리 (데이터에 stats, stat, base_def 등 무엇이든 있으면 표시)
+        // 스탯 텍스트 처리
         let statsHtml = '';
-
-        // 파밍 장비거나 스탯이 있는 경우
         if (item.stats) {
-            // stats가 배열이거나 문자열일 수 있음. 문자열이면 줄바꿈 처리
             const sText = Array.isArray(item.stats) ? item.stats.join('<br>') : item.stats.replace(/\n/g, '<br>');
-            statsHtml = `<div class="equip-stats highlight">${sText}</div>`;
-        } else if (item.base_def) {
-            statsHtml = `<div class="equip-stats">DEF: ${item.base_def}</div>`;
-        } else if (item.base_atk) {
-            statsHtml = `<div class="equip-stats">ATK: ${item.base_atk}</div>`;
+            statsHtml = `<div class="equip-stats highlight" style="margin-top:10px;">${sText}</div>`;
+        } else if (item.base_def || item.base_atk) {
+            statsHtml = `<div class="equip-stats">${item.base_atk ? 'ATK: ' + item.base_atk : 'DEF: ' + item.base_def}</div>`;
         }
 
-        // ★ 핵심: PNG -> JPG -> Fallback 순서로 로딩하는 이미지 태그 생성
-        // onerror에서 this.src를 바꾸고, onerror를 null로 만들어 무한 루프 방지
-        const imgTag = `
-      <img src="${basePath}" 
-        onerror="this.onerror=null; this.src='https://toram-id.info/img/skill/unknown.png';" 
-        alt="${item.name}">
-    `;
+        // 카테고리 뱃지
+        const catBadge = isFarmingMode && item.category ? `<span class="trait-cat-badge" style="margin-bottom:5px; display:inline-block;">${item.category}</span>` : '';
+
+        // ★ 핵심 수정: 이미지가 필요한 경우에만 img 태그 생성
+        let imgContent = '';
+        if (!isNoImageCategory) {
+            const rootFolder = isFarmingMode ? 'Farming' : 'Equipment';
+            const subFolder = isFarmingMode && ['Weapon', 'Armor'].includes(currentCategory) ? 'WeaponArmor' : currentCategory;
+
+            let imgFileName = item.image || (item.id ? (item.id.includes('.') ? item.id : `${item.id}.png`) : 'unknown.png');
+            const basePath = `${rootFolder}/${subFolder}/${imgFileName}`;
+
+            imgContent = `
+        <div class="equip-img-box">
+          <img src="${basePath}" 
+            onerror="this.onerror=null; this.src='${basePath.replace('.png', '.jpg')}'; this.onerror=function(){this.src='https://toram-id.info/img/skill/unknown.png'}" 
+            alt="${item.name}">
+        </div>
+      `;
+        }
 
         card.innerHTML = `
-      <div class="equip-img-box">
-        ${imgTag}
-      </div>
-      <div class="equip-info">
-        <div class="equip-name">${item.name}</div>
-        <div class="equip-name-en">${item.name_en || ''}</div>
+      ${imgContent}
+      <div class="equip-info" style="${isNoImageCategory ? 'width:100%; text-align:left;' : ''}">
+        ${catBadge}
+        <div class="equip-name" style="font-size:1.1rem;">${item.name}</div>
+        <div class="equip-name-en" style="margin-bottom:5px;">${item.name_en || ''}</div>
         ${statsHtml}
       </div>
     `;
@@ -1629,22 +1872,14 @@ function renderPagination() {
         return btn;
     };
 
-    container.appendChild(createBtn('Prev', () => {
-        equipCurrentPage--;
-        renderEquipGrid();
-        renderPagination();
-    }, equipCurrentPage === 1));
+    container.appendChild(createBtn('Prev', () => { equipCurrentPage--; renderEquipGrid(); renderPagination(); }, equipCurrentPage === 1));
 
     const pageInfo = document.createElement('span');
     pageInfo.className = 'page-info';
     pageInfo.innerText = `${equipCurrentPage} / ${totalPages}`;
     container.appendChild(pageInfo);
 
-    container.appendChild(createBtn('Next', () => {
-        equipCurrentPage++;
-        renderEquipGrid();
-        renderPagination();
-    }, equipCurrentPage === totalPages));
+    container.appendChild(createBtn('Next', () => { equipCurrentPage++; renderEquipGrid(); renderPagination(); }, equipCurrentPage === totalPages));
 }
 // =================================================
 // [기능] 낮/밤 테마 토글 (Day/Night Switch)
@@ -1686,6 +1921,170 @@ function toggleTheme() {
         btn.innerText = '🌙 밤 모드';
         localStorage.setItem('toram-theme', 'light');
     }
+}
+
+// =================================================
+// [Page 8] 뉴비 가이드 (Newbie Guide)
+// =================================================
+
+let guideList: any[] = [];
+
+function renderGuidePage() {
+    app.innerHTML = `
+    <div class="nav-bar">
+      <button class="btn-home" id="back-home">🏠 Home</button>
+      <h2 style="margin:0 0 0 15px; border:none;">📘 뉴비 가이드</h2>
+    </div>
+
+    <div class="container">
+      <!-- 검색창 -->
+      <div class="search-container" style="background:transparent; border:none; padding:0; margin-bottom:20px;">
+        <input type="text" id="guide-search" class="search-input" placeholder="제목 또는 내용 검색...">
+      </div>
+
+      <!-- 가이드 리스트 (1단) -->
+      <div id="guide-list" class="guide-list-container">
+        <div style="text-align:center; padding:50px; color:#888;">데이터 로딩 중...</div>
+      </div>
+    </div>
+  `;
+
+    document.getElementById('back-home')?.addEventListener('click', renderHomePage);
+    document.getElementById('guide-search')?.addEventListener('input', (e) => {
+        const keyword = (e.target as HTMLInputElement).value.trim();
+        renderGuideItems(keyword);
+    });
+
+    loadGuideData();
+}
+
+async function loadGuideData() {
+    const container = document.getElementById('guide-list')!;
+
+    if (guideList.length > 0) {
+        renderGuideItems('');
+        return;
+    }
+
+    try {
+        // ▼▼▼ 경로 수정됨 (guideDB 폴더 포함) ▼▼▼
+        const res = await fetch('guideDB/guideData.js');
+        if (!res.ok) throw new Error('File not found');
+        const text = await res.text();
+
+        const eqIndex = text.indexOf('=');
+        let jsonContent = text.substring(eqIndex + 1).trim();
+        if (jsonContent.endsWith(';')) jsonContent = jsonContent.slice(0, -1);
+
+        guideList = new Function(`return ${jsonContent}`)();
+        renderGuideItems('');
+
+    } catch (err) {
+        console.error(err);
+        container.innerHTML = `<div style="text-align:center; color:#ff4444;">가이드 데이터를 불러올 수 없습니다.</div>`;
+    }
+}
+
+function renderGuideItems(keyword: string) {
+    const container = document.getElementById('guide-list')!;
+    container.innerHTML = '';
+
+    const lowerKey = keyword.toLowerCase();
+    const filtered = guideList.filter((item: any) => {
+        return item.title.toLowerCase().includes(lowerKey) || item.description.toLowerCase().includes(lowerKey);
+    });
+
+    if (filtered.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding:30px; color:#888;">검색 결과가 없습니다.</div>';
+        return;
+    }
+
+    filtered.forEach((item: any) => {
+        const card = document.createElement('div');
+        card.className = 'guide-card';
+
+        // 제목 화살표 변환 로직
+        const steps = item.title.split('-').map((s: string) => s.trim());
+        const titleHtml = steps.join(' <span style="color:var(--accent-pink);">▶</span> ');
+
+        // 이미지 (데이터에 image 필드가 있다고 가정)
+        const imgHtml = item.image ? `<img src="GuideImg/${item.image}" class="guide-img" alt="${item.title}">` : '';
+
+        card.innerHTML = `
+      ${imgHtml}
+      <div class="guide-title-box">${titleHtml}</div>
+      <div class="guide-desc">${item.description.replace(/\n/g, '<br>')}</div>
+    `;
+        container.appendChild(card);
+    });
+}
+
+
+// =================================================
+// [Page 9] 정보 페이지 (Credits)
+// =================================================
+
+function renderInfoPage() {
+    app.innerHTML = `
+    <div class="nav-bar">
+      <button class="btn-home" id="back-home">🏠 Home</button>
+      <h2 style="margin:0 0 0 15px; border:none;">ℹ️ 정보 (Credits)</h2>
+    </div>
+
+    <div class="container" style="max-width:600px;">
+      
+      <div class="info-card">
+        <h3>👑 제작 및 운영</h3>
+        <p><strong>주인(Owner):</strong> Your Name</p>
+        <p><strong>개발(Dev):</strong> Toram Tools Team</p>
+      </div>
+
+      <div class="info-card">
+        <h3>🤝 참여해주신 분들</h3>
+        <ul style="padding-left:20px; color:var(--text-dim);">
+          <li>데이터 제공: User A</li>
+          <li>번역 도움: User B</li>
+          <li>디자인 조언: User C</li>
+        </ul>
+      </div>
+
+      <div class="info-card">
+        <h3>📚 참고 데이터</h3>
+        <p>Toram Online Wiki, Coryn Club, Official Site</p>
+      </div>
+
+      <h3 style="margin-top:30px; border-bottom:1px solid #444; padding-bottom:10px;">🔗 관련 링크</h3>
+      <div class="link-grid">
+        <a href="https://github.com" target="_blank" class="link-box">
+          <div class="link-icon">🐙</div>
+          <div>GitHub</div>
+        </a>
+        <a href="https://toram.jp" target="_blank" class="link-box">
+          <div class="link-icon">🌐</div>
+          <div>Official Site</div>
+        </a>
+        <a href="https://coryn.club" target="_blank" class="link-box">
+          <div class="link-icon">🛡️</div>
+          <div>Coryn Club</div>
+        </a>
+        <a href="https://discord.com" target="_blank" class="link-box">
+          <div class="link-icon">💬</div>
+          <div>Discord</div>
+        </a>
+        <a href="https://youtube.com" target="_blank" class="link-box">
+          <div class="link-icon">▶️</div>
+          <div>YouTube</div>
+        </a>
+      </div>
+
+      <div style="text-align:center; margin-top:50px; color:#666; font-size:0.8rem;">
+        © 2025 Toram Tools. All rights reserved.<br>
+        This is a fan-made site and is not affiliated with Asobimo Inc.
+      </div>
+    </div>
+  `;
+
+    document.getElementById('back-home')?.addEventListener('click', renderHomePage);
 }
 
 // 앱 시작 시 테마 초기화 실행
