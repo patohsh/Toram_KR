@@ -149,7 +149,7 @@ function renderHomePage() {
           <div class="menu-text">요리 주소</div>
         </div>
 
-        <div class="menu-card" id="go-equipment">
+        <div class="menu-card" id="go-equip">
           <div class="menu-icon">🛡️</div>
           <div class="menu-text">장비 검색</div>
         </div>
@@ -166,7 +166,7 @@ function renderHomePage() {
     document.getElementById('go-ability')?.addEventListener('click', renderAbilityPage);
     document.getElementById('go-registlet')?.addEventListener('click', renderRegistletPage);
     document.getElementById('go-cooking')?.addEventListener('click', renderCookingPage);
-    document.getElementById('go-equipment')?.addEventListener('click', renderEquipmentPage);
+    document.getElementById('go-equip')?.addEventListener('click', renderEquipmentPage);
 }
 
 // --- [Page 2] 크리스타 페이지 (기능 구현 완료) ---
@@ -1170,7 +1170,7 @@ const REGISTLET_CATEGORIES = [
 ];
 
 const LEVEL_RANGES = {
-    "All": true,
+    "All": (lv: any) => checkLevelRange(lv, 0, 300),
     "0~30": (lv: any) => checkLevelRange(lv, 0, 30),
     "30~100": (lv: any) => checkLevelRange(lv, 30, 100),
     "100~150": (lv: any) => checkLevelRange(lv, 100, 150),
@@ -1356,18 +1356,295 @@ function renderCookingPage() {
 }
 
 // --- [Page 7] 장비 검색 ---
+// =================================================
+// [Page 7] 장비 & 파밍 검색 (Equipment & Farming)
+// =================================================
+
+// 1. 일반 장비 카테고리
+const EQUIP_CATEGORIES: Record<string, string> = {
+    'Handed_Sword': '한손검',
+    'big_handed_sword': '양손검',
+    'bow': '활',
+    'bowgun': '보우건',
+    'staff': '지팡이',
+    'magicdevice': '마도구',
+    'knuckle': '너클',
+    'halberd': '선풍창',
+    'katana': '발도검',
+    'armor': '몸장비',
+    'additional': '추가장비',
+    'shield': '방패'
+};
+
+// 2. 파밍 장비 카테고리
+const FARMING_CATEGORIES: Record<string, string> = {
+    'WeaponArmor': '무기 & 옷',
+    'ArrowDagger': '화살 & 단검',
+    'Additional': '추가장비 (파밍)'
+};
+
+// 상태 변수
+let currentEquipData: any[] = [];
+let filteredEquipData: any[] = [];
+let currentCategory = 'Handed_Sword';
+let isFarmingMode = false; // 파밍 모드 여부
+let equipCurrentPage = 1;
+const ITEMS_PER_PAGE = 9;
+
 function renderEquipmentPage() {
+    // 모드에 따라 탭 메뉴 결정
+    const categories = isFarmingMode ? FARMING_CATEGORIES : EQUIP_CATEGORIES;
+
+    // 모드 전환 버튼 텍스트/스타일
+    const modeBtnText = isFarmingMode ? "🔄 일반 장비 보기" : "🌿 파밍 장비 보기";
+    const modeBtnClass = isFarmingMode ? "btn-mode-farming active" : "btn-mode-farming";
+
     app.innerHTML = `
     <div class="nav-bar">
       <button class="btn-home" id="back-home">🏠 Home</button>
-      <h2 style="margin:0 0 0 15px; border:none;">🛡️ 장비 검색</h2>
+      <h2 style="margin:0 0 0 15px; border:none;">
+        ${isFarmingMode ? '🌿 파밍 장비 도감' : '🛡️ 일반 장비 검색'}
+      </h2>
     </div>
-    <div class="container" style="text-align:center; padding:50px;">
-      <h3>준비 중입니다 (Construction)</h3>
-      <p>무기 및 방어구 데이터를 준비 중입니다.</p>
+
+    <div class="container">
+      <!-- 모드 전환 버튼 -->
+      <div style="text-align:right; margin-bottom:10px;">
+        <button id="btn-toggle-mode" class="${modeBtnClass}">${modeBtnText}</button>
+      </div>
+
+      <!-- 카테고리 탭 -->
+      <div class="skill-tabs" id="equip-category-tabs">
+        ${Object.entries(categories).map(([key, name]) => `
+          <button class="skill-tab-btn ${key === currentCategory ? 'active' : ''}" data-cat="${key}">
+            ${name}
+          </button>
+        `).join('')}
+      </div>
+
+      <!-- 검색창 -->
+      <div class="search-container" style="background:transparent; border:none; padding:0; margin-bottom:20px;">
+        <input type="text" id="equip-search" class="search-input" placeholder="이름 검색 (한글/영어)...">
+      </div>
+
+      <!-- 장비 리스트 -->
+      <div id="equip-grid" class="equip-grid-container">
+        <div style="grid-column:1/-1; text-align:center; padding:50px; color:#888;">데이터 로딩 중...</div>
+      </div>
+
+      <!-- 페이지네이션 -->
+      <div class="pagination" id="equip-pagination"></div>
     </div>
   `;
+
     document.getElementById('back-home')?.addEventListener('click', renderHomePage);
+
+    // 모드 전환 이벤트
+    document.getElementById('btn-toggle-mode')?.addEventListener('click', () => {
+        isFarmingMode = !isFarmingMode;
+        // 모드 변경 시 첫 번째 카테고리로 초기화
+        currentCategory = isFarmingMode ? 'WeaponArmor' : 'Handed_Sword';
+        equipCurrentPage = 1;
+        renderEquipmentPage(); // 재렌더링
+    });
+
+    // 탭 클릭 이벤트
+    document.querySelectorAll('#equip-category-tabs .skill-tab-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const target = e.target as HTMLElement;
+            document.querySelectorAll('#equip-category-tabs .skill-tab-btn').forEach(b => b.classList.remove('active'));
+            target.classList.add('active');
+
+            currentCategory = target.dataset.cat!;
+            loadEquipmentData(currentCategory);
+        });
+    });
+
+    // 검색 이벤트
+    document.getElementById('equip-search')?.addEventListener('input', (e) => {
+        const keyword = (e.target as HTMLInputElement).value.trim();
+        filterEquipment(keyword);
+    });
+
+    // 초기 데이터 로드
+    loadEquipmentData(currentCategory);
+}
+
+async function loadEquipmentData(folderName: string) {
+    const grid = document.getElementById('equip-grid')!;
+    const pagination = document.getElementById('equip-pagination')!;
+
+    grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:50px;">데이터 로딩 중...</div>';
+    pagination.innerHTML = '';
+
+    const rootFolder = isFarmingMode ? 'Farming' : 'Equipment';
+    const filePath = `${rootFolder}/${folderName}/${folderName}.js`;
+
+    try {
+        const res = await fetch(filePath);
+        if (!res.ok) throw new Error(`File not found: ${filePath}`);
+        const text = await res.text();
+
+        // ★ [강력한 파싱] "const 변수명 =" 부분을 제거하고 순수 객체만 남김
+        // 예: "const Additional = { ... }" -> "{ ... }"
+        // 정규식으로 'const 변수명 =' 패턴을 찾아서 그 뒤부터 끝까지 자름
+
+        // 1. 등호(=)를 찾음
+        const eqIndex = text.indexOf('=');
+        if (eqIndex === -1) throw new Error("Invalid JS format: No assignment found");
+
+        // 2. 등호 뒤의 텍스트(객체 부분)만 추출
+        let jsonContent = text.substring(eqIndex + 1).trim();
+
+        // 3. 만약 끝에 세미콜론(;)이 있으면 제거
+        if (jsonContent.endsWith(';')) {
+            jsonContent = jsonContent.slice(0, -1);
+        }
+
+        // 4. 객체로 변환
+        const dataObj = new Function(`return ${jsonContent}`)();
+
+        // 5. 데이터 추출 (items 배열 확인)
+        let items = [];
+        if (dataObj.items && Array.isArray(dataObj.items)) {
+            items = dataObj.items;
+        } else if (Array.isArray(dataObj)) {
+            items = dataObj;
+        } else {
+            console.error("Data structure error:", dataObj);
+            items = [];
+        }
+
+        currentEquipData = items.reverse();
+
+        const searchInput = document.getElementById('equip-search') as HTMLInputElement;
+        if (searchInput) searchInput.value = '';
+        filterEquipment('');
+
+    } catch (err) {
+        console.error("Load Error:", err);
+        grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:#ff4444;">
+      데이터 로딩 실패<br>
+      <span style="font-size:0.8rem; color:#aaa;">${err}</span>
+    </div>`;
+    }
+}
+
+function filterEquipment(keyword: string) {
+    if (!keyword) {
+        filteredEquipData = currentEquipData;
+    } else {
+        const lowerKey = keyword.toLowerCase();
+        filteredEquipData = currentEquipData.filter((item: any) => {
+            const name = item.name ? item.name.toLowerCase() : '';
+            const nameEn = item.name_en ? item.name_en.toLowerCase() : '';
+            return name.includes(lowerKey) || nameEn.includes(lowerKey);
+        });
+    }
+
+    equipCurrentPage = 1;
+    renderEquipGrid();
+    renderPagination();
+}
+
+function renderEquipGrid() {
+    const grid = document.getElementById('equip-grid')!;
+    grid.innerHTML = '';
+
+    if (filteredEquipData.length === 0) {
+        grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:50px; color:#888;">검색 결과가 없습니다.</div>';
+        return;
+    }
+
+    const start = (equipCurrentPage - 1) * ITEMS_PER_PAGE;
+    const end = start + ITEMS_PER_PAGE;
+    const pageItems = filteredEquipData.slice(start, end);
+
+    // 폴더 경로 설정
+    const rootFolder = isFarmingMode ? 'Farming' : 'Equipment';
+
+    pageItems.forEach((item: any) => {
+        const card = document.createElement('div');
+        card.className = 'equip-card';
+
+        // ★ [수정됨] 데이터에 있는 image 속성을 우선 사용
+        let imgFileName = '';
+        if (item.image) {
+            imgFileName = item.image; // 데이터에 "6-image.jpg"가 있으면 그거 사용
+        } else {
+            // 없으면 id 기반으로 추측
+            imgFileName = item.id ? `${item.id}.png` : 'unknown.png';
+        }
+
+        const basePath = `${rootFolder}/${currentCategory}/${imgFileName}`;
+
+        // 스탯 텍스트 처리 (데이터에 stats, stat, base_def 등 무엇이든 있으면 표시)
+        let statsHtml = '';
+
+        // 파밍 장비거나 스탯이 있는 경우
+        if (item.stats) {
+            // stats가 배열이거나 문자열일 수 있음. 문자열이면 줄바꿈 처리
+            const sText = Array.isArray(item.stats) ? item.stats.join('<br>') : item.stats.replace(/\n/g, '<br>');
+            statsHtml = `<div class="equip-stats highlight">${sText}</div>`;
+        } else if (item.base_def) {
+            statsHtml = `<div class="equip-stats">DEF: ${item.base_def}</div>`;
+        } else if (item.base_atk) {
+            statsHtml = `<div class="equip-stats">ATK: ${item.base_atk}</div>`;
+        }
+
+        // ★ 핵심: PNG -> JPG -> Fallback 순서로 로딩하는 이미지 태그 생성
+        // onerror에서 this.src를 바꾸고, onerror를 null로 만들어 무한 루프 방지
+        const imgTag = `
+      <img src="${basePath}" 
+        onerror="this.onerror=null; this.src='https://toram-id.info/img/skill/unknown.png';" 
+        alt="${item.name}">
+    `;
+
+        card.innerHTML = `
+      <div class="equip-img-box">
+        ${imgTag}
+      </div>
+      <div class="equip-info">
+        <div class="equip-name">${item.name}</div>
+        <div class="equip-name-en">${item.name_en || ''}</div>
+        ${statsHtml}
+      </div>
+    `;
+        grid.appendChild(card);
+    });
+}
+
+function renderPagination() {
+    const container = document.getElementById('equip-pagination')!;
+    container.innerHTML = '';
+
+    const totalPages = Math.ceil(filteredEquipData.length / ITEMS_PER_PAGE);
+    if (totalPages <= 1) return;
+
+    const createBtn = (text: string, onClick: () => void, disabled: boolean) => {
+        const btn = document.createElement('button');
+        btn.innerText = text;
+        btn.disabled = disabled;
+        btn.onclick = onClick;
+        return btn;
+    };
+
+    container.appendChild(createBtn('Prev', () => {
+        equipCurrentPage--;
+        renderEquipGrid();
+        renderPagination();
+    }, equipCurrentPage === 1));
+
+    const pageInfo = document.createElement('span');
+    pageInfo.className = 'page-info';
+    pageInfo.innerText = `${equipCurrentPage} / ${totalPages}`;
+    container.appendChild(pageInfo);
+
+    container.appendChild(createBtn('Next', () => {
+        equipCurrentPage++;
+        renderEquipGrid();
+        renderPagination();
+    }, equipCurrentPage === totalPages));
 }
 // =================================================
 // [기능] 낮/밤 테마 토글 (Day/Night Switch)

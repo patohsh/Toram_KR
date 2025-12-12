@@ -946,3 +946,152 @@ button {
 body.dark-mode .trait-tier-val {
     color: #FFD54F; /* [밤] 밝은 노란색/금색 */
 }
+
+
+/* --- [장비 검색 페이지] --- */
+
+/* 3x3 그리드 레이아웃 */
+.equip-grid-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3열 고정 */
+    gap: 15px;
+    min-height: 400px;
+}
+
+/* 반응형: 모바일에서는 1열 */
+@media (max-width: 600px) {
+    .equip-grid-container {
+        grid-template-columns: repeat(1, 1fr);
+    }
+}
+
+/* 장비 카드 스타일 */
+.equip-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: transform 0.2s, border-color 0.2s;
+    height: 100%;
+}
+
+    .equip-card:hover {
+        border-color: var(--accent-pink);
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+.equip-img-box {
+    width: 150px;
+    height: 190px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+    .equip-img-box img {
+        max-width: 140px;
+        max-height: 190px;
+        object-fit: contain;
+        filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
+    }
+
+.equip-name {
+    font-weight: bold;
+    color: var(--accent-light);
+    margin-bottom: 4px;
+    font-size: 1rem;
+}
+
+.equip-name-en {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+}
+
+.equip-stats {
+    font-size: 0.85rem;
+    color: var(--text-main);
+    background: rgba(0,0,0,0.2);
+    padding: 4px 8px;
+    border-radius: 4px;
+    width: 100%;
+}
+
+/* 페이지네이션 */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 30px;
+    padding-bottom: 20px;
+}
+
+    .pagination button {
+        background: var(--card-bg);
+        border: 1px solid var(--accent-pink);
+        color: var(--text-main);
+        padding: 8px 16px;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+        .pagination button:disabled {
+            border-color: var(--border-color);
+            color: var(--text-dim);
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .pagination button:not(:disabled):hover {
+            background: var(--accent-pink);
+            color: white;
+        }
+
+.page-info {
+    font-weight: bold;
+    color: var(--accent-light);
+}
+
+/* 파밍 모드 전환 버튼 */
+.btn-mode-farming {
+    background: transparent;
+    border: 1px solid var(--success-color);
+    color: var(--success-color);
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+    .btn-mode-farming:hover {
+        background: rgba(0, 255, 157, 0.1);
+    }
+
+    .btn-mode-farming.active {
+        background: var(--success-color);
+        color: #000;
+        box-shadow: 0 0 10px var(--success-color);
+    }
+
+/* 장비 스탯 텍스트 (파밍 장비용 강조) */
+.equip-stats.highlight {
+    color: #ffcc00; /* 금색 */
+    background: rgba(255, 204, 0, 0.1);
+    border: 1px solid rgba(255, 204, 0, 0.3);
+    text-align: left;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    margin-top: 5px;
+}
