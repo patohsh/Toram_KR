@@ -1281,14 +1281,26 @@ async function loadRegistletData() {
         if (!res.ok) throw new Error('File not found');
         const text = await res.text();
 
-        const objectText = text.substring(text.indexOf('{'));
-        const db = new Function(`return ${objectText}`)();
+        // 이렇게 하면 const 변수명이 무엇이든, export가 있든 없든 상관없이 객체만 가져옵니다.
+        const start = text.indexOf('{');
+        const end = text.lastIndexOf('}');
 
+        if (start === -1 || end === -1) {
+            throw new Error("Invalid Data Format: Object {} not found");
+        }
+
+        const jsonContent = text.substring(start, end + 1);
+
+        // 자바스크립트 객체로 변환
+        const db = new Function(`return ${jsonContent}`)();
+
+        // 데이터 추출 (items 배열 확인)
         if (db && Array.isArray(db.items)) {
             registletData = db.items;
             filterRegistlets();
         } else {
-            throw new Error('Invalid data format');
+            console.error("Loaded Data:", db); // 콘솔에서 데이터 구조 확인용
+            throw new Error("Data structure mismatch: 'items' array is missing");
         }
 
     } catch (err) {
