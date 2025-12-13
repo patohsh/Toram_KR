@@ -1,8 +1,8 @@
 ﻿const registletDB = {
     id: "registlet_list",
     name: "📍레지스트릿(박스) 리스트📍", // (Registlet List)
-    url_param: "Registlet",
-    description: "레지스트릿(Gem Case)의 전체 목록입니다. 종류, 획득 레벨, 상세 효과, 최대 레벨 및 변동 수치를 포함합니다. (데이터 출처: 레지스트릿 퍼스트 이미지)",
+    url_param: "registlet",
+    description: "레지스트릿(Gem Case)의 전체 목록입니다. 종류",
     items: [
         // ==================================================
         // 패시브 (공용)
@@ -554,20 +554,20 @@
             name: "레조넌스:가속",
             obtain_lv: [190, 250],
             description: "스킬:레조넌스의 강화내용이 가속타입으로 고정되나 증가률은 90% 저하",
-            max_lv_info: "Lv.9/50%
+            max_lv_info: "Lv.9/50%"
         },
         {
             category: "매직 블레이드 스킬",
-            name: "레조넌스:화력
+            name: "레조넌스:화력",
             obtain_lv: [170, 230],
             description: "스킬:레조넌스의 강화내용이 화력입으로 고정되나 증가률은 90% 저하",
-            max_lv_info: "Lv.9/50%
+            max_lv_info: "Lv.9/50%"
         },
         {
             category: "매직 블레이드 스킬",
             name: "에텔플레아:만능",
             obtain_lv: [170],
-            description: "스킬:에테르 플레어는 대상에게 약점 속성으로 공격을 안해도 공격Mp회복이 가능해진다:,
+            description: "스킬:에테르 플레어는 대상에게 약점 속성으로 공격을 안해도 공격Mp회복이 가능해진다",
             max_lv_info: "Lv.1 Max"
         },
         {
