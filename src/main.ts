@@ -1,125 +1,42 @@
 ﻿// src/main.ts
 import './style.css';
 
-import {
-    EnchantCategory,
-    Grimoire,
-    EnchantItem
-} from './lib/Enchant/EnchantBase';
-
-// ▼▼▼ 수정됨: StatTypes의 경로를 올바르게 변경했습니다 ▼▼▼
-import { StatTypes } from './lib/Enchant/enums';
-import { EnchantDoll } from './lib/Enchant/EnchantDoll';
-import { EnchantStat } from './lib/Enchant/EnchantBuild';
-import { enchantConfig } from './lib/Enchant/state';
+// =================================================
+// 1. 토람 이벤트 스케줄 데이터
+// =================================================
+const eventSchedule = [
+    { month: "연초", title: "신년맞이 이벤트" },
+    { month: "1월", title: "메기스톤 & 고난도 (1분기)" },
+    { month: "2월", title: "눈싸움 이벤트 / 발렌타인" },
+    { month: "3월", title: "화이트데이" },
+    { month: "4월", title: "벚꽃맞이 이벤트 / 고난도 (2분기)" },
+    { month: "5월", title: "골든위크 / 황금 이벤트" },
+    { month: "6월", title: "장마 이벤트" },
+    { month: "7월", title: "여름 이벤트 / 주년제 이벤트 / 고난도 (3분기)" },
+    { month: "8월", title: "이스터에그" },
+    { month: "9월", title: "가을미각 / 황금포툼 / 고난도 (4분기)" },
+    { month: "10월", title: "할로윈 이벤트" },
+    { month: "11월", title: "크리스마스 이벤트" },
+    { month: "상시/비정기", title: "N만명 다운로드 기념 / 콜라보 이벤트 / 복각" }
+];
 
 // =================================================
-// 1. 데이터베이스 구축
-// =================================================
-
-const catStatus = new EnchantCategory("Basic Stats");
-const catAttack = new EnchantCategory("Attack");
-const catCrit = new EnchantCategory("Critical");
-const catDef = new EnchantCategory("Defense");
-const catHpMp = new EnchantCategory("HP / MP");
-const catSpeed = new EnchantCategory("Speed / Dodge");
-const catElements = new EnchantCategory("Elements & DTE");
-
-// 아이템 저장소 (초기 화면 렌더링용)
-const items: Record<string, EnchantItem> = {};
-
-function addItem(
-    cat: EnchantCategory,
-    id: string,
-    name: string,
-    potC: number | null,
-    potM: number | null,
-    limit: number,
-    matType: number = 0
-) {
-    const item = cat.appendItem({
-        baseId: id,
-        potential: [potC ?? 0, potM ?? 0],
-        limit: [[null, null], [limit, -1 * limit]],
-        extraLimit: [[null, null], [null, null]],
-        unitValue: [[1, 1], [1, 1]],
-        materialPointType: matType as any,
-        materialPointValue: [null, null],
-        potentialConvertThreshold: [null, null]
-    });
-
-    (item.statBase as any).name = name;
-    (item.statBase as any).hasMultiplier = (potM !== null && potM !== 0);
-
-    // 아이템 저장 (나중에 쓰기 위해)
-    items[id] = item;
-
-    return item;
-}
-
-// --- 데이터 정의 (중복 제거됨) ---
-
-// Stats
-addItem(catStatus, 'str', 'STR', 5, 10, 50, 1);
-addItem(catStatus, 'dex', 'DEX', 5, 10, 50, 1);
-addItem(catStatus, 'int', 'INT', 5, 10, 50, 1);
-addItem(catStatus, 'vit', 'VIT', 5, 10, 50, 1);
-addItem(catStatus, 'agi', 'AGI', 5, 10, 50, 1);
-
-// Attack
-addItem(catAttack, 'atk', 'ATK', 3, 10, 50, 2);
-addItem(catAttack, 'matk', 'MATK', 3, 10, 50, 5);
-addItem(catAttack, 'ppierce', '물리관통', null, 20, 20, 2);
-addItem(catAttack, 'mpierce', '마법관통', null, 20, 20, 5);
-
-// Critical (변수 선언 대신 items 객체에 저장됨)
-addItem(catCrit, 'cdmg', '크리티컬 데미지', 3, 10, 50, 5);
-addItem(catCrit, 'crit', '크리티컬률', 1, 1, 50, 5);
-
-// Defense
-addItem(catDef, 'def', 'DEF', 3, 10, 50, 0);
-addItem(catDef, 'mdef', 'MDEF', 3, 10, 50, 0);
-
-// HP/MP & Speed
-addItem(catHpMp, 'hp_regen', 'HP자연회복', 10, 20, 50, 4);
-addItem(catHpMp, 'mp_regen', 'MP자연회복', 20, 40, 20, 5);
-addItem(catSpeed, 'dodge', '회피', 3, 10, 50, 0);
-addItem(catSpeed, 'acc', '명중', 10, 20, 50, 0);
-
-// Elements
-addItem(catElements, 'ele_fire', 'Element: 불', 100, null, 1, 5);
-addItem(catElements, 'ele_water', 'Element: 물', 100, null, 1, 5);
-addItem(catElements, 'ele_wind', 'Element: 바람', 100, null, 1, 5);
-addItem(catElements, 'ele_earth', 'Element: 땅', 100, null, 1, 5);
-addItem(catElements, 'ele_light', 'Element: 빛', 100, null, 1, 5);
-addItem(catElements, 'ele_dark', 'Element: 어둠', 100, null, 1, 5);
-addItem(catElements, 'dte_fire', '불속성 데미지 ', null, 5, 20, 5);
-addItem(catElements, 'dte_water', ' 물속성 데미지 ', null, 5, 20, 5);
-addItem(catElements, 'dte_wind', ' 바람속성 데미지 ', null, 5, 20, 5);
-addItem(catElements, 'dte_earth', ' 땅속성 데미지 ', null, 5, 20, 5);
-addItem(catElements, 'dte_light', ' 빛속성 데미지 ', null, 5, 20, 5);
-addItem(catElements, 'dte_dark', ' 어둠속성 데미지 ', null, 5, 20, 5);
-
-Grimoire.Enchant.categorys.push(catStatus, catAttack, catCrit, catDef, catHpMp, catSpeed, catElements);
-
-
-// =================================================
-// 2. 앱 라우팅 및 페이지 렌더링
+// 2. 앱 라우팅 및 렌더링
 // =================================================
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
 
-// --- [Page 1] 홈 화면 ui결정---
+// --- [Page 1] 홈 화면 ---
 function renderHomePage() {
     app.innerHTML = `
     <div class="home-container">
-      <h1 class="home-title">🌸 토람 리모컨</h1>
+      <h1 class="home-title">🌸 토람 종합 정보정리 가이드</h1>
       
       <div class="menu-grid">
-        <!-- 기존 메뉴 -->
-        <div class="menu-card" id="go-enchant">
-          <div class="menu-icon">⚔️</div>
-          <div class="menu-text">옵션 부여 시뮬레이션<br> (조정중)</div>
+        <!-- 이벤트 스케줄 (구 옵션부여) -->
+        <div class="menu-card" id="go-schedule">
+          <div class="menu-icon">📅</div>
+          <div class="menu-text">이벤트 스케줄</div>
         </div>
         
         <div class="menu-card" id="go-crysta">
@@ -132,7 +49,6 @@ function renderHomePage() {
           <div class="menu-text">스킬 정보</div>
         </div>
 
-        <!-- 신규 메뉴 4종 -->
         <div class="menu-card" id="go-ability">
           <div class="menu-icon">🔮</div>
           <div class="menu-text">장비 어빌리티</div>
@@ -154,32 +70,61 @@ function renderHomePage() {
         </div>
 
         <div class="menu-card" id="go-guide">
-          <div class="menu-icon">📖</div>
+          <div class="menu-icon">📘</div>
           <div class="menu-text">뉴비 가이드</div>
         </div>
 
         <div class="menu-card" id="go-info">
           <div class="menu-icon">⭐</div>
-          <div class="menu-text">정보</div>
+          <div class="menu-text">참가자</div>
         </div>
-
       </div>
     </div>
   `;
 
     // 이벤트 바인딩
-    document.getElementById('go-enchant')?.addEventListener('click', renderEnchantPage);
+    document.getElementById('go-schedule')?.addEventListener('click', renderSchedulePage);
     document.getElementById('go-crysta')?.addEventListener('click', renderCrystaPage);
     document.getElementById('go-skill')?.addEventListener('click', renderSkillPage);
-
-    // 신규 이벤트 바인딩
     document.getElementById('go-ability')?.addEventListener('click', renderAbilityPage);
     document.getElementById('go-registlet')?.addEventListener('click', renderRegistletPage);
     document.getElementById('go-food')?.addEventListener('click', renderFoodPage);
     document.getElementById('go-equip')?.addEventListener('click', renderEquipmentPage);
     document.getElementById('go-guide')?.addEventListener('click', renderGuidePage);
     document.getElementById('go-info')?.addEventListener('click', renderInfoPage);
+}
 
+// --- [Page 2] 이벤트 스케줄 페이지 ---
+function renderSchedulePage() {
+    const listHtml = eventSchedule.map(item => `
+    <div class="event-row" style="display:flex; padding:15px; border-bottom:1px dashed var(--border-color); align-items:center;">
+      <div class="event-month" style="width:80px; font-weight:bold; color:var(--accent-pink); background:rgba(255,0,127,0.1); padding:5px 10px; border-radius:20px; text-align:center; margin-right:15px; flex-shrink:0;">
+        ${item.month}
+      </div>
+      <div class="event-title" style="font-size:1.1rem; color:var(--text-main); line-height:1.4;">
+        ${item.title}
+      </div>
+    </div>
+  `).join('');
+
+    app.innerHTML = `
+    <div class="nav-bar">
+      <button class="btn-home" id="back-home">🏠 Home</button>
+      <h2 style="margin:0 0 0 15px; border:none;">📅 이벤트 스케줄</h2>
+    </div>
+
+    <div class="container" style="max-width:800px;">
+      <div class="schedule-box" style="background:var(--card-bg); border:1px solid var(--border-color); border-radius:15px; padding:20px; box-shadow:0 4px 15px rgba(0,0,0,0.2);">
+        ${listHtml}
+      </div>
+
+      <div style="text-align:center; margin-top:30px; color:#888; font-size:0.9rem;">
+        ※ 일정은 운영사 사정에 따라 변경될 수 있습니다.
+      </div>
+    </div>
+  `;
+
+    document.getElementById('back-home')?.addEventListener('click', renderHomePage);
 }
 
 // --- [Page 2] 크리스타 페이지 (기능 구현 완료) ---
@@ -690,308 +635,6 @@ function showSkillDetail(skill: any, imgSrc: string, fallback: string) {
 // [초기화]
 // =================================================
 renderHomePage();
-// --- [Page 4] 강화 시뮬레이터 (핵심 로직 포함) ---
-function renderEnchantPage() {
-    app.innerHTML = `
-    <div class="nav-bar">
-      <button class="btn-home" id="back-home">🏠 Home</button>
-      <h2 style="margin:0 0 0 15px; border:none;">⚔️ 옵션부여 시뮬</h2>
-    </div>
-
-    <div>
-      <div class="section">
-        <h2>1. 초기설정</h2>
-        <div style="margin-bottom: 15px;">
-          <label><input type="radio" name="eqType" value="weapon" checked> 무기</label>
-          <label><input type="radio" name="eqType" value="armor"> 방어구</label>
-          <span style="margin:0 10px; color:#555">|</span>
-          잠재력: <input type="number" id="base-pot" value="81">
-        </div>
-        <div style="display:flex; gap:15px; align-items:center;">
-          <label> 캐릭터 Lv: <input type="number" id="char-lv" value="290"></label>
-          <label> 스미스 Lv: <input type="number" id="smith-lv" value="290"></label>
-        </div>
-      </div>
-
-      <div class="section">
-        <h2>2. ➕ 옵션 (Positive)</h2>
-        <div id="target-list"></div>
-        <div style="text-align:center; margin-top:15px;">
-          <button id="btn-add-pos">➕ 옵션 추가</button>
-        </div>
-      </div>
-
-      <div class="section">
-        <h2>3. -옵션 (Penalty)</h2>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-          <label style="cursor:pointer;">
-            <input type="checkbox" id="chk-auto-neg" checked> 
-            자동- 옵션 버튼 (고장났습니다.)
-          </label>
-          <button id="btn-add-neg" class="secondary" style="display:none;">➖ 옵션 추가</button>
-        </div>
-        <div id="negative-list"></div>
-        <p id="auto-desc" style="font-size:0.9em; color:var(--text-dim)">
-          * Automatically selects optimized penalties (DEF%, MDEF%, Dodge, etc.)
-        </p>
-      </div>
-
-      <div style="text-align:center; margin:30px;">
-        <button id="run-btn" style="font-size:1.2em; padding:12px 40px; box-shadow: 0 0 15px var(--accent-pink);">🚀 실행</button>
-      </div>
-
-      <div id="result-area" class="section" style="display:none;">
-        <h2> 결과</h2>
-        <div id="result-summary" style="font-size:1.1em; margin-bottom:15px; padding:10px; background:rgba(0,0,0,0.3); border-radius:5px;"></div>
-        <h3 style="margin-top:20px; border-bottom:1px solid #444; padding-bottom:5px;">🛠️ 레시피</h3>
-        <div id="material-output" style="display:grid; grid-template-columns: repeat(6, 1fr); gap:5px; margin-bottom:20px; text-align:center;"></div>
-        <h3>👣 스텝</h3>
-        <div id="steps-output"></div>
-      </div>
-    </div>
-
-    <!-- 모달 팝업 -->
-    <div id="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; justify-content:center; align-items:center;">
-      <div style="background:var(--card-bg); width:500px; max-height:80vh; border:1px solid var(--accent-pink); border-radius:10px; padding:20px; display:flex; flex-direction:column;">
-        <h3 id="modal-title" style="margin-top:0; color:var(--accent-light)">Select Stat</h3>
-        <div id="modal-content" style="overflow-y:auto; flex:1; padding-right:5px;"></div>
-        <div style="text-align:right; margin-top:15px;">
-          <button class="secondary" id="btn-close-modal">Close</button>
-        </div>
-      </div>
-    </div>
-  `;
-
-    // 뒤로가기 버튼 이벤트
-    document.getElementById('back-home')?.addEventListener('click', renderHomePage);
-
-    // 강화 로직 실행
-    initEnchantLogic();
-}
-
-// =================================================
-// 3. 강화 시뮬레이터 로직 (Page Logic)
-// =================================================
-
-// 상태 관리
-const state = {
-    positives: [] as any[],
-    negatives: [] as any[],
-    modalMode: 'positive' as 'positive' | 'negative'
-};
-
-function initEnchantLogic() {
-    // 초기값 (리셋 방지: 이미 값이 있으면 유지)
-    if (state.positives.length === 0) {
-        state.positives.push(
-            { item: items['cdmg'], type: StatTypes.Constant, value: 10 },
-            { item: items['cdmg'], type: StatTypes.Multiplier, value: 10 },
-            { item: items['crit'], type: StatTypes.Constant, value: 25 },
-            { item: items['crit'], type: StatTypes.Multiplier, value: 25 }
-        );
-    }
-    renderList();
-
-    // 이벤트 바인딩
-    document.getElementById('btn-add-pos')?.addEventListener('click', () => openModal('positive'));
-    document.getElementById('btn-add-neg')?.addEventListener('click', () => openModal('negative'));
-    document.getElementById('btn-close-modal')?.addEventListener('click', () => document.getElementById('modal-overlay')!.style.display = 'none');
-
-    document.getElementById('chk-auto-neg')?.addEventListener('change', (e) => {
-        const isChecked = (e.target as HTMLInputElement).checked;
-        document.getElementById('btn-add-neg')!.style.display = isChecked ? 'none' : 'inline-block';
-        document.getElementById('auto-desc')!.style.display = isChecked ? 'block' : 'none';
-        renderList();
-    });
-
-    document.getElementById('run-btn')?.addEventListener('click', runCalculation);
-}
-
-function renderList() {
-    const pContainer = document.getElementById('target-list');
-    const nContainer = document.getElementById('negative-list');
-    // 페이지 이동 시 DOM이 사라질 수 있으므로 체크
-    if (!pContainer || !nContainer) return;
-
-    pContainer.innerHTML = '';
-    state.positives.forEach((t: any, idx) => pContainer.appendChild(createRow(t, idx, 'positive')));
-
-    nContainer.innerHTML = '';
-    const isAuto = (document.getElementById('chk-auto-neg') as HTMLInputElement)?.checked;
-
-    if (!isAuto) {
-        if (state.negatives.length === 0) {
-            nContainer.innerHTML = `<div style="color:#666; text-align:center; padding:10px;">No penalties selected.</div>`;
-        }
-        state.negatives.forEach((t: any, idx) => nContainer.appendChild(createRow(t, idx, 'negative')));
-    } else {
-        nContainer.innerHTML = `<div style="color:#666; text-align:center;">Auto-selecting penalties...</div>`;
-    }
-}
-
-function createRow(data: any, idx: number, mode: 'positive' | 'negative') {
-    const row = document.createElement('div');
-    row.className = 'stat-row';
-    if (mode === 'negative') row.style.borderLeftColor = '#ffaa00';
-
-    const isPercent = (data.type === StatTypes.Multiplier);
-    const name = (data.item.statBase as any).name + (isPercent ? ' %' : '');
-
-    row.innerHTML = `
-    <span style="font-weight:bold;">${name}</span>
-    <div>
-      <button class="secondary" data-action="dec">-</button>
-      <input type="number" value="${data.value}" readonly style="width:50px;">
-      <button class="secondary" data-action="inc">+</button>
-      <button class="remove" data-action="del">×</button>
-    </div>
-  `;
-    row.querySelectorAll('button').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const action = (e.target as HTMLElement).dataset.action;
-            const arr = mode === 'positive' ? state.positives : state.negatives;
-            if (action === 'inc') arr[idx].value++;
-            if (action === 'dec') arr[idx].value--;
-            if (action === 'del') arr.splice(idx, 1);
-            renderList();
-        });
-    });
-    return row;
-}
-
-function openModal(mode: 'positive' | 'negative') {
-    state.modalMode = mode;
-    const overlay = document.getElementById('modal-overlay')!;
-    const content = document.getElementById('modal-content')!;
-    document.getElementById('modal-title')!.innerText = mode === 'positive' ? 'Select Target' : 'Select Penalty';
-    overlay.style.display = 'flex';
-    content.innerHTML = '';
-
-    Grimoire.Enchant.categorys.forEach(cat => {
-        const title = document.createElement('div');
-        title.innerText = cat.title;
-        title.style.fontWeight = 'bold';
-        title.style.marginTop = '10px';
-        title.style.borderBottom = '1px dashed #555';
-        content.appendChild(title);
-        const grid = document.createElement('div');
-        grid.style.display = 'grid';
-        grid.style.gridTemplateColumns = '1fr 1fr';
-        grid.style.gap = '5px';
-        cat.items.forEach(item => {
-            const pot = item.potential;
-            if (pot[StatTypes.Constant] !== 0) createStatBtn(grid, item, StatTypes.Constant);
-            if (pot[StatTypes.Multiplier] !== 0) createStatBtn(grid, item, StatTypes.Multiplier);
-        });
-        content.appendChild(grid);
-    });
-}
-
-function createStatBtn(container: HTMLElement, item: EnchantItem, type: StatTypes) {
-    const btn = document.createElement('button');
-    btn.style.textAlign = 'left';
-    btn.style.background = 'rgba(255,255,255,0.05)';
-    const isPercent = (type === StatTypes.Multiplier);
-    btn.innerText = (item.statBase as any).name + (isPercent ? ' %' : '');
-    btn.onclick = () => {
-        addStatToState(item, type);
-        document.getElementById('modal-overlay')!.style.display = 'none';
-    };
-    container.appendChild(btn);
-}
-
-function addStatToState(item: EnchantItem, type: StatTypes) {
-    const isPercent = (type === StatTypes.Multiplier);
-    if (state.modalMode === 'positive') {
-        state.positives.push({ item, type, value: isPercent ? 10 : 20 });
-    } else {
-        state.negatives.push({ item, type, value: -10 });
-    }
-    renderList();
-}
-
-function runCalculation() {
-    try {
-        const basePot = Number((document.getElementById('base-pot') as HTMLInputElement).value);
-        const charLv = Number((document.getElementById('char-lv') as HTMLInputElement).value);
-        const smithLv = Number((document.getElementById('smith-lv') as HTMLInputElement).value);
-        const isAuto = (document.getElementById('chk-auto-neg') as HTMLInputElement).checked;
-
-        enchantConfig.characterLevel = charLv;
-        enchantConfig.smithLevel = smithLv;
-
-        const doll = new EnchantDoll();
-        doll.build.equipment.originalPotential = basePot;
-
-        state.positives.forEach((t: any) => doll.appendPositiveStat(t.item, t.type, t.value));
-
-        let result;
-        if (isAuto) {
-            result = doll.autoFindNegaitveStats([], basePot);
-        } else {
-            const manualStats = state.negatives.map((n: any) => new EnchantStat(n.item, n.type, n.value));
-            result = { equipment: doll.calc(manualStats, basePot) };
-        }
-        renderResult(result);
-    } catch (e) {
-        alert("Error: " + e);
-    }
-}
-
-function renderResult(result: any) {
-    const area = document.getElementById('result-area')!;
-    const summary = document.getElementById('result-summary')!;
-    const stepsOut = document.getElementById('steps-output')!;
-    const matOut = document.getElementById('material-output')!;
-
-    area.style.display = 'block';
-    stepsOut.innerHTML = '';
-    matOut.innerHTML = '';
-
-    if (!result || !result.equipment) {
-        summary.innerHTML = `<span style="color:#ff4444; font-weight:bold;">Calculation Failed!</span>`;
-        return;
-    }
-
-    const eq = result.equipment;
-    const rate = Math.floor(eq.realSuccessRate);
-    const color = rate > 95 ? '#00ff9d' : (rate > 0 ? '#ffff00' : '#ff4444');
-
-    summary.innerHTML = `잠재 성공률: <strong style="color:${color}">${rate}%</strong> (소모 잠재: ${eq.lastStep?.remainingPotential ?? 0})`;
-
-    const mats = eq.allMaterialPointCost;
-    const matNames = ['금속', '짐승', '목재', '천', '약품', '마나'];
-    mats.forEach((val: number, idx: number) => {
-        const div = document.createElement('div');
-        div.style.background = 'rgba(255,255,255,0.05)';
-        div.style.padding = '5px';
-        div.style.borderRadius = '4px';
-        div.innerHTML = `<div style="font-size:0.8em; color:#aaa;">${matNames[idx]}</div><div style="font-weight:bold; color:var(--accent-light);">${val}</div>`;
-        matOut.appendChild(div);
-    });
-
-    if (eq.allSteps.length === 0) stepsOut.innerHTML = "<div style='padding:10px; color:#aaa'>No steps.</div>";
-
-    eq.allSteps.forEach((step: any, idx: number) => {
-        const statsHtml = step.stats.map((s: any) => {
-            const val = s.value > 0 ? `+${s.value}` : s.value;
-            const isNeg = s.value < 0;
-            const name = (s.itemBase.statBase as any).name;
-            const isPercent = (s.type === StatTypes.Multiplier);
-            return `<span class="badge ${isNeg ? 'neg' : ''}">${name}${isPercent ? '%' : ''} ${val}</span>`;
-        }).join(' ');
-
-        const div = document.createElement('div');
-        div.className = 'step-item';
-        div.innerHTML = `
-      <div style="margin-bottom:5px;">
-        <strong>순서 ${idx + 1}</strong> <span style="font-size:0.8em; color:#888;">(${step.type === 1 ? 'Each' : 'Normal'}) Cost: ${step.potentialCost} | Pot: ${step.remainingPotential}</span>
-      </div>
-      <div>${statsHtml}</div>
-    `;
-        stepsOut.appendChild(div);
-    });
-}
 
 // =================================================
 // [초기 실행] 홈 화면 표시
@@ -1177,11 +820,9 @@ function getCatName(cat: string) {
 
 const REGISTLET_CATEGORIES = [
     "패시브", "블레이드 스킬", "슛 스킬", "매직 스킬", "마샬 스킬",
-    "무사 스킬", "할버드 스킬", "듀얼소드 스킬", "서바이벌 스킬",
-    "배틀 스킬", "민스트럴 스킬", "다크파워 스킬", "서포트 스킬",
-    "매직 블레이드 스킬", "기사 스킬", "위자드 스킬", "어쌔신 스킬",
-    "댄서 스킬", "쉴드 스킬", "크러셔 스킬", "헌터 스킬",
-    "프리스트 스킬", "닌자 스킬", "특수"
+    "무사 스킬", "할버드 스킬", "듀얼소드 스킬", "크러셔 스킬",
+    "매직 디바이스 스킬", "민스트럴 스킬", "다크파워 스킬",
+    "기사 스킬", "어쌔신 스킬", "댄서 스킬", "쉴드 스킬", "특수"
 ];
 
 const LEVEL_RANGES = {
@@ -1282,26 +923,14 @@ async function loadRegistletData() {
         if (!res.ok) throw new Error('File not found');
         const text = await res.text();
 
-        // 이렇게 하면 const 변수명이 무엇이든, export가 있든 없든 상관없이 객체만 가져옵니다.
-        const start = text.indexOf('{');
-        const end = text.lastIndexOf('}');
+        const objectText = text.substring(text.indexOf('{'));
+        const db = new Function(`return ${objectText}`)();
 
-        if (start === -1 || end === -1) {
-            throw new Error("Invalid Data Format: Object {} not found");
-        }
-
-        const jsonContent = text.substring(start, end + 1);
-
-        // 자바스크립트 객체로 변환
-        const db = new Function(`return ${jsonContent}`)();
-
-        // 데이터 추출 (items 배열 확인)
         if (db && Array.isArray(db.items)) {
             registletData = db.items;
             filterRegistlets();
         } else {
-            console.error("Loaded Data:", db); // 콘솔에서 데이터 구조 확인용
-            throw new Error("Data structure mismatch: 'items' array is missing");
+            throw new Error('Invalid data format');
         }
 
     } catch (err) {
@@ -1936,12 +1565,21 @@ function toggleTheme() {
         localStorage.setItem('toram-theme', 'light');
     }
 }
-
 // =================================================
-// [Page 8] 뉴비 가이드 (Newbie Guide)
+// [Page 8] 뉴비 가이드 (Newbie Guide) - 탭 기능 추가
 // =================================================
 
-let guideList: any[] = [];
+// 가이드 카테고리 설정
+const GUIDE_TABS = [
+    { id: 'menu', name: '메뉴 (기본)', file: 'guideData.js' },
+    { id: 'money', name: '돈 벌기', file: 'money.js' },
+    { id: 'raid', name: '레이드', file: 'raid.js' },
+    { id: 'myroom', name: '마이룸', file: 'myroom.js' },
+    { id: 'empty', name: '(준비중)', file: '' } // 공란
+];
+
+let currentGuideTab = 'menu'; // 현재 선택된 탭
+let guideDataCache: Record<string, any[]> = {}; // 데이터 캐싱
 
 function renderGuidePage() {
     app.innerHTML = `
@@ -1951,12 +1589,24 @@ function renderGuidePage() {
     </div>
 
     <div class="container">
-      <!-- 검색창 -->
+      
+      <!-- 1. 상단 탭 (포스트잇 스타일) -->
+      <div class="guide-tabs">
+        ${GUIDE_TABS.map(tab => `
+          <button class="guide-tab-btn ${tab.id === currentGuideTab ? 'active' : ''}" 
+                  data-id="${tab.id}" 
+                  ${!tab.file ? 'disabled' : ''}>
+            ${tab.name}
+          </button>
+        `).join('')}
+      </div>
+
+      <!-- 2. 검색창 -->
       <div class="search-container" style="background:transparent; border:none; padding:0; margin-bottom:20px;">
         <input type="text" id="guide-search" class="search-input" placeholder="제목 또는 내용 검색...">
       </div>
 
-      <!-- 가이드 리스트 (1단) -->
+      <!-- 3. 가이드 리스트 -->
       <div id="guide-list" class="guide-list-container">
         <div style="text-align:center; padding:50px; color:#888;">데이터 로딩 중...</div>
       </div>
@@ -1964,47 +1614,83 @@ function renderGuidePage() {
   `;
 
     document.getElementById('back-home')?.addEventListener('click', renderHomePage);
+
+    // 탭 클릭 이벤트
+    document.querySelectorAll('.guide-tab-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const target = e.target as HTMLElement;
+            if (target.getAttribute('disabled') !== null) return;
+
+            // UI 업데이트
+            document.querySelectorAll('.guide-tab-btn').forEach(b => b.classList.remove('active'));
+            target.classList.add('active');
+
+            // 데이터 로드
+            currentGuideTab = target.dataset.id!;
+            loadGuideData(currentGuideTab);
+        });
+    });
+
+    // 검색 이벤트
     document.getElementById('guide-search')?.addEventListener('input', (e) => {
         const keyword = (e.target as HTMLInputElement).value.trim();
         renderGuideItems(keyword);
     });
 
-    loadGuideData();
+    // 초기 로드
+    loadGuideData(currentGuideTab);
 }
 
-async function loadGuideData() {
+async function loadGuideData(tabId: string) {
     const container = document.getElementById('guide-list')!;
 
-    if (guideList.length > 0) {
+    // 캐시에 있으면 바로 사용
+    if (guideDataCache[tabId]) {
         renderGuideItems('');
         return;
     }
 
+    container.innerHTML = '<div style="text-align:center; padding:50px;">로딩 중...</div>';
+
+    const tabInfo = GUIDE_TABS.find(t => t.id === tabId);
+    if (!tabInfo || !tabInfo.file) {
+        container.innerHTML = '<div style="text-align:center; padding:50px;">준비 중인 컨텐츠입니다.</div>';
+        return;
+    }
+
     try {
-        // ▼▼▼ 경로 수정됨 (guideDB 폴더 포함) ▼▼▼
-        const res = await fetch('guideDB/guideData.js');
+        // guideDB 폴더에서 파일 로드
+        const res = await fetch(`guideDB/${tabInfo.file}`);
         if (!res.ok) throw new Error('File not found');
         const text = await res.text();
 
+        // JS 파일 파싱 (const data = [...] 형태)
         const eqIndex = text.indexOf('=');
         let jsonContent = text.substring(eqIndex + 1).trim();
         if (jsonContent.endsWith(';')) jsonContent = jsonContent.slice(0, -1);
 
-        guideList = new Function(`return ${jsonContent}`)();
+        const data = new Function(`return ${jsonContent}`)();
+
+        // 캐시 저장 및 렌더링
+        guideDataCache[tabId] = data;
         renderGuideItems('');
 
     } catch (err) {
         console.error(err);
-        container.innerHTML = `<div style="text-align:center; color:#ff4444;">가이드 데이터를 불러올 수 없습니다.</div>`;
+        container.innerHTML = `<div style="text-align:center; color:#ff4444;">가이드 데이터를 불러올 수 없습니다.<br>(${tabInfo.file})</div>`;
     }
 }
 
 function renderGuideItems(keyword: string) {
-    const container = document.getElementById('guide-list')!;
+    const container = document.getElementById('guide-list');
+    if (!container) return;
+
     container.innerHTML = '';
 
+    const data = guideDataCache[currentGuideTab] || [];
     const lowerKey = keyword.toLowerCase();
-    const filtered = guideList.filter((item: any) => {
+
+    const filtered = data.filter((item: any) => {
         return item.title.toLowerCase().includes(lowerKey) || item.description.toLowerCase().includes(lowerKey);
     });
 
@@ -2017,17 +1703,26 @@ function renderGuideItems(keyword: string) {
         const card = document.createElement('div');
         card.className = 'guide-card';
 
-        // 제목 화살표 변환 로직
+        // 제목 화살표 변환
         const steps = item.title.split('-').map((s: string) => s.trim());
         const titleHtml = steps.join(' <span style="color:var(--accent-pink);">▶</span> ');
 
-        // 이미지 (데이터에 image 필드가 있다고 가정)
-        const imgHtml = item.image ? `<img src="GuideImg/${item.image}" class="guide-img" alt="${item.title}">` : '';
+        // ★ 수정됨: 이미지가 있으면 <img> 태그 생성, 없으면 빈 문자열
+        // onerror 제거: 이미지가 깨져도 엑박이나 빈 공간이 보여야 오류를 인지함.
+        // 만약 이미지가 정말 없을 때만 숨기고 싶다면, 데이터에 image 필드가 있는지 체크하는 것만으로 충분.
+
+        let imgContent = '';
+        if (item.image) {
+            // 이미지가 있으면 꽉 채워서 보여줌
+            imgContent = `<div class="guide-img-box"><img src="GuideImg/${item.image}" alt="${item.title}"></div>`;
+        }
 
         card.innerHTML = `
-      ${imgHtml}
-      <div class="guide-title-box">${titleHtml}</div>
-      <div class="guide-desc">${item.description.replace(/\n/g, '<br>')}</div>
+      ${imgContent}
+      <div class="guide-content">
+        <div class="guide-title-box">${titleHtml}</div>
+        <div class="guide-desc">${item.description.replace(/\n/g, '<br>')}</div>
+      </div>
     `;
         container.appendChild(card);
     });
@@ -2048,28 +1743,28 @@ function renderInfoPage() {
     <div class="container" style="max-width:600px;">
       
       <div class="info-card">
-        <h3>👑 제작 및 운영</h3>
-        <p><strong>주인(Owner):</strong> Your Name</p>
-        <p><strong>개발(Dev):</strong> Toram Tools Team</p>
+        <h3>👑 제작</h3>
+        <p><strong>제작/개발:</strong> patohsi </p>
+        <p><strong>토람 닉네임 (toram name):</strong> aoiusagi </p>
       </div>
 
       <div class="info-card">
-        <h3>🤝 참여해주신 분들</h3>
+        <h3>🤝 참여자 (토람온라인 닉네임) </h3>
         <ul style="padding-left:20px; color:var(--text-dim);">
-          <li>데이터 제공: User A</li>
-          <li>번역 도움: User B</li>
-          <li>디자인 조언: User C</li>
+          <li>데이터 제공: 스왈로 </li>
+          <li>이미지 도움: cat </li>
+          <li>디자인 조언: last night C</li>
         </ul>
       </div>
 
       <div class="info-card">
         <h3>📚 참고 데이터</h3>
-        <p>Toram Online Wiki, Coryn Club, Official Site</p>
+        <p>Toram Online Wiki, Coryn Club, 토람온라인 연구소, Aries 길드 </p>
       </div>
 
       <h3 style="margin-top:30px; border-bottom:1px solid #444; padding-bottom:10px;">🔗 관련 링크</h3>
       <div class="link-grid">
-        <a href="https://github.com" target="_blank" class="link-box">
+        <a href="https://github.com/patohsh/Toram_KR" target="_blank" class="link-box">
           <div class="link-icon">🐙</div>
           <div>GitHub</div>
         </a>
