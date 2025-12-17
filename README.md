@@ -1,8 +1,7 @@
 # Toram_KR
 토람온라인 한국어 다중 정보 검색 사이트 실시간 업데이트중...
+[link](toramremote.netlify.app)
 
-#[링크](toramremote.netlify.app)
-toramremote.netlify.app(toramremote.netlify.app)
 
 # 사용 가능 기능
 1. 월간 이벤트 목록
