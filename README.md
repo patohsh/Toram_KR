@@ -1,7 +1,7 @@
 # Toram_KR
 토람온라인 한국어 다중 정보 검색 사이트 실시간 업데이트중...
 <br>
-[link](toramremote.netlify.app)
+[link](https://toramremote.netlify.app/)
 
 
 # 사용 가능 기능
