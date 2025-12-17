@@ -93,7 +93,7 @@
         { name: "방랑자의 창", name_en: "Wanderer's Spear", image: "26-Wanderer's Spear.jpg" },
         { name: "워리어 엔젤 할버드", name_en: "Warrior Angel Halberd", image: "26-Warrior Angel Halberd.jpg" },
         { name: "윈드 블래스트 콘", name_en: "Windblast Cone Spear", image: "26-Windblast Cone Spear.jpg" },
-        { name: "요자쿠라 언월도", name_en: "Yozakura Naginata", image: "26-Yozakura Naginata.jpg" }
+        { name: "요자쿠라 언월도", name_en: "Yozakura Naginata", image: "26-Yozakura Naginata.jpg" },
         { name: "혁현의 창", name_en: "Hyeokhyeon's_Halberd", image: "Hyeokhyeon's_Halberd.jpg" }
     ]
 };

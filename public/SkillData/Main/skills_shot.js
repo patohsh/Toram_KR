@@ -35,7 +35,7 @@ const shotTree = {
         },
         {
             id: "bullseye",
-            name: "원활", // (Bullseye)
+            name: "원휠", // (Bullseye)
             tier: 1,
             type: "Active",
             mp_cost: 200,

@@ -2,7 +2,7 @@
 
 const petSkillTree = {
     id: "pet_skills",
-    name: "펫 스킬", // (Pet Skills)
+    name: "펫 🚗스킬", // (Pet Skills)
     url_param: "Pet",
     description: "펫이 습득하여 전투 중 자동으로 사용하는 스킬들입니다. (데이터 갱신: 20241102)",
     skills: [

@@ -1167,7 +1167,7 @@ function filterFoodCodes() {
 // 1. 일반 장비 카테고리
 const EQUIP_CATEGORIES: Record<string, string> = {
     'Handed_Sword': '한손검',
-    'big_handed_sword': '양손검',
+    'Two_Handed_Sword': '양손검',
     'bow': '활',
     'bowgun': '보우건',
     'staff': '지팡이',

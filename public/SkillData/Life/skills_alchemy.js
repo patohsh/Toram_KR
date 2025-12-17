@@ -1,260 +1,260 @@
-// skills_alchemy.js
+ï»¿// skills_alchemy.js
 
 const alchemyTree = {
     id: "alchemy",
-    name: "¿¬±Ý¼ú ½ºÅ³", // (Alchemy Skills)
+    name: "ì—°ê¸ˆìˆ  ðŸš—ìŠ¤í‚¬", // (Alchemy Skills)
     url_param: "Alchemy",
-    description: "¼ÒÀç¸¦ °¡°øÇÏ°Å³ª ¾ÆÀÌÅÛ, Àåºñ, ¿°»ö µîÀ» ÇÕ¼ºÇÏ´Â »ý»ê ½ºÅ³ÀÔ´Ï´Ù. (µ¥ÀÌÅÍ °»½Å: 20241102)",
+    description: "ì†Œìž¬ë¥¼ ê°€ê³µí•˜ê±°ë‚˜ ì•„ì´í…œ, ìž¥ë¹„, ì—¼ìƒ‰ ë“±ì„ í•©ì„±í•˜ëŠ” ìƒì‚° ìŠ¤í‚¬ìž…ë‹ˆë‹¤. (ë°ì´í„° ê°±ì‹ : 20241102)",
     skills: [
         // ==================================================
-        // 1Â÷ ½ºÅ³
+        // 1ì°¨ ìŠ¤í‚¬
         // ==================================================
         {
             id: "item_synthesis",
-            name: "¾ÆÀÌÅÛ ÇÕ¼º",
+            name: "ì•„ì´í…œ í•©ì„±",
             tier: 1,
-            type: "Active", // EX½ºÅ³
+            type: "Active", // EXìŠ¤í‚¬
             mp_cost: 0,
             element: "Neutral",
-            weapon: ["¸ðµç¹«±â"],
+            weapon: ["ëª¨ë“ ë¬´ê¸°"],
             description: `
-        [EX½ºÅ³ / ¸Þ´º¿¡¼­ »ç¿ë]
+        [EXìŠ¤í‚¬ / ë©”ë‰´ì—ì„œ ì‚¬ìš©]
         
-        - ¼Òºñ ¾ÆÀÌÅÛÀ» ÇÕ¼ºÇÒ ¼ö ÀÖ´Ù.
-        - NPC¿Í ´Þ¸® ½ºÇÇ³ª¸¦ »ç¿ëÇÏÁö ¾Ê´Â´Ù.
-        - (¼º°ø È®·üÀº ¼÷·Ãµµ¿Í ³­ÀÌµµ¿¡ µû¸§)
+        - ì†Œë¹„ ì•„ì´í…œì„ í•©ì„±í•  ìˆ˜ ìžˆë‹¤.
+        - NPCì™€ ë‹¬ë¦¬ ìŠ¤í”¼ë‚˜ë¥¼ ì‚¬ìš©í•˜ì§€ ì•ŠëŠ”ë‹¤.
+        - (ì„±ê³µ í™•ë¥ ì€ ìˆ™ë ¨ë„ì™€ ë‚œì´ë„ì— ë”°ë¦„)
       `
         },
         {
             id: "process_material",
-            name: "¼ÒÀç °¡°ø",
+            name: "ì†Œìž¬ ê°€ê³µ",
             tier: 1,
-            type: "Active", // EX½ºÅ³
+            type: "Active", // EXìŠ¤í‚¬
             mp_cost: 0,
             element: "Neutral",
-            weapon: ["¸ðµç¹«±â"],
+            weapon: ["ëª¨ë“ ë¬´ê¸°"],
             description: `
-        [EX½ºÅ³ / ÀÎº¥Åä¸®¿¡¼­ »ç¿ë]
+        [EXìŠ¤í‚¬ / ì¸ë²¤í† ë¦¬ì—ì„œ ì‚¬ìš©]
         
-        - ºÒÇÊ¿äÇÑ ¾ÆÀÌÅÛÀ» ¼ÒÀç Æ÷ÀÎÆ®·Î °¡°øÇÑ´Ù.
-        - ¼ÒÀç È¹µæ·®: [80 + ½ºÅ³·¾]% ~ 100%
-        - (½º¹Ì½º ½ºÅ³ÀÇ '¼ÒÀç °¡°ø'°ú ·¹º§À» °øÀ¯ÇÑ´Ù.)
+        - ë¶ˆí•„ìš”í•œ ì•„ì´í…œì„ ì†Œìž¬ í¬ì¸íŠ¸ë¡œ ê°€ê³µí•œë‹¤.
+        - ì†Œìž¬ íšë“ëŸ‰: [80 + ìŠ¤í‚¬ë ™]% ~ 100%
+        - (ìŠ¤ë¯¸ìŠ¤ ìŠ¤í‚¬ì˜ 'ì†Œìž¬ ê°€ê³µ'ê³¼ ë ˆë²¨ì„ ê³µìœ í•œë‹¤.)
       `
         },
         {
             id: "novice_bottle",
-            name: "ÃÊº¸ÀÇ ¾àº´",
+            name: "ì´ˆë³´ì˜ ì•½ë³‘",
             tier: 1,
             type: "Passive",
             mp_cost: 0,
             element: "Neutral",
-            weapon: ["¸ðµç¹«±â"],
+            weapon: ["ëª¨ë“ ë¬´ê¸°"],
             description: `
-        [ÆÐ½Ãºê]
+        [íŒ¨ì‹œë¸Œ]
         
-        - ¿¬±Ý¼ú ¼÷·Ãµµ »óÇÑ [5 ¡¿ ½ºÅ³·¾] »ó½Â
-        - (10·¹º§ ½Ã ¼÷·Ãµµ 50±îÁö ÇØ¹æ)
+        - ì—°ê¸ˆìˆ  ìˆ™ë ¨ë„ ìƒí•œ [5 Ã— ìŠ¤í‚¬ë ™] ìƒìŠ¹
+        - (10ë ˆë²¨ ì‹œ ìˆ™ë ¨ë„ 50ê¹Œì§€ í•´ë°©)
       `
         },
 
         // ==================================================
-        // 2Â÷ ½ºÅ³
+        // 2ì°¨ ìŠ¤í‚¬
         // ==================================================
         {
             id: "craftsman_bottle",
-            name: "ÀåÀÎÀÇ ¾àº´",
+            name: "ìž¥ì¸ì˜ ì•½ë³‘",
             tier: 2,
             type: "Passive",
             mp_cost: 0,
             element: "Neutral",
-            weapon: ["¸ðµç¹«±â"],
+            weapon: ["ëª¨ë“ ë¬´ê¸°"],
             description: `
-        [ÆÐ½Ãºê]
+        [íŒ¨ì‹œë¸Œ]
         
-        - ¿¬±Ý¼ú ¼÷·Ãµµ »óÇÑ [5 ¡¿ ½ºÅ³·¾] »ó½Â
-        - (10·¹º§ ½Ã ¼÷·Ãµµ 100±îÁö ÇØ¹æ)
+        - ì—°ê¸ˆìˆ  ìˆ™ë ¨ë„ ìƒí•œ [5 Ã— ìŠ¤í‚¬ë ™] ìƒìŠ¹
+        - (10ë ˆë²¨ ì‹œ ìˆ™ë ¨ë„ 100ê¹Œì§€ í•´ë°©)
       `
         },
         {
             id: "mid_synthesis",
-            name: "Áß±Þ ÇÕ¼º¼ú",
+            name: "ì¤‘ê¸‰ í•©ì„±ìˆ ",
             tier: 2,
             type: "Passive",
             mp_cost: 0,
             element: "Neutral",
-            weapon: ["¸ðµç¹«±â"],
+            weapon: ["ëª¨ë“ ë¬´ê¸°"],
             description: `
-        [ÆÐ½Ãºê]
+        [íŒ¨ì‹œë¸Œ]
         
-        - ¾ÆÀÌÅÛ ÇÕ¼º ¼º°ø·ü [½ºÅ³·¾]% Áõ°¡
+        - ì•„ì´í…œ í•©ì„± ì„±ê³µë¥  [ìŠ¤í‚¬ë ™]% ì¦ê°€
       `
         },
         {
             id: "equip_synthesis",
-            name: "Àåºñ ÇÕ¼º",
+            name: "ìž¥ë¹„ í•©ì„±",
             tier: 2,
-            type: "Active", // EX½ºÅ³
+            type: "Active", // EXìŠ¤í‚¬
             mp_cost: 0,
             element: "Neutral",
-            weapon: ["¸ðµç¹«±â"],
+            weapon: ["ëª¨ë“ ë¬´ê¸°"],
             description: `
-        [EX½ºÅ³ / ¸Þ´º¿¡¼­ »ç¿ë]
-        ÀåºñÀÇ ¿ÜÇü, ¿°»ö, ¼º´ÉÀ» ÇÕ¼ºÇÑ´Ù.
+        [EXìŠ¤í‚¬ / ë©”ë‰´ì—ì„œ ì‚¬ìš©]
+        ìž¥ë¹„ì˜ ì™¸í˜•, ì—¼ìƒ‰, ì„±ëŠ¥ì„ í•©ì„±í•œë‹¤.
         
-        [È®Á¤ °¡´É ¼ö (Àá±Ý)]
-        - 1È®Á¤: ÀåºñÇÕ¼º 1·¹º§ ÇØ±Ý
-        - 2È®Á¤: ¿¬±Ý¼ú ¼÷·Ãµµ 50 ÇØ±Ý
-        - 3È®Á¤: ¿¬±Ý¼ú ¼÷·Ãµµ 100 ÇØ±Ý
-        - 4È®Á¤: ¿¬±Ý¼ú ¼÷·Ãµµ 150 ÇØ±Ý
-        - 5È®Á¤: ¿¬±Ý¼ú ¼÷·Ãµµ 200 ÇØ±Ý
+        [í™•ì • ê°€ëŠ¥ ìˆ˜ (ìž ê¸ˆ)]
+        - 1í™•ì •: ìž¥ë¹„í•©ì„± 1ë ˆë²¨ í•´ê¸ˆ
+        - 2í™•ì •: ì—°ê¸ˆìˆ  ìˆ™ë ¨ë„ 50 í•´ê¸ˆ
+        - 3í™•ì •: ì—°ê¸ˆìˆ  ìˆ™ë ¨ë„ 100 í•´ê¸ˆ
+        - 4í™•ì •: ì—°ê¸ˆìˆ  ìˆ™ë ¨ë„ 150 í•´ê¸ˆ
+        - 5í™•ì •: ì—°ê¸ˆìˆ  ìˆ™ë ¨ë„ 200 í•´ê¸ˆ
         
-        - ±âº» ¼º°ø·ü: [½ºÅ³·¾ ¡¿ 10]%
+        - ê¸°ë³¸ ì„±ê³µë¥ : [ìŠ¤í‚¬ë ™ Ã— 10]%
       `
         },
 
         // ==================================================
-        // 3Â÷ ½ºÅ³
+        // 3ì°¨ ìŠ¤í‚¬
         // ==================================================
         {
             id: "blacksmith_bottle",
-            name: "´ëÀå°£ÀÇ ¾àº´",
+            name: "ëŒ€ìž¥ê°„ì˜ ì•½ë³‘",
             tier: 3,
             type: "Passive",
             mp_cost: 0,
             element: "Neutral",
-            weapon: ["¸ðµç¹«±â"],
+            weapon: ["ëª¨ë“ ë¬´ê¸°"],
             description: `
-        [ÆÐ½Ãºê]
+        [íŒ¨ì‹œë¸Œ]
         
-        - ¿¬±Ý¼ú ¼÷·Ãµµ »óÇÑ [5 ¡¿ ½ºÅ³·¾] »ó½Â
-        - (10·¹º§ ½Ã ¼÷·Ãµµ 150±îÁö ÇØ¹æ)
+        - ì—°ê¸ˆìˆ  ìˆ™ë ¨ë„ ìƒí•œ [5 Ã— ìŠ¤í‚¬ë ™] ìƒìŠ¹
+        - (10ë ˆë²¨ ì‹œ ìˆ™ë ¨ë„ 150ê¹Œì§€ í•´ë°©)
       `
         },
         {
             id: "high_synthesis",
-            name: "»ó±Þ ÇÕ¼º¼ú",
+            name: "ìƒê¸‰ í•©ì„±ìˆ ",
             tier: 3,
             type: "Passive",
             mp_cost: 0,
             element: "Neutral",
-            weapon: ["¸ðµç¹«±â"],
+            weapon: ["ëª¨ë“ ë¬´ê¸°"],
             description: `
-        [ÆÐ½Ãºê]
+        [íŒ¨ì‹œë¸Œ]
         
-        - ¾ÆÀÌÅÛ ÇÕ¼º ¼º°ø·ü [½ºÅ³·¾]% Áõ°¡
+        - ì•„ì´í…œ í•©ì„± ì„±ê³µë¥  [ìŠ¤í‚¬ë ™]% ì¦ê°€
       `
         },
         {
             id: "synthesis_tech_1",
-            name: "ÇÕ¼º±â¼ú Çâ»ó I",
+            name: "í•©ì„±ê¸°ìˆ  í–¥ìƒ I",
             tier: 3,
             type: "Passive",
             mp_cost: 0,
             element: "Neutral",
-            weapon: ["¸ðµç¹«±â"],
+            weapon: ["ëª¨ë“ ë¬´ê¸°"],
             description: `
-        [ÆÐ½Ãºê]
+        [íŒ¨ì‹œë¸Œ]
         
-        - Àåºñ ÇÕ¼º ½Ã ¿°»ö ÀúÀå ±â´É »ç¿ë °¡´É
-        - ±âº» ¼º°ø·ü Áõ°¡: [½ºÅ³·¾ ¡¿ 1.5]%
-        - ¿°»ö ÀúÀå ÇÑµµ: 99ÇÇ½º
+        - ìž¥ë¹„ í•©ì„± ì‹œ ì—¼ìƒ‰ ì €ìž¥ ê¸°ëŠ¥ ì‚¬ìš© ê°€ëŠ¥
+        - ê¸°ë³¸ ì„±ê³µë¥  ì¦ê°€: [ìŠ¤í‚¬ë ™ Ã— 1.5]%
+        - ì—¼ìƒ‰ ì €ìž¥ í•œë„: 99í”¼ìŠ¤
       `
         },
 
         // ==================================================
-        // 4Â÷ ½ºÅ³
+        // 4ì°¨ ìŠ¤í‚¬
         // ==================================================
         {
             id: "master_bottle",
-            name: "´ÞÀÎÀÇ ¾àº´",
+            name: "ë‹¬ì¸ì˜ ì•½ë³‘",
             tier: 4,
             type: "Passive",
             mp_cost: 0,
             element: "Neutral",
-            weapon: ["¸ðµç¹«±â"],
+            weapon: ["ëª¨ë“ ë¬´ê¸°"],
             description: `
-        [ÆÐ½Ãºê]
+        [íŒ¨ì‹œë¸Œ]
         
-        - ¿¬±Ý¼ú ¼÷·Ãµµ »óÇÑ [5 ¡¿ ½ºÅ³·¾] »ó½Â
-        - (10·¹º§ ½Ã ¼÷·Ãµµ 200±îÁö ÇØ¹æ)
+        - ì—°ê¸ˆìˆ  ìˆ™ë ¨ë„ ìƒí•œ [5 Ã— ìŠ¤í‚¬ë ™] ìƒìŠ¹
+        - (10ë ˆë²¨ ì‹œ ìˆ™ë ¨ë„ 200ê¹Œì§€ í•´ë°©)
       `
         },
         {
             id: "expert_synthesis",
-            name: "ÀåÀÎ ÇÕ¼º¼ú",
+            name: "ìž¥ì¸ í•©ì„±ìˆ ",
             tier: 4,
             type: "Passive",
             mp_cost: 0,
             element: "Neutral",
-            weapon: ["¸ðµç¹«±â"],
+            weapon: ["ëª¨ë“ ë¬´ê¸°"],
             description: `
-        [ÆÐ½Ãºê]
+        [íŒ¨ì‹œë¸Œ]
         
-        - ¾ÆÀÌÅÛ ÇÕ¼º ¼º°ø·ü [½ºÅ³·¾]% Áõ°¡
+        - ì•„ì´í…œ í•©ì„± ì„±ê³µë¥  [ìŠ¤í‚¬ë ™]% ì¦ê°€
       `
         },
         {
             id: "synthesis_tech_2",
-            name: "ÇÕ¼º±â¼ú Çâ»ó II",
+            name: "í•©ì„±ê¸°ìˆ  í–¥ìƒ II",
             tier: 4,
             type: "Passive",
             mp_cost: 0,
             element: "Neutral",
-            weapon: ["¸ðµç¹«±â"],
+            weapon: ["ëª¨ë“ ë¬´ê¸°"],
             description: `
-        [ÆÐ½Ãºê]
+        [íŒ¨ì‹œë¸Œ]
         
-        - ±âº» ¼º°ø·ü Áõ°¡: [½ºÅ³·¾ ¡¿ 2.0]%
-        - ÀÌ ½ºÅ³±îÁö 10·¾ ½Àµæ ½Ã 5È®Á¤ ÇÕ¼º ¼º°ø·ü: 80%
+        - ê¸°ë³¸ ì„±ê³µë¥  ì¦ê°€: [ìŠ¤í‚¬ë ™ Ã— 2.0]%
+        - ì´ ìŠ¤í‚¬ê¹Œì§€ 10ë ™ ìŠµë“ ì‹œ 5í™•ì • í•©ì„± ì„±ê³µë¥ : 80%
       `
         },
 
         // ==================================================
-        // 5Â÷ ½ºÅ³
+        // 5ì°¨ ìŠ¤í‚¬
         // ==================================================
         {
             id: "master_bottle_2",
-            name: "´ÞÀÎÀÇ ¾àº´II",
+            name: "ë‹¬ì¸ì˜ ì•½ë³‘II",
             tier: 5,
             type: "Passive",
             mp_cost: 0,
             element: "Neutral",
-            weapon: ["¸ðµç¹«±â"],
+            weapon: ["ëª¨ë“ ë¬´ê¸°"],
             description: `
-        [ÆÐ½Ãºê]
+        [íŒ¨ì‹œë¸Œ]
         
-        - ¿¬±Ý¼ú ¼÷·Ãµµ »óÇÑ [5 ¡¿ ½ºÅ³·¾] »ó½Â
-        - (10·¹º§ ½Ã ¼÷·Ãµµ 250±îÁö ÇØ¹æ)
+        - ì—°ê¸ˆìˆ  ìˆ™ë ¨ë„ ìƒí•œ [5 Ã— ìŠ¤í‚¬ë ™] ìƒìŠ¹
+        - (10ë ˆë²¨ ì‹œ ìˆ™ë ¨ë„ 250ê¹Œì§€ í•´ë°©)
       `
         },
         {
             id: "expert_synthesis_2",
-            name: "ÀåÀÎ ÇÕ¼º¼úII",
+            name: "ìž¥ì¸ í•©ì„±ìˆ II",
             tier: 5,
             type: "Passive",
             mp_cost: 0,
             element: "Neutral",
-            weapon: ["¸ðµç¹«±â"],
+            weapon: ["ëª¨ë“ ë¬´ê¸°"],
             description: `
-        [ÆÐ½Ãºê]
+        [íŒ¨ì‹œë¸Œ]
         
-        - ¾ÆÀÌÅÛ ÇÕ¼º ¼º°ø·ü [½ºÅ³·¾]% Áõ°¡
+        - ì•„ì´í…œ í•©ì„± ì„±ê³µë¥  [ìŠ¤í‚¬ë ™]% ì¦ê°€
       `
         },
         {
             id: "synthesis_tech_3",
-            name: "ÇÕ¼º±â¼ú Çâ»ó III",
+            name: "í•©ì„±ê¸°ìˆ  í–¥ìƒ III",
             tier: 5,
             type: "Passive",
             mp_cost: 0,
             element: "Neutral",
-            weapon: ["¸ðµç¹«±â"],
+            weapon: ["ëª¨ë“ ë¬´ê¸°"],
             description: `
-        [ÆÐ½Ãºê]
+        [íŒ¨ì‹œë¸Œ]
         
-        - ±âº» ¼º°ø·ü Áõ°¡: [½ºÅ³·¾ ¡¿ 2.5]%
-        - ÀÌ ½ºÅ³±îÁö 10·¾ ½Àµæ ½Ã 5È®Á¤ ÇÕ¼º ¼º°ø·ü: 96%
-        - (°³ÀÎ ÀåºñÇÕ¼º ½Ã ¼º°ø·üÀÌ ºñ¾àÀûÀ¸·Î »ó½Â)
+        - ê¸°ë³¸ ì„±ê³µë¥  ì¦ê°€: [ìŠ¤í‚¬ë ™ Ã— 2.5]%
+        - ì´ ìŠ¤í‚¬ê¹Œì§€ 10ë ™ ìŠµë“ ì‹œ 5í™•ì • í•©ì„± ì„±ê³µë¥ : 96%
+        - (ê°œì¸ ìž¥ë¹„í•©ì„± ì‹œ ì„±ê³µë¥ ì´ ë¹„ì•½ì ìœ¼ë¡œ ìƒìŠ¹)
       `
         }
     ]
