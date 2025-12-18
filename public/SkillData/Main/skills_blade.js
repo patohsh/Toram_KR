@@ -128,7 +128,7 @@ const bladeTree = {
         },
         {
             id: "quick_slash",
-            name: "재빠른 검술",
+            name: "재빠른 참격",
             tier: 1,
             type: "Passive",
             mp_cost: 0,
@@ -378,7 +378,7 @@ const bladeTree = {
         // ==================================================
         {
             id: "garde_blade",
-            name: "가디 블레이드",
+            name: "가드 블레이드",
             tier: 4,
             type: "Active",
             mp_cost: 300,

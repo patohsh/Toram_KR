@@ -370,7 +370,7 @@ const halberdTree = {
         },
         {
             id: "lightning_hail",
-            name: "헤일 라이트닝",
+            name: "라이트닝 헤일",
             tier: 4,
             type: "Active",
             mp_cost: 200,

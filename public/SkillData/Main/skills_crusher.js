@@ -60,7 +60,7 @@ const crusherTree = {
         // ==================================================
         {
             id: "goliath_punch",
-            name: "골리아스테이크샷",
+            name: "골리아스테이크 샷",
             tier: 2,
             type: "Active",
             mp_cost: 0, // 충전식

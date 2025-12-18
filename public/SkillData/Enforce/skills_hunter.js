@@ -432,20 +432,7 @@ const hunterTree = {
         - 멀티풀 헌트의 계수 상승 [0.25×스킬렙]
         - (레지스트렛: 악성 댓글 감지 - 내용 없음)
       `
-        },
-        {
-            id: "pale_trapper",
-            name: "페일 트래퍼",
-            tier: 1, // 레지스트렛 전용 기술 (위치는 1차지만 실제론 별도)
-            type: "Passive", // 레지스트렛
-            mp_cost: 0,
-            element: "Neutral",
-            weapon: ["모든무기"],
-            description: `
-        [레지스트렛 효과]
-        덫 스킬들의 상태이상 효과를 자신이 받는다.
-        (레지 최대렙: 1)
-      `
         }
+       
     ]
 };

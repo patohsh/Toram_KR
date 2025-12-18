@@ -276,7 +276,7 @@ const shieldTree = {
         // ==================================================
         {
             id: "belagerung",
-            name: "벨라겔룽",
+            name: "벨라겔룸",
             tier: 5,
             type: "Active",
             mp_cost: 600,

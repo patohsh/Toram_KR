@@ -161,7 +161,7 @@ const daggerTree = {
         },
         {
             id: "combat_knife",
-            name: "컴뱃 나이프",
+            name: "나이프 컴뱃",
             tier: 3,
             type: "Active", // 버프기
             mp_cost: 0,
