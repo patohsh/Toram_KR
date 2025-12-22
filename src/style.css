@@ -1238,3 +1238,91 @@ body.dark-mode .trait-tier-val {
         cursor: not-allowed;
         background: rgba(0,0,0,0.2);
     }
+/* src/style.css - 기존 코드 아래에 추가 */
+
+/* --- 상단 이동 버튼 (Top Button) --- */
+.scroll-top-btn {
+    position: fixed;
+    bottom: 25px;
+    right: 160px; /* 테마 버튼(Right 25px) + 버튼 크기만큼 왼쪽으로 배치 */
+    z-index: 9990; /* 테마 버튼보다 살짝 아래 혹은 동일 레벨 */
+    padding: 12px 20px;
+    font-size: 1rem;
+    border-radius: 30px;
+    background: var(--card-bg);
+    color: var(--text-main);
+    border: 2px solid var(--border-color);
+    backdrop-filter: blur(15px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    cursor: pointer;
+    font-weight: bold;
+    /* 애니메이션 초기 상태: 숨김 & 아래로 살짝 내려감 */
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: none; /* 안 보일 때 클릭 방지 */
+    transition: all 0.4s ease;
+}
+
+/* --- [신규] 홈 이동 버튼 (Top 버튼 옆) --- */
+.float-home-btn {
+    position: fixed;
+    bottom: 25px;
+    right: 270px; /* Top 버튼(155px) + 버튼 크기만큼 왼쪽 배치 */
+    z-index: 9990;
+    padding: 12px 20px;
+    font-size: 1rem;
+    border-radius: 30px;
+    background: var(--card-bg);
+    color: var(--text-main);
+    border: 2px solid var(--border-color);
+    backdrop-filter: blur(15px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    cursor: pointer;
+    font-weight: bold;
+    /* 애니메이션 초기 상태 (Top 버튼과 동일) */
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: none;
+    transition: all 0.4s ease;
+}
+
+    /* 활성화 클래스 (스크롤 시 붙음) */
+    .scroll-top-btn.show,
+    .float-home-btn.show {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: all;
+    }
+
+    /* 호버 효과 */
+    .scroll-top-btn:hover,
+    .float-home-btn:hover {
+        background: var(--accent-pink);
+        color: white;
+        border-color: var(--accent-pink);
+        transform: translateY(-5px);
+    }
+
+/* 모바일 대응: 버튼 간격 좁히기 및 텍스트 줄이기 고려 */
+@media (max-width: 600px) {
+    .theme-toggle-btn {
+        padding: 10px 14px;
+        font-size: 0.85rem;
+        right: 15px;
+        bottom: 20px;
+    }
+
+    .scroll-top-btn {
+        padding: 10px 14px;
+        font-size: 0.85rem;
+        right: 120px; /* 간격 조정 */
+        bottom: 20px;
+    }
+
+    .float-home-btn {
+        padding: 10px 15px;
+        font-size: 0.85rem;
+        right: 210px; /* 간격 조정 */
+        bottom: 20px;
+    }
+}

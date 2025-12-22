@@ -1,5 +1,64 @@
 ﻿// src/main.ts
 import './style.css';
+// =================================================
+// 0. 전역 상태 및 라우팅 설정 (신규 추가)
+// =================================================
+
+// 페이지 키 타입 정의
+type PageKey = 'home' | 'schedule' | 'crysta' | 'skill' | 'ability' | 'registlet' | 'food' | 'equip' | 'guide' | 'info';
+
+// 라우터 맵: 페이지 키와 렌더링 함수를 매핑
+const routes: Record<PageKey, () => void> = {
+    home: renderHomePage,
+    schedule: renderSchedulePage,
+    crysta: renderCrystaPage,
+    skill: renderSkillPage,
+    ability: renderAbilityPage,
+    registlet: renderRegistletPage,
+    food: renderFoodPage,
+    equip: renderEquipmentPage,
+    guide: renderGuidePage,
+    info: renderInfoPage
+};
+
+// [기능] 페이지 이동 (History API 사용)
+function navigate(page: PageKey) {
+    // 현재 페이지와 같으면 무시 (중복 쌓임 방지)
+    if (history.state && history.state.page === page) return;
+
+    // 히스토리 스택에 추가
+    history.pushState({ page }, '', `#${page}`);
+
+    // 해당 페이지 렌더링
+    routes[page]();
+
+    // 페이지 이동 시 스크롤 최상단으로
+    window.scrollTo(0, 0);
+}
+
+// [기능] 뒤로가기 핸들러 (PopState)
+window.addEventListener('popstate', (event) => {
+    if (event.state && event.state.page) {
+        // 히스토리에 상태가 있으면 해당 페이지 렌더링
+        const page = event.state.page as PageKey;
+        if (routes[page]) routes[page]();
+    } else {
+        // 상태가 없으면(초기 진입 등) 홈으로
+        renderHomePage();
+    }
+});
+
+// [기능] PC 마우스 백버튼 이벤트 (mouseup)
+function initMouseBackEvent() {
+    window.addEventListener('mouseup', (e) => {
+        // e.button === 3 : Browser Back Button (마우스 엄지 버튼 뒤로)
+        // e.button === 4 : Browser Forward Button
+        if (e.button === 3) {
+            e.preventDefault(); // 기본 동작 방지 (일부 브라우저)
+            history.back();
+        }
+    });
+}
 
 // =================================================
 // 1. 토람 이벤트 스케줄 데이터
@@ -81,19 +140,17 @@ function renderHomePage() {
       </div>
     </div>
   `;
-
-    // 이벤트 바인딩
-    document.getElementById('go-schedule')?.addEventListener('click', renderSchedulePage);
-    document.getElementById('go-crysta')?.addEventListener('click', renderCrystaPage);
-    document.getElementById('go-skill')?.addEventListener('click', renderSkillPage);
-    document.getElementById('go-ability')?.addEventListener('click', renderAbilityPage);
-    document.getElementById('go-registlet')?.addEventListener('click', renderRegistletPage);
-    document.getElementById('go-food')?.addEventListener('click', renderFoodPage);
-    document.getElementById('go-equip')?.addEventListener('click', renderEquipmentPage);
-    document.getElementById('go-guide')?.addEventListener('click', renderGuidePage);
-    document.getElementById('go-info')?.addEventListener('click', renderInfoPage);
+    // 이벤트 바인딩 (navigate 함수 사용)
+    document.getElementById('go-schedule')?.addEventListener('click', () => navigate('schedule'));
+    document.getElementById('go-crysta')?.addEventListener('click', () => navigate('crysta'));
+    document.getElementById('go-skill')?.addEventListener('click', () => navigate('skill'));
+    document.getElementById('go-ability')?.addEventListener('click', () => navigate('ability'));
+    document.getElementById('go-registlet')?.addEventListener('click', () => navigate('registlet'));
+    document.getElementById('go-food')?.addEventListener('click', () => navigate('food'));
+    document.getElementById('go-equip')?.addEventListener('click', () => navigate('equip'));
+    document.getElementById('go-guide')?.addEventListener('click', () => navigate('guide'));
+    document.getElementById('go-info')?.addEventListener('click', () => navigate('info'));
 }
-
 // --- [Page 2] 이벤트 스케줄 페이지 ---
 function renderSchedulePage() {
     const listHtml = eventSchedule.map(item => `
@@ -1527,36 +1584,57 @@ function renderPagination() {
 // =================================================
 // [기능] 낮/밤 테마 토글 (Day/Night Switch)
 // =================================================
+function initGlobalFeatures() {
+    // 1. 테마 버튼 (기존)
+    const themeBtn = document.createElement('button');
+    themeBtn.className = 'theme-toggle-btn';
+    themeBtn.id = 'theme-btn';
+    themeBtn.onclick = toggleTheme;
+    document.body.appendChild(themeBtn);
 
-function initTheme() {
-    // 1. 버튼 생성 (우측 하단 플로팅 버튼)
-    const btn = document.createElement('button');
-    btn.className = 'theme-toggle-btn';
-    btn.id = 'theme-btn';
-    btn.onclick = toggleTheme;
-    document.body.appendChild(btn);
-
-    // 2. 저장된 테마 불러오기 (localStorage)
     const savedTheme = localStorage.getItem('toram-theme');
-
-    // 저장된 테마가 'dark'라면 밤 모드 적용
     if (savedTheme === 'dark') {
         document.body.classList.add('dark-mode');
-        btn.innerText = '☀️ 낮 모드'; // 밤이니까 낮으로 가는 버튼 표시
+        themeBtn.innerText = '☀️ 낮 모드';
     } else {
-        // 기본은 낮 모드 (body에 클래스 없음)
-        btn.innerText = '🌙 밤 모드'; // 낮이니까 밤으로 가는 버튼 표시
+        themeBtn.innerText = '🌙 밤 모드';
     }
+
+    // 2. 상단 이동 버튼 (Top)
+    const topBtn = document.createElement('button');
+    topBtn.className = 'scroll-top-btn';
+    topBtn.innerText = '⬆️ Top';
+    topBtn.onclick = () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+    document.body.appendChild(topBtn);
+
+    // 3. 홈 이동 버튼 (Home) - [추가됨]
+    const homeBtn = document.createElement('button');
+    homeBtn.className = 'float-home-btn';
+    homeBtn.innerText = '🏠 Home';
+    homeBtn.onclick = () => {
+        navigate('home'); // 라우터 함수 호출
+    };
+    document.body.appendChild(homeBtn);
+
+    // 스크롤 이벤트 감지 -> 버튼 2개 동시 표시/숨김
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 150) {
+            topBtn.classList.add('show');
+            homeBtn.classList.add('show');
+        } else {
+            topBtn.classList.remove('show');
+            homeBtn.classList.remove('show');
+        }
+    });
 }
 
 function toggleTheme() {
+    // (기존 동일)
     const body = document.body;
     const btn = document.getElementById('theme-btn') as HTMLButtonElement;
-
-    // 클래스 토글
     body.classList.toggle('dark-mode');
-
-    // 현재 상태 확인 후 버튼 텍스트 및 로컬 스토리지 저장
     if (body.classList.contains('dark-mode')) {
         btn.innerText = '☀️ 낮 모드';
         localStorage.setItem('toram-theme', 'dark');
@@ -1565,6 +1643,7 @@ function toggleTheme() {
         localStorage.setItem('toram-theme', 'light');
     }
 }
+
 // =================================================
 // [Page 8] 뉴비 가이드 (Newbie Guide) - 탭 기능 추가
 // =================================================
@@ -1796,6 +1875,28 @@ function renderInfoPage() {
     document.getElementById('back-home')?.addEventListener('click', renderHomePage);
 }
 
-// 앱 시작 시 테마 초기화 실행
-initTheme();
-renderHomePage();
+// 1. 마우스 백버튼 감지 시작
+initMouseBackEvent();
+
+// 2. 테마 및 탑버튼 초기화
+initGlobalFeatures();
+
+// 3. 앱 시작 (초기 진입 시 홈 화면)
+// History 상태가 있으면 그 페이지로, 없으면 홈으로
+if (history.state && history.state.page) {
+    const page = history.state.page as PageKey;
+    if (routes[page]) routes[page]();
+    else renderHomePage();
+} else {
+    // 초기 URL 해시 확인 (예: #schedule)
+    const hash = window.location.hash.replace('#', '') as PageKey;
+    if (hash && routes[hash]) {
+        // 해시가 있으면 해당 페이지로 이동 및 히스토리 대체
+        history.replaceState({ page: hash }, '', `#${hash}`);
+        routes[hash]();
+    } else {
+        // 기본 홈
+        history.replaceState({ page: 'home' }, '', '#home');
+        renderHomePage();
+    }
+}
