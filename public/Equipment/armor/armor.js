@@ -128,8 +128,9 @@
         { name: "워리어 메일", name_en: "Warrior Mail", image: "8-Warrior Mail [Normal-Female].jpg" },
         { name: "물의 무녀 의상", name_en: "Water Priest Robe", image: "8-Water Priest Robe [Normal-Female].jpg" },
         { name: "웨딩 드레스", name_en: "Wedding Dress", image: "8-Wedding Dress [Normal-Female].jpg" },
-        { name: "윈터 의상", name_en: "Winter Outfit", image: "8-Winter Outfit [Normal-Female].jpg" },
-        { name: "윈터 의상 II", name_en: "Winter Outfit II", image: "8-Winter Outfit II [Normal-Female].jpg" },
+        { name: "겨울 의상", name_en: "Winter Outfit", image: "8-Winter Outfit [Normal-Female].jpg" },
+        { name: "겨울 의상 II", name_en: "Winter Outfit II", image: "8-Winter Outfit II [Normal-Female].jpg" },
+        { name: "겨울 의상 III", name_en: "Winter Outfit III", image: "8-Winter Outfit III.jpg" },
         { name: "제가 슈트", name_en: "Zega Onesie", image: "8-Zega Onesie [Normal-Female].jpg" },
         { name: "다크 신디케이트 빌먼트", name_en: "Dark Syndicate Vilment", image: "8-  Dark Syndicate   Vilment [Normal-Female].jpg" }
     ]

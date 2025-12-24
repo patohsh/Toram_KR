@@ -228,15 +228,26 @@ function renderCrystaPage() {
           <option value="최대MP%">최대MP %</option> <option value="최대MP">최대MP (고정)</option>
           <option value="공격속도%">공격속도 %</option> <option value="공격속도">공격속도 (고정)</option>
           <option value="시전속도%">시전속도 %</option> <option value="시전속도">시전속도 (고정)</option>
+          <option value="행동속도%">행동속도 %</option> <option value="행동속도">행동속도 (고정)</option>
           <option value="안정률%">안정률 %</option>
           <option value="명중%">명중 %</option> <option value="명중">명중 (고정)</option>
+          <option value="절대명중%">절대명중 %</option>
           <option value="회피%">회피 %</option> <option value="회피">회피 (고정)</option>
           <option value="물리내성%">물리내성 %</option>
           <option value="마법내성%">마법내성 %</option>
+          <option value="이상내성%">이상내성 %</option>
           <option value="근거리위력%">근거리위력 %</option>
           <option value="원거리위력%">원거리위력 %</option>
           <option value="발도공격%">발도공격 %</option>
           <option value="어그로%">어그로 %</option>
+          <option value="마법배리어">마법배리어</option> 
+          <option value="물리배리어">물리배리어</option>
+          <option value="비율배리어%">비율배리어 %</option>
+          <option value="공격MP회복%">공격MP회복 %</option>
+          <option value="공격MP회복">공격MP회복</option>
+          <option value="MP자연회복%">MP자연회복 %</option>
+          <option value="HP자연회복%">HP자연회복 %</option>
+
         </select>
 
         <select id="symbol" style="padding:8px; border-radius:5px; background:var(--input-bg); color:white; border:1px solid var(--border-color);">
@@ -1654,6 +1665,7 @@ const GUIDE_TABS = [
     { id: 'money', name: '돈 벌기', file: 'money.js' },
     { id: 'raid', name: '레이드', file: 'raid.js' },
     { id: 'myroom', name: '마이룸', file: 'myroom.js' },
+    { id: 'boss', name: '특수보스', file: 'boss.js' },
     { id: 'empty', name: '(준비중)', file: '' } // 공란
 ];
 
