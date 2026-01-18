@@ -12,7 +12,8 @@
         { name: "6주년의 축순", name_en: "6th Anniv Shield", image: "6th anniv shield.png" },
         { name: "7주년의 축순", name_en: "7th Anniv Shield", image: "7th anniv shield.png" },
         { name: "8주년의 축순", name_en: "8th Anniv Shield", image: "8th anniv shield.png" },
-        { name: "9주년의 축순", name_en: "9th Anniv Shield", image: "9th anniv shield.png" },
+        { name: "9주년의 축순", name_en: "9th Anniv Shield", image: "9th anniv shield.jpg" },
+        { name: "10주년의 축순", name_en: "10th Anniv Shield", image: "10th anniv shield.jpg" },
         { name: "아에리아 실드", name_en: "Aeria Shield", image: "aeria shield.png" },
         { name: "알베로 실드", name_en: "Albero Shield", image: "albero shield.png" },
         { name: "비스트 로드 실드", name_en: "Beastlord Shield", image: "beastlord shield.png" },
@@ -87,6 +88,7 @@
         { name: "수박 방패", name_en: "Watermelon Shield", image: "watermelon shield.png" },
         { name: "윈드 그레이스 실드", name_en: "Windgrace Shield", image: "windgrace shield.png" },
         { name: "자하크 실드", name_en: "Zahhak Shield", image: "zahhak shield.png" },
-        { name: "조이의 마법서", name_en: "Zoe's Magic Book", image: "zoe's magic book.png" }
+        { name: "조이의 마법서", name_en: "Zoe's Magic Book", image: "zoe's magic book.png" },
+        { name: "메이플의 방패", name_en: "Maple Shield", image: "메이플의 방패.png" }
     ]
 };
