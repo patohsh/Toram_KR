@@ -68,7 +68,7 @@
               "RelativeDocumentMoniker": "public\\SkillData\\Enforce\\skills_knight.js",
               "ToolTip": "D:\\0.main\\cosuzu\\Toram_KR\\public\\SkillData\\Enforce\\skills_knight.js",
               "RelativeToolTip": "public\\SkillData\\Enforce\\skills_knight.js",
-              "ViewState": "AgIAAEgBAAAAAAAAAAAAAEwBAAATAAAAAAAAAA==",
+              "ViewState": "AgIAAGwBAAAAAAAAAAAAAEsBAAAVAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
               "WhenOpened": "2026-01-28T08:27:46.593Z",
               "EditorCaption": ""
@@ -83,8 +83,7 @@
               "RelativeToolTip": "public\\SkillData\\Enforce\\skills_shield.js",
               "ViewState": "AgIAABIBAAAAAAAAAAAAAC4BAAAKAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2026-01-28T08:24:23.731Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-28T08:24:23.731Z"
             },
             {
               "$type": "Document",
@@ -96,8 +95,7 @@
               "RelativeToolTip": "public\\SkillData\\Enforce\\skills_guard.js",
               "ViewState": "AgIAAAAAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2026-01-28T08:24:15.24Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-28T08:24:15.24Z"
             },
             {
               "$type": "Document",
@@ -109,8 +107,7 @@
               "RelativeToolTip": "public\\SkillData\\Assist\\skills_survival.js",
               "ViewState": "AgIAACwAAAAAAAAAAAAAAEoAAAATAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2026-01-28T08:23:03.32Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-28T08:23:03.32Z"
             },
             {
               "$type": "Document",
@@ -122,8 +119,7 @@
               "RelativeToolTip": "public\\SkillData\\Assist\\skills_support.js",
               "ViewState": "AgIAAMoAAAAAAAAAAAAAAOMAAAATAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2026-01-28T08:22:14.262Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-28T08:22:14.262Z"
             },
             {
               "$type": "Document",
@@ -135,8 +131,7 @@
               "RelativeToolTip": "public\\SkillData\\Main\\skills_crusher.js",
               "ViewState": "AgIAAJcAAAAAAAAAAAAAAKcAAAAKAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2026-01-28T08:21:32.45Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-28T08:21:32.45Z"
             },
             {
               "$type": "Document",
@@ -148,8 +143,7 @@
               "RelativeToolTip": "public\\SkillData\\Main\\skills_blade.js",
               "ViewState": "AgIAAGcAAAAAAAAAAAAAAH8AAAAKAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2026-01-28T08:20:32.724Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-28T08:20:32.724Z"
             },
             {
               "$type": "Document",
@@ -161,8 +155,7 @@
               "RelativeToolTip": "public\\SkillData\\Main\\skills_shot.js",
               "ViewState": "AgIAANoBAAAAAAAAAAAQwAQCAAAKAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2026-01-28T08:17:29.951Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-28T08:17:29.951Z"
             },
             {
               "$type": "Document",
@@ -174,8 +167,7 @@
               "RelativeToolTip": "public\\SkillData\\Main\\skills_magic.js",
               "ViewState": "AgIAABgCAAAAAAAAAAAAACYCAAAKAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2026-01-28T08:13:15.335Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-28T08:13:15.335Z"
             },
             {
               "$type": "Document",
@@ -187,8 +179,7 @@
               "RelativeToolTip": "public\\SkillData\\Main\\skills_martial.js",
               "ViewState": "AgIAAD0BAAAAAAAAAAAAAFEBAAAKAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2026-01-28T08:10:35.898Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-28T08:10:35.898Z"
             },
             {
               "$type": "Document",
@@ -200,8 +191,7 @@
               "RelativeToolTip": "public\\SkillData\\Main\\skills_halberd.js",
               "ViewState": "AgIAAGkBAAAAAAAAAAAAAIIBAAAKAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2026-01-28T08:05:30.589Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-28T08:05:30.589Z"
             },
             {
               "$type": "Document",
@@ -213,8 +203,7 @@
               "RelativeToolTip": "src\\main.ts",
               "ViewState": "AgIAAGACAAAAAAAAAAAAAHECAAArAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-01-28T06:41:55.828Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-28T06:41:55.828Z"
             }
           ]
         }
