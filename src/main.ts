@@ -623,7 +623,7 @@ function renderSkillColumns(skills: any[], mainCatFolder: string, fileName: stri
     grid.innerHTML = '';
 
     // Tier 분류
-    const tiers: any[][] = [[], [], [], [], [], [], []];
+    const tiers: any[][] = [[], [], [], [], [], []];
 
     skills.forEach(skill => {
         const t = skill.tier || 1;
