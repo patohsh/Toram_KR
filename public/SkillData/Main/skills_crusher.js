@@ -167,6 +167,11 @@ const crusherTree = {
       `
         },
         {
+            id: "x",
+            name: " ",
+            tier: 3,
+        },
+        {
             id: "destroyer",
             name: "파괴자",
             tier: 3,

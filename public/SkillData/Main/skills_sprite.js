@@ -34,6 +34,21 @@ const spriteTree = {
       `
         },
         {
+            id: "x",
+            name: " ",
+            tier: 1,
+        },
+        {
+            id: "x",
+            name: " ",
+            tier: 1,
+        },
+        {
+            id: "x",
+            name: " ",
+            tier: 1,
+        },
+        {
             id: "ignition",
             name: "이그니션",
             tier: 1,
@@ -103,6 +118,16 @@ const spriteTree = {
         • 스킬상수: 75 (타격당)
         • 위력: X / 발도공X
       `
+        },
+        {
+            id: "x",
+            name: " ",
+            tier: 2,
+        },
+        {
+            id: "x",
+            name: " ",
+            tier: 2,
         },
         {
             id: "alde_drak",
@@ -192,6 +217,11 @@ const spriteTree = {
         • 스킬상수: 500
         • 위력: O / 발도공X
       `
+        },
+        {
+            id: "x",
+            name: " ",
+            tier: 3,
         },
         {
             id: "factus_alarm",
@@ -339,6 +369,11 @@ const spriteTree = {
         • 위력: O (롱레인지X) / 발도공X
       `
         },
+        {
+            id: "x",
+            name: " ",
+            tier: 5,
+        },
 
         // ==================================================
         // 5차 스킬
@@ -360,6 +395,12 @@ const spriteTree = {
         - 카운터 포스: (3×스킬렙)초
         - 아스트랄 랜스: (9×스킬렙)초
       `
+        },
+
+        {
+            id: "x",
+            name: " ",
+            tier: 5,
         },
         {
             id: "kataramobos",

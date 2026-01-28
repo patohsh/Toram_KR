@@ -56,7 +56,7 @@ const survivalTree = {
         {
             id: "safe_rest",
             name: "안전한 휴식",
-            tier: 1,
+            tier: 2,
             type: "Passive",
             mp_cost: 0,
             element: "Neutral",
@@ -70,9 +70,14 @@ const survivalTree = {
       `
         },
         {
+            id: "x",
+            name: " ",
+            tier: 2,
+        },
+        {
             id: "short_rest",
             name: "작은 휴식",
-            tier: 1,
+            tier: 2,
             type: "Passive",
             mp_cost: 0,
             element: "Neutral",
@@ -92,7 +97,7 @@ const survivalTree = {
         {
             id: "hp_boost",
             name: "HP 부스트",
-            tier: 2,
+            tier: 3,
             type: "Passive",
             mp_cost: 0,
             element: "Neutral",
@@ -107,7 +112,7 @@ const survivalTree = {
         {
             id: "fighters_high",
             name: "여유있는 전투",
-            tier: 2,
+            tier: 3,
             type: "Passive",
             mp_cost: 0,
             element: "Neutral",
@@ -123,7 +128,7 @@ const survivalTree = {
         {
             id: "mp_boost",
             name: "MP 부스트",
-            tier: 2,
+            tier: 3,
             type: "Passive",
             mp_cost: 0,
             element: "Neutral",
@@ -137,7 +142,7 @@ const survivalTree = {
         {
             id: "sober_analysis",
             name: "냉정한 전술",
-            tier: 2,
+            tier: 3,
             type: "Passive",
             mp_cost: 0,
             element: "Neutral",

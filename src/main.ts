@@ -623,11 +623,11 @@ function renderSkillColumns(skills: any[], mainCatFolder: string, fileName: stri
     grid.innerHTML = '';
 
     // Tier 분류
-    const tiers: any[][] = [[], [], [], [], [], []];
+    const tiers: any[][] = [[], [], [], [], [], [], []];
 
     skills.forEach(skill => {
         const t = skill.tier || 1;
-        if (t >= 1 && t <= 5) {
+        if (t >= 1 && t <= 6) {
             tiers[t].push(skill);
         }
     });
@@ -635,7 +635,7 @@ function renderSkillColumns(skills: any[], mainCatFolder: string, fileName: stri
     // 이미지 폴더명 추출 (예: skills_blade -> blade)
     const subFolder = fileName.replace('skills_', '');
 
-    for (let i = 1; i <= 5; i++) {
+    for (let i = 1; i <= 6; i++) {
         const col = document.createElement('div');
         col.className = 'skill-tier-column';
 

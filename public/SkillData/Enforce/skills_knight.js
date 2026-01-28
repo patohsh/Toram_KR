@@ -55,6 +55,11 @@ const knightTree = {
       `
         },
         {
+            id: "x",
+            name: " ",
+            tier: 1,
+        },
+        {
             id: "knights_stance",
             name: "나이트 스탠스",
             tier: 1,
@@ -269,6 +274,11 @@ const knightTree = {
       `
         },
         {
+            id: "x",
+            name: " ",
+            tier: 4,
+        },
+        {
             id: "knights_remedy",
             name: "나이트 힐", // (Knight's Remedy / Heal)
             tier: 4,
@@ -334,6 +344,11 @@ const knightTree = {
         - 받는 피해 감소: [3×스킬렙]%
         - 버프 시간동안 이동하더라도 파레스가 초기화 되지 않는다.
       `
+        },
+        {
+            id: "x",
+            name: " ",
+            tier: 5,
         },
         {
             id: "knights_decision",

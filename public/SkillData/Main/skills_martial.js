@@ -32,38 +32,6 @@ const martialTree = {
       `
         },
         {
-            id: "martial_mastery",
-            name: "마셜 마스터리",
-            tier: 1,
-            type: "Passive",
-            mp_cost: 0,
-            element: "Neutral",
-            weapon: ["메인 권갑"],
-            description: `
-        [패시브 / 메인 권갑 적용]
-        효과: 3×스킬렙의 무기어택%를 얻는다.
-        효과: 1렙시 1%, 3렙시 2%, 8렙시 3%의 어택%를 얻는다.
-      `
-        },
-        {
-            id: "aggravate",
-            name: "원찬스",
-            tier: 1,
-            type: "Passive",
-            mp_cost: 0,
-            element: "Neutral",
-            weapon: ["권갑"],
-            description: `
-        [패시브 / 권갑 적용]
-        효과: 소숫점 버림(스킬렙+1)/2의 공격MP회복 상승
-        평타 적중 시 50% 확률로 원찬스 발동
-        
-        [원찬스 데미지]
-        • 계수: 스킬렙×0.05
-        • 크리티컬이 절대 터지지 않는다.
-      `
-        },
-        {
             id: "bash",
             name: "배쉬",
             tier: 1,
@@ -105,6 +73,38 @@ const martialTree = {
         - 넘어짐 부여 확률: 5×스킬렙 % (모든무기)
         - 권갑 보너스: 50 + (5×스킬렙) %
         - (레지 최대렙: 20)
+      `
+        },
+        {
+            id: "martial_mastery",
+            name: "마셜 마스터리",
+            tier: 1,
+            type: "Passive",
+            mp_cost: 0,
+            element: "Neutral",
+            weapon: ["메인 권갑"],
+            description: `
+        [패시브 / 메인 권갑 적용]
+        효과: 3×스킬렙의 무기어택%를 얻는다.
+        효과: 1렙시 1%, 3렙시 2%, 8렙시 3%의 어택%를 얻는다.
+      `
+        },
+        {
+            id: "aggravate",
+            name: "원찬스",
+            tier: 1,
+            type: "Passive",
+            mp_cost: 0,
+            element: "Neutral",
+            weapon: ["권갑"],
+            description: `
+        [패시브 / 권갑 적용]
+        효과: 소숫점 버림(스킬렙+1)/2의 공격MP회복 상승
+        평타 적중 시 50% 확률로 원찬스 발동
+        
+        [원찬스 데미지]
+        • 계수: 스킬렙×0.05
+        • 크리티컬이 절대 터지지 않는다.
       `
         },
 
@@ -161,6 +161,16 @@ const martialTree = {
         - 적중당 MAX HP의 5% 회복 (최대 500) (권갑은 1000)
         - (레지 최대렙: 10)
       `
+        },
+        {
+            id: "x",
+            name: " ",
+            tier: 2,
+        },
+        {
+            id: "x",
+            name: " ",
+            tier: 2,
         },
         {
             id: "strong_chase",
@@ -236,6 +246,11 @@ const martialTree = {
         - 1~5렙 25% / 6렙이상 50%
         - 권갑 보너스: 1~5렙 50% / 6렙이상 75% + (총AGI/10)
       `
+        },
+        {
+            id: "x",
+            name: " ",
+            tier: 3,
         },
         {
             id: "martial_discipline",
@@ -320,6 +335,11 @@ const martialTree = {
         - 스킬 사용 시 버프 획득 (10초)
         - 버프: (스킬레벨-1)/3+2의 행동속도% (권갑 장비+5)
       `
+        },
+        {
+            id: "x",
+            name: " ",
+            tier: 4,
         },
         {
             id: "chakra",
@@ -424,31 +444,14 @@ const martialTree = {
         - 권갑 보너스: 스킬 계수, 상수, 버프효과 상승
       `
         },
-        {
-            id: "energy_control",
-            name: "화경",
-            tier: 5,
-            type: "Active",
-            mp_cost: 100,
-            element: "Neutral",
-            weapon: ["권갑"],
-            description: `
-        [방어형 버프 스킬 / 권갑 사용가능]
-        모션중에 모든 받는 피해를 0으로 한다.
-        만약, 피해 감소에 성공한다면 [10+스킬레벨]초 동안 차크라를 얻고,
-        차크라의 MP회복 효과를 제외한 효과를 얻습니다.
-        (자신의 차크라 레벨만큼, 화경 레벨을 넘을 수 없다.)
-        
-        [버프 획득 (지속 90초)]
-        - 기본 무기ATK%: 5×스킬렙 (메인권갑)
-        - 안정률: 10%
-        - 이 스킬로 얻는 무기ATK는 크러셔 스킬의 파괴자와 합한다. (최대 50이며 넘길 수 없다.)
-      `
-        },
+        //=======
+        //6티어
+        //=======
+       
         {
             id: "mountain_press",
             name: "첩산고", // (Mountain Press)
-            tier: 5,
+            tier: 6,
             type: "Active",
             mp_cost: 500,
             element: "Neutral",
@@ -473,7 +476,7 @@ const martialTree = {
         {
             id: "seismic_stomp",
             name: "진각", // (Seismic Stomp)
-            tier: 5,
+            tier: 6,
             type: "Active",
             mp_cost: 300,
             element: "Neutral",
@@ -495,7 +498,7 @@ const martialTree = {
         {
             id: "spin_sweep",
             name: "선휘", // (Sweep? Spin?)
-            tier: 5,
+            tier: 6,
             type: "Active",
             mp_cost: 400,
             element: "Neutral",
@@ -520,6 +523,27 @@ const martialTree = {
         - 부여 성공시 버프 획득 (시간: (2+저항시간(스킬렙/2))초)
         - 버프 효과: 슬로우, 흡인장판, 정지를 무시한다. 어보이드의 갯수를 1회복한다.
         - 서브마도구 1.7개, 서브 권갑 2개, 서브 단검 3개, 메인 권갑 3개
+      `
+        },
+        {
+            id: "energy_control",
+            name: "화경",
+            tier: 6,
+            type: "Active",
+            mp_cost: 100,
+            element: "Neutral",
+            weapon: ["권갑"],
+            description: `
+        [방어형 버프 스킬 / 권갑 사용가능]
+        모션중에 모든 받는 피해를 0으로 한다.
+        만약, 피해 감소에 성공한다면 [10+스킬레벨]초 동안 차크라를 얻고,
+        차크라의 MP회복 효과를 제외한 효과를 얻습니다.
+        (자신의 차크라 레벨만큼, 화경 레벨을 넘을 수 없다.)
+        
+        [버프 획득 (지속 90초)]
+        - 기본 무기ATK%: 5×스킬렙 (메인권갑)
+        - 안정률: 10%
+        - 이 스킬로 얻는 무기ATK는 크러셔 스킬의 파괴자와 합한다. (최대 50이며 넘길 수 없다.)
       `
         }
     ]
