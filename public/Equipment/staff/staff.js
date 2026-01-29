@@ -100,9 +100,10 @@
         { name: "불칸 스태프", name_en: "Vulcan Staff", image: "vulcan staff.png" },
         { name: "워터 로드", name_en: "Water Staff", image: "water staff.png" },
         { name: "윈드 로드", name_en: "Wind Staff", image: "wind staff.png" },
+        { name: "괴도 위스프의 지팡이", name_en: "옵션:", image: "위스프.jpg" },
         { name: "윈드 찬터 지팡이", name_en: "Windchanter Staff", image: "windchanter staff.png" },
         { name: "제로스의 지팡이", name_en: "Xellos' Staff", image: "xellos' staff.png" },
         { name: "요자쿠라 언월장", name_en: "Yozakura Crescent Staff", image: "yozakura crescent staff.png" },
-        { name: "아게이트 로드", name_en: "", image: "아게이트로드.png" }
+        { name: "아게이트 로드", name_en: "", image: "아게이트로드.jpg" }
     ]
 };
