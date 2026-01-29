@@ -80,6 +80,7 @@
         { name: "수호자의 활", name_en: "Water Guardian Bow", image: "9-Water Guardian Bow.jpg" },
         { name: "요자쿠라 언월궁", name_en: "Yozakura Crescent Bow", image: "9-Yozakura Crescent Bow.jpg" },
         { name: "젤 슈터", name_en: "Zel Shooter", image: "9-Zel Shooter.jpg" },
-        { name: "조노의 숏 보우", name_en: "Zono's Short Bow", image: "9-Zono's Short Bow.jpg" }
+        { name: "조노의 숏 보우", name_en: "Zono's Short Bow", image: "9-Zono's Short Bow.jpg" },
+        { name: "루주 보우", name_en: "", image: "루주보우.jpg" }
     ]
 };

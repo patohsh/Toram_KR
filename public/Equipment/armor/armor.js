@@ -5,11 +5,12 @@
     description: "캐릭터의 외형과 방어력을 담당하는 몸장비 목록입니다. 경량화/중량화 개조가 가능하며, DEF와 각종 저항력을 제공합니다.",
     items: [
         { name: "모험가의 옷", name_en: "Adventurer's Garb", image: "8-Adventurer's Garb [Normal-Female].jpg" },
-        { name: "주년 축제 옷", name_en: "Anniversary Dress", image: "8-Anniversary Dress [Normal-Female].jpg" },
-        { name: "주년 축제 옷 II", name_en: "Anniversary Festive Garb II", image: "8-Anniversary Festive Garb II [Normal-Female].jpg" },
-        { name: "주년 축제 옷 III", name_en: "Anniversary Festive Garb III", image: "8-Anniversary Festive Garb III [Normal-Female].jpg" },
-        { name: "주년 축제 옷 IV", name_en: "Anniversary Festive Garb IV", image: "8-Anniversary Festive Garb IV [Normal-Female].jpg" },
-        { name: "주년 축제 옷 V", name_en: "Anniversary Festive Garb V", image: "8-Anniversary Festive Garb [Normal-Female].jpg" }, // 파일명 규칙상 V가 생략된 경우 매핑
+        { name: "주년제의 축하 옷", name_en: "Anniversary Dress", image: "8-Anniversary Dress [Normal-Female].jpg" },
+        { name: "주년제의 축하 옷 II", name_en: "Anniversary Festive Garb II", image: "8-Anniversary Festive Garb II [Normal-Female].jpg" },
+        { name: "주년제의 축하 옷 III", name_en: "Anniversary Festive Garb III", image: "8-Anniversary Festive Garb III [Normal-Female].jpg" },
+        { name: "주년제의 축하 옷 IV", name_en: "Anniversary Festive Garb IV", image: "8-Anniversary Festive Garb IV [Normal-Female].jpg" },
+        { name: "주년제의 축하 옷 V", name_en: "Anniversary Festive Garb V", image: "8-Anniversary Festive Garb V [Normal-Female].jpg" }, // 
+        { name: "주년제의 축하 옷 VI", name_en: "Anniversary Festive Garb VI", image: "8-Anniversary Festive Garb VI [Normal-Female].jpg" }, // 파일명 규칙상 V가 생략된 경우 매핑
         { name: "앤티크 메일", name_en: "Antique Mail", image: "8-Antique Mail [Normal-Female].jpg" },
         { name: "아쿠아 가브", name_en: "Aqua Garb", image: "8-Aqua Garb [Normal-Female].jpg" },
         { name: "아르미그마", name_en: "Armigma", image: "8-Armigma [Normal-Female].jpg" },
@@ -43,9 +44,10 @@
         { name: "포르투이타 베스티", name_en: "Fortuita Vestibus", image: "8-Fortuita Vestibus [Normal-Female].jpg" },
         { name: "검투사의 갑옷", name_en: "Gladiator Armor", image: "8-Gladiator Armor [Normal-Female].jpg" },
         { name: "비룡의 옷", name_en: "Green Dragon Garb", image: "8-Green Dragon Garb [Normal-Female].jpg" },
+        { name: "할로윈 의상", name_en: "Halloween Garb", image: "8-Halloween Garb [Normal-Female].jpg" },
         { name: "할로윈 의상 II", name_en: "Halloween Garb II", image: "8-Halloween Garb II [Normal-Female].jpg" },
         { name: "할로윈 의상 III", name_en: "Halloween Garb III", image: "8-Halloween Garb III [Normal-Female].jpg" },
-        { name: "할로윈 의상", name_en: "Halloween Garb", image: "8-Halloween Garb [Normal-Female].jpg" },
+        { name: "할로윈 의상 IV", name_en: "Halloween Garb IV", image: "8 - Halloween Garb IV.jpg" },
         { name: "천사 깃털 옷", name_en: "Heaven Feather Garb", image: "8-Heaven Feather Garb [Normal-Female].jpg" },
         { name: "성스러운 옷", name_en: "Holy Robe", image: "8-Holy Robe [Normal-Female].jpg" },
         { name: "사냥꾼의 옷", name_en: "Hunter's Garb", image: "8-Hunter's Garb [Normal-Female].jpg" },
@@ -70,18 +72,18 @@
         { name: "메이플 코트", name_en: "Maple Coat", image: "8-Maple Coat [Normal-Female].jpg" },
         { name: "메딕 코트", name_en: "Medic Coat", image: "8-Medic Coat [Normal-Female].jpg" },
         { name: "모즈토 아머", name_en: "Mozt Armor", image: "8-Mozt Armor [Normal-Female].jpg" },
-        { name: "물군 로브", name_en: "Mulgoon Robe", image: "8-Mulgoon Robe [Normal-Female].jpg" },
+        { name: "물윙구 로브", name_en: "Mulgoon Robe", image: "8-Mulgoon Robe [Normal-Female].jpg" },
         { name: "미라 붕대 옷", name_en: "Mummy Bandage Outfit", image: "8-Mummy Bandage Outfit [Normal-Female].jpg" },
         { name: "닌자 의상", name_en: "Ninja Costume", image: "8-Ninja Costume [Normal-Female].jpg" },
         { name: "오션 댄서", name_en: "Ocean Dancer", image: "8-Ocean Dancer [Normal-Female].jpg" },
-        { name: "오션 익스플로러", name_en: "Ocean Explorer", image: "8-Ocean Explorer [Normal-Female].jpg" },
+        { name: "오션 탐구자", name_en: "Ocean Explorer", image: "8-Ocean Explorer [Normal-Female].jpg" },
         { name: "도깨비 의상", name_en: "Oni Garb", image: "8-Oni Garb [Normal-Female].jpg" },
         { name: "우즈 아머", name_en: "Ooze Armor", image: "8-Ooze Armor [Normal-Female].jpg" },
         { name: "오라클 로브", name_en: "Oracle Robe", image: "8-Oracle Robe [Normal-Female].jpg" },
         { name: "오리엔탈 로브", name_en: "Oriental Robe", image: "8-Oriental Robe [Normal-Female].jpg" },
         { name: "달구경 옷", name_en: "Otsukimi Garb", image: "8-Otsukimi Garb [Normal-Female].jpg" },
         { name: "이계의 갑옷", name_en: "Outerworld Armor", image: "8-Outerworld Armor [Normal-Female].jpg" },
-        { name: "가마꾼의 옷", name_en: "Palanquin Carrier Garment", image: "8-Palanquin Carrier Garment [Normal-Female].jpg" },
+        { name: "가마 행렬 의상", name_en: "Palanquin Carrier Garment", image: "8-Palanquin Carrier Garment [Normal-Female].jpg" },
         { name: "판다 의상", name_en: "Panda Costume", image: "8-Panda Costume [Normal-Female].jpg" },
         { name: "연회복", name_en: "Party Costume", image: "8-Party Costume [Normal-Female].jpg" },
         { name: "팔랑크스 (옷)", name_en: "Phalanx (Armor)", image: "8-Phalanx (Armor) [Normal-Female].jpg" },
@@ -99,6 +101,7 @@
         { name: "벚꽃 기모노 IV", name_en: "Sakura Kimono IV", image: "8-Sakura Kimono IV [Normal-Female].jpg" },
         { name: "벚꽃 기모노 V", name_en: "Sakura Kimono V", image: "8-Sakura Kimono V [Normal-Female].jpg" },
         { name: "벚꽃 기모노 VI", name_en: "Sakura Kimono VI", image: "8-Sakura Kimono VI [Normal-Female].jpg" },
+        { name: "벚꽃 기모노 VII", name_en: "Sakura Kimono VII", image: "Sakura VII.jpg" },
         { name: "산타 슈트", name_en: "Santa Suit", image: "8-Santa Suit [Normal-Female].jpg" },
         { name: "산타 슈트 II", name_en: "Santa Suit II", image: "8-Santa Suit II [Normal-Female].jpg" },
         { name: "산타 슈트 III", name_en: "Santa Suit III", image: "8-Santa Suit III [Normal-Female].jpg" },
@@ -133,5 +136,6 @@
         { name: "겨울 의상 III", name_en: "Winter Outfit III", image: "8-Winter Outfit III.jpg" },
         { name: "제가 슈트", name_en: "Zega Onesie", image: "8-Zega Onesie [Normal-Female].jpg" },
         { name: "다크 신디케이트 빌먼트", name_en: "Dark Syndicate Vilment", image: "8-  Dark Syndicate   Vilment [Normal-Female].jpg" }
+        { name: "두아트 로브", name_en: "duart", image: "duatu.jpg" }
     ]
 };

@@ -102,6 +102,7 @@
         { name: "윈드 로드", name_en: "Wind Staff", image: "wind staff.png" },
         { name: "윈드 찬터 지팡이", name_en: "Windchanter Staff", image: "windchanter staff.png" },
         { name: "제로스의 지팡이", name_en: "Xellos' Staff", image: "xellos' staff.png" },
-        { name: "요자쿠라 언월장", name_en: "Yozakura Crescent Staff", image: "yozakura crescent staff.png" }
+        { name: "요자쿠라 언월장", name_en: "Yozakura Crescent Staff", image: "yozakura crescent staff.png" },
+        { name: "아게이트 로드", name_en: "", image: "아게이트로드.png" }
     ]
 };

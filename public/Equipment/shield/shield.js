@@ -89,6 +89,7 @@
         { name: "윈드 그레이스 실드", name_en: "Windgrace Shield", image: "windgrace shield.png" },
         { name: "자하크 실드", name_en: "Zahhak Shield", image: "zahhak shield.png" },
         { name: "조이의 마법서", name_en: "Zoe's Magic Book", image: "zoe's magic book.png" },
+        { name: "터콰이즈 실드", name_en: "", image: "터콰이즈실드.png" },
         { name: "메이플의 방패", name_en: "Maple Shield", image: "메이플의 방패.png" }
     ]
 };

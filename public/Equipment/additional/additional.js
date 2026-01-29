@@ -756,8 +756,10 @@
         { name: "좀비 트로피", name_en: "Zomby Trophy", image: "6-Zomby Trophy.jpg" },
         { name: "사자춤 탈머리", name_en: "Lion Dance Head", image: "사자춤 탈머리.jpg" },
         { name: "어깨 위 매", name_en: "Hawk on Shoulder", image: "어깨 위 매.jpg" },
-        { name: "머리 위 분재" name_en: "Bonsai Head Ornament", image: "머리 위 분재.jpg" },
+        { name: "머리 위 분재", name_en: "Bonsai Head Ornament", image: "머리 위 분재.jpg" },
         { name: "수호견 머리띠", name_en: "Komainu Headband", image: "수호견 머리띠.jpg" },
+        { name: "앤티크 벨트", name_en: "", image: "앤티크벨트.jpg" },
+        { name: "블랙 하트 리본", name_en: "", image: "블랙하트리본.jpg" },
         { name: "업데이트 예정", name_en: "update", image: "update.jpg" }
     ]
 };

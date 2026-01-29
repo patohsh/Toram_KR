@@ -94,6 +94,7 @@
         { name: "워리어 엔젤 할버드", name_en: "Warrior Angel Halberd", image: "26-Warrior Angel Halberd.jpg" },
         { name: "윈드 블래스트 콘", name_en: "Windblast Cone Spear", image: "26-Windblast Cone Spear.jpg" },
         { name: "요자쿠라 언월도", name_en: "Yozakura Naginata", image: "26-Yozakura Naginata.jpg" },
-        { name: "혁현의 창", name_en: "Hyeokhyeon's_Halberd", image: "Hyeokhyeon's_Halberd.jpg" }
+        { name: "혁현의 창", name_en: "Hyeokhyeon's_Halberd", image: "Hyeokhyeon's_Halberd.jpg" },
+        { name: "슈트라이 스피어", name_en: "", image: "슈트라이스피어.jpg" }
     ]
 };

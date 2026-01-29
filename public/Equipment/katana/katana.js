@@ -81,6 +81,7 @@
         { name: "츠키카게 사쿠야", name_en: "Tsukikage-Sakuya", image: "27-Tsukikage-Sakuya.jpg" },
         { name: "화이트 바이퍼", name_en: "White Viper", image: "27-White Viper.jpg" },
         { name: "야타가라스", name_en: "Yatagarasu", image: "27-Yatagarasu.jpg" },
-        { name: "요자쿠라 카타나", name_en: "Yozakura Katana", image: "27-Yozakura Katana.jpg" }
+        { name: "요자쿠라 카타나", name_en: "Yozakura Katana", image: "27-Yozakura Katana.jpg" },
+        { name: "흑희도", name_en: "black katana", image: "흑희도.jpg" }
     ]
 };
