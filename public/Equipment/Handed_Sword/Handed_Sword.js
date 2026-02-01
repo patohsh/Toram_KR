@@ -67,7 +67,7 @@
         { name: "레베 팡", name_en: "Leve Fang", image: "leve fang.png" },
         { name: "라이트닝 소드", name_en: "Lightning Sword", image: "lightning sword.png" },
         { name: "리틀 여제의 검", name_en: "Lil Empress Sword", image: "lil empress sword.png" },
-        { name: "롱 소드", name_en: "ATK:17(80%)&최대 HP+50&명중+1", image: "longsword.png" },
+        { name: "롱 소드", name_en: "ATK:17(80%)<br>최대 HP+50<br>명중+1", image: "longsword.png" },
         { name: "러스터 소드", name_en: "Luster Sword", image: "luster sword.png" },
         { name: "럭셔리 소드", name_en: "Luxurie Sword", image: "luxurie sword.png" },
         { name: "메이스 소드", name_en: "Mace Sword", image: "mace sword.png" },
