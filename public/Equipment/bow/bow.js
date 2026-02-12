@@ -81,6 +81,8 @@
         { name: "요자쿠라 언월궁", name_en: "Yozakura Crescent Bow", image: "9-Yozakura Crescent Bow.jpg" },
         { name: "젤 슈터", name_en: "Zel Shooter", image: "9-Zel Shooter.jpg" },
         { name: "조노의 숏 보우", name_en: "Zono's Short Bow", image: "9-Zono's Short Bow.jpg" },
-        { name: "루주 보우", name_en: "", image: "루주보우.jpg" }
+        { name: "루주 보우", name_en: "", image: "루주보우.jpg" },
+        { name: "쿠벨 보우", name_en: "물속성<br>불속성 대미지+10%<br>ATK+12%<br>공격속도+1100<br>크리티컬률+35<br>무적수단(1초)<br>탄환경감+30%", image: "쿠보.jpg" }
+
     ]
 };

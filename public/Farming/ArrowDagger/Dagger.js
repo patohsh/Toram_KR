@@ -346,6 +346,14 @@
         },
         {
             category: "한정/이벤트",
+            name: "후르츠 나이프",
+            name_en: "쿠킹렘 파밍",
+            atk: 212,
+            stats: ["최대 MP+200", "MP회복+5", "크리티컬률+10"],
+            drop: "발렌타인데이 /230~/ 카르카오 농촌 유적 "
+        },
+        {
+            category: "한정/이벤트",
             name: "꽃봉오리 단검",
             name_en: "Flower Bud Dagger",
             atk: 15,

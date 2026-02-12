@@ -84,6 +84,13 @@
         { name: "훨윈드", name_en: "Whirlwind", image: "15-Whirlwind.jpg" },
         { name: "불카누스의 분노", name_en: "Wrath of Vulcan", image: "15-Wrath of Vulcan.jpg" },
         { name: "요자쿠라 마도구", name_en: "Yozakura Magic Device", image: "15-Yozakura Magic Device.jpg" },
-        { name: "요자쿠라 윙", name_en: "Yozakura Wings", image: "15-Yozakura Wings.jpg" }
+        { name: "요자쿠라 윙", name_en: "Yozakura Wings", image: "15-Yozakura Wings.jpg" },
+        { name: "대어 날개", name_en: "Yozakura Wings", image: "대어 날개.jpg" },
+        { name: "슈라이프 윙", name_en: "Yozakura Wings", image: "슈라이프 윙.jpg" },
+        { name: "카타라 앵커윙", name_en: "Yozakura Wings", image: "카타라 앵커윙.jpg" },
+        { name: "크루엘 윙", name_en: "Yozakura Wings", image: "크루엘 윙.jpg" },
+        { name: "시드 윙", name_en: "Yozakura Wings", image: "시드 윙.jpg" },
+        { name: "쿠벨 윙", name_en: "물속성<br>불속성데미지+10%<br>MATK+12%<br>시전속도+1100<br>크리티컬률+35<br>무적수단(1초)<br>운석경감+30%", image: "쿠벨.jpg" }
+
     ]
 };
