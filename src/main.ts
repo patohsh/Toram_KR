@@ -1510,36 +1510,53 @@ function renderEquipGrid() {
     grid.innerHTML = '';
 
     if (filteredEquipData.length === 0) {
-        grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:50px; color:#888;">검색 결과가 없습니다.</div>';
+        grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:50px; color:#888;">결과가 없습니다.</div>';
         return;
     }
 
     const start = (equipCurrentPage - 1) * ITEMS_PER_PAGE;
-    const end = start + ITEMS_PER_PAGE;
-    const pageItems = filteredEquipData.slice(start, end);
-
-    // 현재 카테고리가 이미지 숨김 대상인지 확인 (화살, 단검, 추가장비)
+    const pageItems = filteredEquipData.slice(start, start + ITEMS_PER_PAGE);
     const isNoImageCategory = isFarmingMode && ['Arrow', 'Dagger', 'Additional'].includes(currentCategory);
-
-    // 그리드 스타일 변경 (이미지 없으면 좀 더 촘촘하게 보여주기 위해 클래스 추가 가능)
-    // 여기선 기존 그리드 유지하되 내용물만 바꿈
 
     pageItems.forEach((item: any) => {
         const card = document.createElement('div');
         card.className = 'equip-card';
 
-        // 1. 이미지 경로 및 리스트 설정 (images 배열이 있으면 사용, 없으면 image 단일 배열화)
-        const imgList: string[] = item.images && Array.isArray(item.images) ? item.images : [item.image || 'unknown.jpg'];
-        let activeIdx = 0;
+        // ★ [수정됨] 이미지 리스트 처리: images 배열이 있으면 쓰고, 없으면 image 단일 항목을 배열로 감싸서 처리 (Armor 외 타 장비 호환)
+        const imgList: string[] = item.images && Array.isArray(item.images) ? item.images : [item.image || (item.id ? `${item.id}.jpg` : 'unknown.png')];
+        let activeIdx = 0; // 카드 내에서 현재 보여지는 이미지 번호
+        const isMulti = imgList.length > 1;
 
+        // ★ [수정됨] 경로 계산 함수: 카테고리에 맞는 폴더 경로를 반환
         const getFullImgPath = (name: string) => {
-            const rootFolder = isFarmingMode ? 'Farming' : 'Equipment';
-            const subFolder = isFarmingMode && ['Weapon', 'Armor'].includes(currentCategory) ? 'WeaponArmor' : currentCategory;
-            return `${rootFolder}/${subFolder}/${name}`;
+            const root = isFarmingMode ? 'Farming' : 'Equipment';
+            const sub = isFarmingMode && ['Weapon', 'Armor'].includes(currentCategory) ? 'WeaponArmor' : currentCategory;
+            return `${root}/${sub}/${name}`;
         };
 
+        // ★ [수정됨] JPG/PNG 자동 전환 핸들러: 로드 실패 시 확장자를 바꿔서 재시도
+        const handleImgError = (imgEl: HTMLImageElement) => {
+            const src = imgEl.src;
+            if (src.includes('.jpg')) imgEl.src = src.replace('.jpg', '.png');
+            else if (src.includes('.png')) imgEl.src = src.replace('.png', '.jpg');
+            else imgEl.src = 'https://toram-id.info/img/skill/unknown.png';
+            imgEl.onerror = null;
+        };
 
-        // 스탯 텍스트 처리
+        // 3. 이미지 섹션 생성 (슬라이드 버튼 포함)
+        let imgContent = '';
+        if (!isNoImageCategory) {
+            // ★ [수정됨] 슬라이드 버튼 및 카운터 표시 HTML 구성
+            imgContent = `
+                <div class="equip-img-box">
+                    ${isMulti ? `<button class="slide-btn prev">◀</button>` : ''}
+                    <img src="${getFullImgPath(imgList[activeIdx])}" class="main-img" alt="${item.name}">
+                    ${isMulti ? `<button class="slide-btn next">▶</button>` : ''}
+                    ${isMulti ? `<div class="img-counter">1 / ${imgList.length}</div>` : ''}
+                </div>`;
+        }
+
+        // 5. ★ [질문하신 스탯 텍스트 처리 부분] - 변수로 다시 분리함
         let statsHtml = '';
         if (item.stats) {
             const sText = Array.isArray(item.stats) ? item.stats.join('<br>') : item.stats.replace(/\n/g, '<br>');
@@ -1548,26 +1565,10 @@ function renderEquipGrid() {
             statsHtml = `<div class="equip-stats">${item.base_atk ? 'ATK: ' + item.base_atk : 'DEF: ' + item.base_def}</div>`;
         }
 
-        // 카테고리 뱃지
+        // 6. ★ [질문하신 카테고리 뱃지 부분] - 변수로 다시 분리함
         const catBadge = isFarmingMode && item.category ? `<span class="trait-cat-badge" style="margin-bottom:5px; display:inline-block;">${item.category}</span>` : '';
 
-        // ★ 핵심 수정: 이미지가 필요한 경우에만 img 태그 생성
-
-        // 3. 이미지 섹션 생성 (슬라이드 버튼 포함)
-        let imgContent = ''; // 카드 내부 슬라이드용 인덱스
-        const isMulti = imgList.length > 1;// 이미지가 여러 장인지 확인
-        if (!isNoImageCategory) {
-            imgContent = `
-                <div class="equip-img-box">
-                            <!-- 이미지가 여러 장일 때만 좌우 버튼 생성 -->
-                    ${isMulti ? `<button class="slide-btn prev">◀</button>` : ''}
-                    <img src="${getFullImgPath(imgList[activeIdx])}" class="main-img" alt="${item.name}">
-                    ${isMulti ? `<button class="slide-btn next">▶</button>` : ''}
-                    ${isMulti ? `<div class="img-counter">1 / ${imgList.length}</div>` : ''}
-                </div>
-            `;
-        }
-
+        // 7. ★ [최종 HTML 결합]
         card.innerHTML = `
             ${imgContent}
             <div class="equip-info" style="${isNoImageCategory ? 'width:100%; text-align:left;' : ''}">
@@ -1578,33 +1579,36 @@ function renderEquipGrid() {
             </div>
         `;
 
-        if (isMulti) {
+        // ★ [수정됨] 이미지 로드 실패 시 에러 핸들러 연결 및 클릭 시 확대 모달 연결
         const mainImg = card.querySelector('.main-img') as HTMLImageElement;
-        const counter = card.querySelector('.img-counter') as HTMLElement;
+        if (mainImg) {
+            mainImg.onerror = () => handleImgError(mainImg);
+            mainImg.addEventListener('click', () => {
+                const fullPaths = imgList.map(n => getFullImgPath(n));
+                openImageModalWithSlide(fullPaths, activeIdx, item.name);
+            });
+        }
 
-        card.querySelector('.prev')?.addEventListener('click', (e) => {
-            e.stopPropagation();
-            activeIdx = (activeIdx - 1 + imgList.length) % imgList.length;
-            mainImg.src = getFullImgPath(imgList[activeIdx]);
-            counter.innerText = `${activeIdx + 1} / ${imgList.length}`;
-        });
-
-        card.querySelector('.next')?.addEventListener('click', (e) => {
-            e.stopPropagation();
-            activeIdx = (activeIdx + 1) % imgList.length;
-            mainImg.src = getFullImgPath(imgList[activeIdx]);
-            counter.innerText = `${activeIdx + 1} / ${imgList.length}`;
-        });
-    }
-
-    // 5. 이미지 클릭 확대 (현재 슬라이드된 인덱스 전달)
-    card.querySelector('.main-img')?.addEventListener('click', () => {
-        const fullPathList = imgList.map(name => getFullImgPath(name));
-        openImageModalWithSlide(fullPathList, activeIdx, item.name);
+        // ★ [수정됨] 카드 내 좌우 화살표 클릭 시 이미지 교체 로직
+        if (isMulti) {
+            const counter = card.querySelector('.img-counter') as HTMLElement;
+            card.querySelector('.prev')?.addEventListener('click', (e) => {
+                e.stopPropagation(); // 카드 클릭(확대) 이벤트 방지
+                activeIdx = (activeIdx - 1 + imgList.length) % imgList.length;
+                mainImg.src = getFullImgPath(imgList[activeIdx]);
+                mainImg.onerror = () => handleImgError(mainImg);
+                counter.innerText = `${activeIdx + 1} / ${imgList.length}`;
+            });
+            card.querySelector('.next')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                activeIdx = (activeIdx + 1) % imgList.length;
+                mainImg.src = getFullImgPath(imgList[activeIdx]);
+                mainImg.onerror = () => handleImgError(mainImg);
+                counter.innerText = `${activeIdx + 1} / ${imgList.length}`;
+            });
+        }
+        grid.appendChild(card);
     });
-
-    grid.appendChild(card);
-});
 }
 function openImageModalWithSlide(imgList: string[], startIndex: number, title: string) {
     modalImages = imgList;
@@ -1623,12 +1627,11 @@ function openImageModalWithSlide(imgList: string[], startIndex: number, title: s
         `;
         document.body.appendChild(modal);
 
-        // 배경 클릭 시 닫기 (뒤로가기 명령으로 닫기 수행)
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) history.back();
-        });
 
-        // 모달 슬라이드 이벤트
+       // ★ [수정됨] 배경 클릭 시 사이트가 나가지지 않고 모달만 닫히도록 history.back() 실행
+        modal.addEventListener('click', (e) => { if (e.target === modal) history.back(); });
+
+        // ★ [수정됨] 모달 내부 슬라이드 이동 버튼 이벤트
         modal.querySelector('.m-prev')?.addEventListener('click', (e) => {
             e.stopPropagation();
             modalCurrentIndex = (modalCurrentIndex - 1 + modalImages.length) % modalImages.length;
@@ -1644,22 +1647,25 @@ function openImageModalWithSlide(imgList: string[], startIndex: number, title: s
     const updateModalUI = () => {
         const mImg = document.getElementById('modal-img') as HTMLImageElement;
         const mCap = document.getElementById('modal-caption') as HTMLElement;
-        const mPrev = modal?.querySelector('.m-prev') as HTMLElement;
-        const mNext = modal?.querySelector('.m-next') as HTMLElement;
+        const arrows = modal?.querySelectorAll('.modal-arrow');
 
         mImg.src = modalImages[modalCurrentIndex];
+        // 모달에서도 JPG/PNG 교차 에러 대응
+        mImg.onerror = () => {
+            if (mImg.src.includes('.jpg')) mImg.src = mImg.src.replace('.jpg', '.png');
+            else if (mImg.src.includes('.png')) mImg.src = mImg.src.replace('.png', '.jpg');
+            mImg.onerror = null;
+        };
         mCap.innerText = `${title} (${modalCurrentIndex + 1} / ${modalImages.length})`;
 
-        // 이미지가 1개면 화살표 숨김
-        const display = modalImages.length > 1 ? 'block' : 'none';
-        if (mPrev) mPrev.style.display = display;
-        if (mNext) mNext.style.display = display;
+        // 이미지가 1장뿐이면 화살표 버튼 숨김
+        arrows?.forEach((a: any) => a.style.display = modalImages.length > 1 ? 'block' : 'none');
     };
 
     updateModalUI();
     modal.style.display = 'flex';
 
-    // ★ 모바일 뒤로가기 대응: 가짜 히스토리 추가
+    // ★ [수정됨] 핵심: 뒤로가기 버튼 클릭 시 사이트가 나가지 않고 모달만 닫히게 하기 위해 가짜 히스토리 기록
     history.pushState({ modalOpen: true }, '');
 }
 
@@ -1687,6 +1693,7 @@ function renderPagination() {
 
     container.appendChild(createBtn('Next', () => { equipCurrentPage++; renderEquipGrid(); renderPagination(); }, equipCurrentPage === totalPages));
 }
+// ★ [신규 추가] 브라우저 뒤로가기 버튼(혹은 제스처) 발생 시 모달이 열려있다면 모달만 닫음
 window.addEventListener('popstate', () => {
     const modal = document.getElementById('image-modal');
     if (modal && modal.style.display === 'flex') {
