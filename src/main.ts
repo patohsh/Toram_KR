@@ -1557,15 +1557,17 @@ function renderEquipGrid() {
         // 3. 이미지 섹션 생성 (슬라이드 버튼 포함)
         let imgContent = '';
         if (!isNoImageCategory) {
-            // ★ [수정됨] 슬라이드 버튼 및 카운터 표시 HTML 구성
             imgContent = `
-                <div class="equip-img-box">
+                <div class="equip-image-wrapper">
                     ${isMulti ? `<button class="slide-btn prev">◀</button>` : ''}
-                    <img src="${getFullImgPath(imgList[activeIdx])}" class="main-img" alt="${item.name}">
+                    <div class="equip-img-box">
+                        <img src="${getFullImgPath(imgList[activeIdx])}" class="main-img" alt="${item.name}">
+                    </div>
                     ${isMulti ? `<button class="slide-btn next">▶</button>` : ''}
                     ${isMulti ? `<div class="img-counter">1 / ${imgList.length}</div>` : ''}
                 </div>`;
         }
+
 
         // 5. ★ [질문하신 스탯 텍스트 처리 부분] - 변수로 다시 분리함
         let statsHtml = item.stats ? `<div class="equip-stats highlight" style="margin-top:10px;">${Array.isArray(item.stats) ? item.stats.join('<br>') : item.stats.replace(/\n/g, '<br>')}</div>` : (item.base_def || item.base_atk ? `<div class="equip-stats">${item.base_atk ? 'ATK: ' + item.base_atk : 'DEF: ' + item.base_def}</div>` : '');
