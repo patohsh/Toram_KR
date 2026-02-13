@@ -112,7 +112,7 @@
         { name: "새비지 메일", name_en: "Savage Mail", image: "8-Savage Mail [Normal-Female].jpg" },
         { name: "스케일 아머", name_en: "Scale Armor", image: "8-Scale Armor [Normal-Female].jpg" },
         { name: "스쿠버 레인저 슈트", name_en: "Scuba Ranger Suit", image: "8-Scuba Ranger Suit [Normal-Female].jpg" },
-        { name: "시셸", name_en: "Seashell", image: "8-Seashell [Normal-Female].jpg" },
+        { name: "시셸즈", name_en: "Seashell", image: "Seashell.png" },
         { name: "눈사람 의상", name_en: "Snowman Garb", image: "8-Snowman Garb [Normal-Female].jpg" },
         { name: "스노우 웨어", name_en: "Snowwear", image: "8-Snowwear [Normal-Female].jpg" },
         { name: "소다 수영복", name_en: "Soda Swimsuit", image: "8-Soda Swimsuit [Normal-Female].jpg" },
