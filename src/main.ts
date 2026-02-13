@@ -1522,19 +1522,29 @@ function renderEquipGrid() {
         const card = document.createElement('div');
         card.className = 'equip-card';
 
-        // ★ [수정됨] 이미지 리스트 처리: images 배열이 있으면 쓰고, 없으면 image 단일 항목을 배열로 감싸서 처리 (Armor 외 타 장비 호환)
-        const imgList: string[] = item.images && Array.isArray(item.images) ? item.images : [item.image || (item.id ? `${item.id}.jpg` : 'unknown.png')];
-        let activeIdx = 0; // 카드 내에서 현재 보여지는 이미지 번호
+        // ★ [수정됨] 이미지 리스트 감지 로직
+        // item.image 자체가 배열인지 확인하고, 아니면 단일 배열로 만듭니다.
+        let imgList: string[] = [];
+        if (Array.isArray(item.image)) {
+            imgList = item.image; // 주신 데이터처럼 image: [...] 인 경우
+        } else if (Array.isArray(item.images)) {
+            imgList = item.images; // 혹시 images: [...] 인 경우 대응
+        } else {
+            // 단일 파일명인 경우
+            imgList = [item.image || (item.id ? `${item.id}.jpg` : 'unknown.png')];
+        }
+
+        let activeIdx = 0;
         const isMulti = imgList.length > 1;
 
-        // ★ [수정됨] 경로 계산 함수: 카테고리에 맞는 폴더 경로를 반환
+        // [경로 계산 함수]
         const getFullImgPath = (name: string) => {
             const root = isFarmingMode ? 'Farming' : 'Equipment';
             const sub = isFarmingMode && ['Weapon', 'Armor'].includes(currentCategory) ? 'WeaponArmor' : currentCategory;
             return `${root}/${sub}/${name}`;
         };
 
-        // ★ [수정됨] JPG/PNG 자동 전환 핸들러: 로드 실패 시 확장자를 바꿔서 재시도
+        // [JPG/PNG 자동 전환 핸들러]
         const handleImgError = (imgEl: HTMLImageElement) => {
             const src = imgEl.src;
             if (src.includes('.jpg')) imgEl.src = src.replace('.jpg', '.png');
@@ -1542,6 +1552,7 @@ function renderEquipGrid() {
             else imgEl.src = 'https://toram-id.info/img/skill/unknown.png';
             imgEl.onerror = null;
         };
+
 
         // 3. 이미지 섹션 생성 (슬라이드 버튼 포함)
         let imgContent = '';
@@ -1557,21 +1568,12 @@ function renderEquipGrid() {
         }
 
         // 5. ★ [질문하신 스탯 텍스트 처리 부분] - 변수로 다시 분리함
-        let statsHtml = '';
-        if (item.stats) {
-            const sText = Array.isArray(item.stats) ? item.stats.join('<br>') : item.stats.replace(/\n/g, '<br>');
-            statsHtml = `<div class="equip-stats highlight" style="margin-top:10px;">${sText}</div>`;
-        } else if (item.base_def || item.base_atk) {
-            statsHtml = `<div class="equip-stats">${item.base_atk ? 'ATK: ' + item.base_atk : 'DEF: ' + item.base_def}</div>`;
-        }
-
-        // 6. ★ [질문하신 카테고리 뱃지 부분] - 변수로 다시 분리함
+        let statsHtml = item.stats ? `<div class="equip-stats highlight" style="margin-top:10px;">${Array.isArray(item.stats) ? item.stats.join('<br>') : item.stats.replace(/\n/g, '<br>')}</div>` : (item.base_def || item.base_atk ? `<div class="equip-stats">${item.base_atk ? 'ATK: ' + item.base_atk : 'DEF: ' + item.base_def}</div>` : '');
         const catBadge = isFarmingMode && item.category ? `<span class="trait-cat-badge" style="margin-bottom:5px; display:inline-block;">${item.category}</span>` : '';
 
-        // 7. ★ [최종 HTML 결합]
         card.innerHTML = `
             ${imgContent}
-            <div class="equip-info" style="${isNoImageCategory ? 'width:100%; text-align:left;' : ''}">
+            <div class="equip-info">
                 ${catBadge}
                 <div class="equip-name" style="font-size:1.1rem;">${item.name}</div>
                 <div class="equip-name-en" style="margin-bottom:5px;">${item.name_en || ''}</div>
@@ -1593,10 +1595,10 @@ function renderEquipGrid() {
         if (isMulti) {
             const counter = card.querySelector('.img-counter') as HTMLElement;
             card.querySelector('.prev')?.addEventListener('click', (e) => {
-                e.stopPropagation(); // 카드 클릭(확대) 이벤트 방지
+                e.stopPropagation();
                 activeIdx = (activeIdx - 1 + imgList.length) % imgList.length;
                 mainImg.src = getFullImgPath(imgList[activeIdx]);
-                mainImg.onerror = () => handleImgError(mainImg);
+                mainImg.onerror = () => handleImgError(mainImg); // 이미지 바뀔 때마다 에러 핸들러 재작동
                 counter.innerText = `${activeIdx + 1} / ${imgList.length}`;
             });
             card.querySelector('.next')?.addEventListener('click', (e) => {
