@@ -1280,6 +1280,8 @@ let currentSubTag = '전체';
 let isFarmingMode = false;
 let equipCurrentPage = 1;
 const ITEMS_PER_PAGE = 9;
+let modalImages: string[] = [];
+let modalCurrentIndex = 0;
 
 function renderEquipmentPage() {
     const categories = isFarmingMode ? FARMING_CATEGORIES : EQUIP_CATEGORIES;
@@ -1526,6 +1528,17 @@ function renderEquipGrid() {
         const card = document.createElement('div');
         card.className = 'equip-card';
 
+        // 1. 이미지 경로 및 리스트 설정 (images 배열이 있으면 사용, 없으면 image 단일 배열화)
+        const imgList: string[] = item.images && Array.isArray(item.images) ? item.images : [item.image || 'unknown.png'];
+        let activeIdx = 0;
+
+        const getFullImgPath = (name: string) => {
+            const rootFolder = isFarmingMode ? 'Farming' : 'Equipment';
+            const subFolder = isFarmingMode && ['Weapon', 'Armor'].includes(currentCategory) ? 'WeaponArmor' : currentCategory;
+            return `${rootFolder}/${subFolder}/${name}`;
+        };
+
+
         // 스탯 텍스트 처리
         let statsHtml = '';
         if (item.stats) {
@@ -1539,63 +1552,115 @@ function renderEquipGrid() {
         const catBadge = isFarmingMode && item.category ? `<span class="trait-cat-badge" style="margin-bottom:5px; display:inline-block;">${item.category}</span>` : '';
 
         // ★ 핵심 수정: 이미지가 필요한 경우에만 img 태그 생성
-        let imgContent = '';
+
+        // 3. 이미지 섹션 생성 (슬라이드 버튼 포함)
+        let imgContent = ''; // 카드 내부 슬라이드용 인덱스
+        const isMulti = imgList.length > 1;// 이미지가 여러 장인지 확인
         if (!isNoImageCategory) {
-            const rootFolder = isFarmingMode ? 'Farming' : 'Equipment';
-            const subFolder = isFarmingMode && ['Weapon', 'Armor'].includes(currentCategory) ? 'WeaponArmor' : currentCategory;
-
-            let imgFileName = item.image || (item.id ? (item.id.includes('.') ? item.id : `${item.id}.png`) : 'unknown.png');
-            const basePath = `${rootFolder}/${subFolder}/${imgFileName}`;
-
             imgContent = `
-        <div class="equip-img-box">
-          <img src="${basePath}" 
-            onerror="this.onerror=null; this.src='${basePath.replace('.png', '.jpg')}'; this.onerror=function(){this.src='https://toram-id.info/img/skill/unknown.png'}" 
-            alt="${item.name}">
-        </div>
-      `;
+                <div class="equip-img-box">
+                            <!-- 이미지가 여러 장일 때만 좌우 버튼 생성 -->
+                    ${isMulti ? `<button class="slide-btn prev">◀</button>` : ''}
+                    <img src="${getFullImgPath(imgList[activeIdx])}" class="main-img" alt="${item.name}">
+                    ${isMulti ? `<button class="slide-btn next">▶</button>` : ''}
+                    ${isMulti ? `<div class="img-counter">1 / ${imgList.length}</div>` : ''}
+                </div>
+            `;
         }
 
         card.innerHTML = `
-      ${imgContent}
-      <div class="equip-info" style="${isNoImageCategory ? 'width:100%; text-align:left;' : ''}">
-        ${catBadge}
-        <div class="equip-name" style="font-size:1.1rem;">${item.name}</div>
-        <div class="equip-name-en" style="margin-bottom:5px;">${item.name_en || ''}</div>
-        ${statsHtml}
-      </div>
-    `;
-        grid.appendChild(card);
+            ${imgContent}
+            <div class="equip-info" style="${isNoImageCategory ? 'width:100%; text-align:left;' : ''}">
+                ${catBadge}
+                <div class="equip-name" style="font-size:1.1rem;">${item.name}</div>
+                <div class="equip-name-en" style="margin-bottom:5px;">${item.name_en || ''}</div>
+                ${statsHtml}
+            </div>
+        `;
 
-        const imgBox = card.querySelector('.equip-img-box');
-        if (imgBox) {
-            imgBox.addEventListener('click', () => {
-                const imgTag = imgBox.querySelector('img') as HTMLImageElement;
-                if (imgTag) openImageModal(imgTag.src, item.name);
-            });
-        }
+        if (isMulti) {
+        const mainImg = card.querySelector('.main-img') as HTMLImageElement;
+        const counter = card.querySelector('.img-counter') as HTMLElement;
+
+        card.querySelector('.prev')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            activeIdx = (activeIdx - 1 + imgList.length) % imgList.length;
+            mainImg.src = getFullImgPath(imgList[activeIdx]);
+            counter.innerText = `${activeIdx + 1} / ${imgList.length}`;
+        });
+
+        card.querySelector('.next')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            activeIdx = (activeIdx + 1) % imgList.length;
+            mainImg.src = getFullImgPath(imgList[activeIdx]);
+            counter.innerText = `${activeIdx + 1} / ${imgList.length}`;
+        });
+    }
+
+    // 5. 이미지 클릭 확대 (현재 슬라이드된 인덱스 전달)
+    card.querySelector('.main-img')?.addEventListener('click', () => {
+        const fullPathList = imgList.map(name => getFullImgPath(name));
+        openImageModalWithSlide(fullPathList, activeIdx, item.name);
     });
+
+    grid.appendChild(card);
+});
 }
-function openImageModal(imgSrc: string, title: string) {
+function openImageModalWithSlide(imgList: string[], startIndex: number, title: string) {
+    modalImages = imgList;
+    modalCurrentIndex = startIndex;
+
     let modal = document.getElementById('image-modal');
     if (!modal) {
         modal = document.createElement('div');
         modal.id = 'image-modal';
         modal.className = 'image-modal';
         modal.innerHTML = `
+            <button class="modal-arrow m-prev">◀</button>
             <img class="modal-content" id="modal-img">
+            <button class="modal-arrow m-next">▶</button>
             <div id="modal-caption" class="modal-caption"></div>
         `;
         document.body.appendChild(modal);
-        modal.addEventListener('click', () => modal!.style.display = 'none');
+
+        // 배경 클릭 시 닫기 (뒤로가기 명령으로 닫기 수행)
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) history.back();
+        });
+
+        // 모달 슬라이드 이벤트
+        modal.querySelector('.m-prev')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            modalCurrentIndex = (modalCurrentIndex - 1 + modalImages.length) % modalImages.length;
+            updateModalUI();
+        });
+        modal.querySelector('.m-next')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            modalCurrentIndex = (modalCurrentIndex + 1) % modalImages.length;
+            updateModalUI();
+        });
     }
 
-    const modalImg = document.getElementById('modal-img') as HTMLImageElement;
-    const modalCaption = document.getElementById('modal-caption') as HTMLElement;
+    const updateModalUI = () => {
+        const mImg = document.getElementById('modal-img') as HTMLImageElement;
+        const mCap = document.getElementById('modal-caption') as HTMLElement;
+        const mPrev = modal?.querySelector('.m-prev') as HTMLElement;
+        const mNext = modal?.querySelector('.m-next') as HTMLElement;
 
-    modalImg.src = imgSrc;
-    modalCaption.innerText = title;
+        mImg.src = modalImages[modalCurrentIndex];
+        mCap.innerText = `${title} (${modalCurrentIndex + 1} / ${modalImages.length})`;
+
+        // 이미지가 1개면 화살표 숨김
+        const display = modalImages.length > 1 ? 'block' : 'none';
+        if (mPrev) mPrev.style.display = display;
+        if (mNext) mNext.style.display = display;
+    };
+
+    updateModalUI();
     modal.style.display = 'flex';
+
+    // ★ 모바일 뒤로가기 대응: 가짜 히스토리 추가
+    history.pushState({ modalOpen: true }, '');
 }
 
 function renderPagination() {
@@ -1622,6 +1687,13 @@ function renderPagination() {
 
     container.appendChild(createBtn('Next', () => { equipCurrentPage++; renderEquipGrid(); renderPagination(); }, equipCurrentPage === totalPages));
 }
+window.addEventListener('popstate', () => {
+    const modal = document.getElementById('image-modal');
+    if (modal && modal.style.display === 'flex') {
+        modal.style.display = 'none';
+    }
+});
+
 // =================================================
 // [기능] 낮/밤 테마 토글 (Day/Night Switch)
 // =================================================

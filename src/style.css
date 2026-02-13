@@ -921,6 +921,88 @@ body.dark-mode .trait-tier-val {
     border-radius: 4px;
     width: 100%;
 }
+/*이미지 화살표 버튼*/
+/* 카드 내 화살표 */
+.equip-img-box {
+    position: relative; /* 화살표 배치를 위해 필수 */
+}
+
+.slide-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.5);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+    .slide-btn.prev {
+        left: 5px;
+    }
+
+    .slide-btn.next {
+        right: 5px;
+    }
+
+    .slide-btn:hover {
+        background: var(--accent-pink);
+    }
+
+.img-counter {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 10px;
+}
+
+/* 모달 내 화살표 */
+.modal-arrow {
+    background: rgba(255,255,255,0.1);
+    color: white;
+    border: 1px solid white;
+    font-size: 24px;
+    padding: 15px;
+    border-radius: 50%;
+    cursor: pointer;
+    margin: 0 20px;
+    transition: 0.3s;
+}
+
+    .modal-arrow:hover {
+        background: var(--accent-pink);
+        border-color: var(--accent-pink);
+    }
+
+@media (max-width: 600px) {
+    .modal-arrow {
+        position: absolute;
+        bottom: 100px;
+        margin: 0;
+        padding: 10px;
+    }
+
+    .m-prev {
+        left: 20%;
+    }
+
+    .m-next {
+        right: 20%;
+    }
+}
+/*끝*/
 
 .image-modal {
     display: none;

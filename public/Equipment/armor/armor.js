@@ -135,7 +135,7 @@
         { name: "겨울 의상 II", name_en: "Winter Outfit II", image: "8-Winter Outfit II [Normal-Female].jpg" },
         { name: "겨울 의상 III", name_en: "Winter Outfit III", image: "8-Winter Outfit III.jpg" },
         { name: "제가 슈트", name_en: "Zega Onesie", image: "8-Zega Onesie [Normal-Female].jpg" },
-        { name: "다크 신디케이트 빌먼트", name_en: "Dark Syndicate Vilment", image: "8-†Dark Syndicate† Vilment [Normal-Female].jpg" },
-        { name: "두아트 로브", name_en: "duart", image: "duatu.jpg" }
+        { name: "다크 신디케이트 빌먼트", name_en: "Dark Syndicate Vilment", image: ["8-†Dark Syndicate† Vilment [Normal-Female].jpg", "8-†Dark Syndicate† Vilment [Heavy-Female]","8-†Dark Syndicate† Vilment [Light-Female]"] },
+        { name: "두아트 로브", name_en: "duart", image: "duatu.jpg" , stats:"테스트용 스텟입니다<br>추후 수정 보안 예정." }
     ]
 };
