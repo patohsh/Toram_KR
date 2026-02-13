@@ -1529,7 +1529,7 @@ function renderEquipGrid() {
         card.className = 'equip-card';
 
         // 1. 이미지 경로 및 리스트 설정 (images 배열이 있으면 사용, 없으면 image 단일 배열화)
-        const imgList: string[] = item.images && Array.isArray(item.images) ? item.images : [item.image || 'unknown.png'];
+        const imgList: string[] = item.images && Array.isArray(item.images) ? item.images : [item.image || 'unknown.jpg'];
         let activeIdx = 0;
 
         const getFullImgPath = (name: string) => {
