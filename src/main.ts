@@ -1393,7 +1393,7 @@ async function loadEquipmentData(categoryName: string) {
         // 만약 폴더 구조가 public/Farming/WeaponArmor/Weapon.js 라면:
         // filePath = `Farming/WeaponArmor/${categoryName}.js`;
 
-        // 하지만 "폴더는 합쳐져 있다"고 하셨으므로:
+        // 하지만 "폴더는 합쳐져 있다":
         // 1. Weapon, Armor -> public/Farming/WeaponArmor/Weapon.js 
         // 2. Arrow, Dagger -> public/Farming/ArrowDagger/Arrow.js
         // 3. Additional -> public/Farming/Additional/Additional.js
@@ -1502,6 +1502,7 @@ function filterEquipment(keyword: string) {
     renderEquipGrid();
     renderPagination();
 }
+
 function renderEquipGrid() {
     const grid = document.getElementById('equip-grid')!;
     grid.innerHTML = '';
@@ -1565,7 +1566,36 @@ function renderEquipGrid() {
       </div>
     `;
         grid.appendChild(card);
+
+        const imgBox = card.querySelector('.equip-img-box');
+        if (imgBox) {
+            imgBox.addEventListener('click', () => {
+                const imgTag = imgBox.querySelector('img') as HTMLImageElement;
+                if (imgTag) openImageModal(imgTag.src, item.name);
+            });
+        }
     });
+}
+function openImageModal(imgSrc: string, title: string) {
+    let modal = document.getElementById('image-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'image-modal';
+        modal.className = 'image-modal';
+        modal.innerHTML = `
+            <img class="modal-content" id="modal-img">
+            <div id="modal-caption" class="modal-caption"></div>
+        `;
+        document.body.appendChild(modal);
+        modal.addEventListener('click', () => modal!.style.display = 'none');
+    }
+
+    const modalImg = document.getElementById('modal-img') as HTMLImageElement;
+    const modalCaption = document.getElementById('modal-caption') as HTMLElement;
+
+    modalImg.src = imgSrc;
+    modalCaption.innerText = title;
+    modal.style.display = 'flex';
 }
 
 function renderPagination() {
