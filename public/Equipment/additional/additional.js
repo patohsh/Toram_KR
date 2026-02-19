@@ -322,10 +322,11 @@
         { name: "하트 귀마개", name_en: "Heart Earmuffs", image: "6-Heart Earmuffs.jpg" },
         { name: "하트 눈", name_en: "Heart Eyes", image: "6-Heart Eyes.jpg" },
         { name: "하트 배낭", name_en: "Heart Knapsack", image: "6-Heart Knapsack.jpg" },
-        { name: "초코 펜 헤드", name_en: "AGI+10%<br>INT+10%<br>물리관통+15%<br>마법관통+15%", image: "초코펜.jpg" },
-        { name: "러브러브 하트 L", name_en: "MATK+11%<br>공격속도+500<br>탄환경감+25%<br>부여정지(넘어짐)", image: "러브L.jpg" },
-        { name: "러브러브 하트 R", name_en: "ATK+11%<br>공격속도+500<br>장판경감+25%<br>부여정지(넘어짐)", image: "러브R.jpg" },
-        { name: "하트 컵 해드", name_en: "발도공격+13%<br>DEX+10%<br>어그로-10%", image: "초코컵.jpg" },
+        { name: "초코 펜 헤드", stats: ["AGI+10%", "INT+10%", "물리관통+15%", "마법관통+15%"], image: "초코펜.jpg" },
+        { name: "러브러브 하트 L", stats: ["MATK+11%", "공격속도+500", "탄환경감+25%", "부여정지(넘어짐)"], image: "러브L.jpg" },
+        { name: "러브러브 하트 R", stats: ["ATK+11%", "공격속도+500", "장판경감+25%", "부여정지(넘어짐)"], image: "러브R.jpg" },
+        { name: "하트 컵 해드", stats: ["발도공격+13%", "DEX+10%", "어그로-10%"], image: "초코컵.jpg" },
+        { name: "고딕 초코 모자", stats: ["근거리 위력+12%", "AGI+10%", "불내성-10%", "(경갑)행동속도 +5%", "(경갑)물리내성 -5%", "(경갑)마법내성 -5%"], image: "고딕초코.jpg" },
         { name: "천사 깃털 머리띠", name_en: "Heaven Feather Headband", image: "6-Heaven Feather Headband.jpg" },
         { name: "중기사 투구", name_en: "Heavy Knight Helmet", image: "6-Heavy Knight Helmet.jpg" },
         { name: "영웅의 스카프", name_en: "Hero Scarf", image: "6-Hero Scarf.jpg" },
@@ -764,7 +765,7 @@
         { name: "수호견 머리띠", name_en: "Komainu Headband", image: "수호견 머리띠.jpg" },
         { name: "앤티크 벨트", name_en: "", image: "앤티크벨트.jpg" },
         { name: "블랙 하트 리본", name_en: "", image: "블랙하트리본.jpg" },
-        { name: "혼 크라운", name_en: "크리티컬률+25<br>공격 MP 회복+15<br>드랍율+1%", image: "crown.jpg" },
+        { name: "혼 크라운", stats: ["크리티컬률+25","공격 MP 회복+15","드랍율+1%"], image: "crown.jpg" },
         { name: "업데이트 예정", name_en: "update", image: "update.jpg" }
 
     ]

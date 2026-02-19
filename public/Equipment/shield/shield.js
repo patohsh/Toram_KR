@@ -90,6 +90,7 @@
         { name: "자하크 실드", name_en: "Zahhak Shield", image: "zahhak shield.png" },
         { name: "조이의 마법서", name_en: "Zoe's Magic Book", image: "zoe's magic book.png" },
         { name: "터콰이즈 실드", name_en: "", image: "터콰이즈실드.png" },
+        { name: "쿠벨실드", stats: ["guard회복+20%", "guard력+40%", "MATK+2%","행동속도+4%","불내성+15%", "어둠내성+15%"], image: "쿠벨실드.jpg" },
         { name: "메이플의 방패", name_en: "Maple Shield", image: "메이플의 방패.png" }
     ]
 };
