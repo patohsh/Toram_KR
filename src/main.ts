@@ -467,7 +467,7 @@ const skillFileMap: Record<string, Record<string, string>> = {
         '마샬': 'skills_martial',
         '듀얼소드': 'skills_dual_sword',
         '할버드': 'skills_halberd',
-        '모노노후': 'skills_mononofu',
+        '발도': 'skills_mononofu',
         '크러셔': 'skills_crusher',
         '스프라이트': 'skills_sprite'
     },

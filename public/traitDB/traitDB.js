@@ -175,7 +175,7 @@
         },
         {
             id: "blood_regen",
-            name: "블러드 리젠",
+            name: "블러드 엣지",
             name_en: "Blood Regen",
             formula: "회복량 증가: +총 STR 수치",
             description: "대상에게 데미지를 입히면 [200 × Tier]의 HP를 회복합니다. STR 스탯에 따라 회복량이 증가합니다. (3초마다 1회 발동)"
@@ -196,24 +196,24 @@
         },
         {
             id: "bunker_magica",
-            name: "벙커 매지카",
+            name: "벙커 마기카",
             name_en: "Bunker Magica",
             formula: "발동 위력: 20 × Tier",
             description: "대상에게 데미지를 입히면 5초간 마법 관통이 1% 증가합니다. (최대 10 중첩)"
         },
         {
             id: "counter_evasion_mana",
-            name: "카운터 이베이전 마나",
+            name: "어보이드 마나",
             name_en: "Counter Evasion Mana",
             formula: "INT 비례 회복량: +기본 INT / (20 - 3 × Tier)",
-            description: "대상이 회피(Evasion)를 했을 때 [20 × Tier] MP를 회복합니다. INT 스탯에 따라 회복량이 증가합니다. (6초마다 1회 발동, 이벤트 제외)"
+            description: "대상이 회피(avoid)를 했을 때 [20 × Tier] MP를 회복합니다. INT 스탯에 따라 회복량이 증가합니다. (6초마다 1회 발동, 이벤트 제외)"
         },
         {
             id: "counter_evasion_power",
-            name: "카운터 이베이전 파워",
+            name: "어보이드 파워",
             name_en: "Counter Evasion Power",
             formula: "DEX 비례 ATK 증가량: +기본 DEX / 5",
-            description: "대상이 회피(Evasion)를 했을 때 [5 + 5 × Tier]초 동안 ATK가 100 증가합니다. DEX가 높을수록 증가량이 커집니다. (20초마다 1회 발동, 이벤트 제외)"
+            description: "대상이 회피(avoid)를 했을 때 [5 + 5 × Tier]초 동안 ATK가 100 증가합니다. DEX가 높을수록 증가량이 커집니다. (20초마다 1회 발동, 이벤트 제외)"
         },
         {
             id: "counter_rage",
@@ -228,35 +228,35 @@
             description: "대상에게 데미지를 입으면 3초간 ASPD, CSPD, 행동 속도가 [2% × Tier] 증가합니다."
         },
         {
-            id: "critical_trait",
-            name: "크리티컬(특성)",
+            id: "critical",
+            name: "크리티컬",
             name_en: "Critical",
             formula: "지속시간 증가: +CRT / 15",
             description: "대상에게 데미지를 입히면 3초간 크리티컬 확률이 1 증가합니다. CRT 스탯에 따라 지속시간이 증가합니다. (최대 [10 × Tier] 중첩, 타격 시 지속시간 갱신)"
         },
         {
             id: "critical_rebound",
-            name: "크리티컬 리바운드",
+            name: "크리티컬 리덕션",
             name_en: "Critical Rebound",
-            description: "공격이 빗나갈(MISS) 경우, 60초간 크리티컬 확률이 [4 × Tier] 증가합니다. (최대 5 중첩)"
+            description: "명중 판정으로 공격이 빗나갈(MISS) 경우, 60초간 크리티컬 확률이 [4 × Tier] 증가합니다. (최대 5 중첩)"
         },
         {
             id: "cursed_weapon",
             name: "커스드 웨폰",
             name_en: "Cursed Weapon",
-            description: "대상에게 데미지를 입히면 3초간 최대 HP가 1% 감소하지만, ATK와 MATK가 [1 × Tier] 증가합니다. (최대 99 중첩, Max HP는 장비/스킬 %옵션 기준)"
+            description: "대상에게 데미지를 입히면 3초간 최대HP가 1% 감소하지만, ATK와 MATK가 [1 × Tier] 증가합니다. (최대 99 중첩, Max HP는 장비/스킬 %옵션 기준)"
         },
         {
             id: "dash_defence",
             name: "대시 디펜스",
             name_en: "Dash Defence",
-            description: "회피(Evasion) 사용 시 3초간 물리 및 마법 내성이 [2% × Tier] 증가합니다. (최대 3 중첩)"
+            description: "회피(avoid) 사용 시 3초간 물리 및 마법 내성이 [2% × Tier] 증가합니다. (최대 3 중첩)"
         },
         {
             id: "dash_power",
             name: "대시 파워",
             name_en: "Dash Power",
-            description: "회피(Evasion) 사용 시 3초간 ATK가 [10 × Tier], ASPD가 [50 + 50 × Tier] 증가합니다. (최대 3 중첩)"
+            description: "회피(avoid) 사용 시 3초간 ATK가 [10 × Tier], ASPD가 [50 + 50 × Tier] 증가합니다. (최대 3 중첩)"
         },
         {
             id: "engineer",
@@ -267,25 +267,25 @@
         },
         {
             id: "fighting_magica",
-            name: "파이팅 매지카",
+            name: "파이트 마기카",
             name_en: "Fighting Magica",
             description: "대상에게 데미지를 입히면 4초간 MATK가 [1 × Tier] 증가합니다. (최대 [300 ÷ Tier] 중첩)"
         },
         {
             id: "fighting_power",
-            name: "파이팅 파워",
+            name: "파이트 파워",
             name_en: "Fighting Power",
             description: "대상에게 데미지를 입히면 2초간 ATK가 [1 × Tier] 증가합니다. (최대 [300 ÷ Tier] 중첩)"
         },
         {
             id: "foreseen_evasion",
-            name: "포신 이베이전(간파)",
+            name: "어보이드 코프",
             name_en: "Foreseen Evasion",
-            description: "대상이 회피(Evasion)를 했을 때 12초간 간파(Anticipate)가 [5% × Tier] 증가합니다. (이벤트 제외)"
+            description: "대상이 회피(avoid)를 했을 때 12초간 예측이 [5% × Tier] 증가합니다."
         },
         {
             id: "gearshift",
-            name: "기어 시프트",
+            name: "기어 체인지",
             name_en: "Gearshift",
             description: "대상에게 데미지를 입히면 3초간 ASPD가 [20 × Tier] 증가합니다. (최대 20 중첩)"
         },
@@ -298,32 +298,32 @@
         },
         {
             id: "graze_mana_boost",
-            name: "그레이즈 마나 부스트",
+            name: "그레이즈 부스트 마나",
             name_en: "Graze Mana Boost",
             description: "공격이 그레이즈(Graze)가 났을 때 15초간 MaxMP가 [350 - 50 × Tier] 감소하지만, 근/원거리 위력이 1%, 명중이 [60 × Tier] 증가합니다. (최대 3 중첩)"
         },
         {
             id: "graze_precision",
-            name: "그레이즈 프리시전",
+            name: "그레이즈 애큐러시",
             name_en: "Graze Precision",
             description: "공격이 그레이즈(Graze)가 났을 때 30초간 명중이 [20 × Tier] 증가합니다. (최대 5 중첩)"
         },
         {
             id: "guarded_advantage",
-            name: "가디드 어드밴티지",
+            name: "가드 코프",
             name_en: "Guarded Advantage",
             description: "대상이 가드(Guard)를 했을 때 12초간 가드 파괴(Guard Break)가 [5% × Tier] 증가합니다. (이벤트 제외)"
         },
         {
             id: "guarded_magica",
-            name: "가디드 매지카",
+            name: "가드 마기카",
             name_en: "Guarded Magica",
             formula: "DEX 비례 MATK 증가: +기본 DEX / 10",
             description: "대상이 가드(Guard)를 했을 때 [5 + 5 × Tier]초 동안 MATK가 50 증가합니다. DEX가 높을수록 증가량이 커집니다. (20초마다 1회 발동, 이벤트 제외)"
         },
         {
             id: "guarded_recovery",
-            name: "가디드 리커버리",
+            name: "가드 힐",
             name_en: "Guarded Recovery",
             formula: "STR 비례 HP 회복: +기본 STR × 2^(Tier-1) / 2",
             description: "대상이 가드(Guard)를 했을 때 [500 + 500 × Tier] HP를 회복합니다. STR 스탯에 따라 회복량이 증가합니다. (6초마다 1회 발동, 이벤트 제외)"
@@ -332,8 +332,8 @@
             id: "health_barrier",
             name: "헬스 배리어",
             name_en: "Health Barrier",
-            formula: "MTL 비례 배리어 증가: +MTL / (6 - Tier)",
-            description: "대상에게 데미지를 입히면 6초간 물리/마법 배리어가 [2 × Tier] 증가합니다. MTL 스탯이 높을수록 증가합니다. (최대 100 중첩)"
+            formula: "MEN 비례 배리어 증가: +MTL / (6 - Tier)",
+            description: "대상에게 데미지를 입히면 6초간 물리/마법 배리어가 [2 × Tier] 증가합니다. MEN 스탯이 높을수록 증가합니다. (최대 100 중첩)"
         },
         {
             id: "life_purge",
@@ -343,36 +343,36 @@
         },
         {
             id: "lucky_experience",
-            name: "럭키 익스피리언스",
+            name: "럭익스피리언스",
             name_en: "Lucky Experience",
             formula: "LUK 비례 최대 중첩 증가: +LUK / (30 - 5 × Level)",
             description: "대상에게 데미지를 입히면 77초간 경험치 획득량이 [1% × Tier] 증가합니다. LUK 스탯에 따라 최대 중첩 수가 증가합니다. (기본 최대 10 중첩)"
         },
         {
             id: "magica_rebound",
-            name: "매지카 리바운드",
+            name: "마기카 리덕션",
             name_en: "Magica Rebound",
-            description: "공격이 빗나갈(MISS) 경우 30초간 MATK가 [10 × Tier] 증가합니다. (최대 10 중첩)"
+            description: "명중 공격이 빗나갈(MISS) 경우 30초간 MATK가 [10 × Tier] 증가합니다. (최대 10 중첩)"
         },
         {
             id: "mana_combat",
-            name: "마나 컴뱃",
+            name: "마나 컨버트",
             name_en: "Mana Combat",
             formula: "VIT 비례 MP 회복: +기본 VIT / (20 × (6 - Tier))",
             description: "대상에게 데미지를 입으면 [1 × Tier] MP를 회복합니다. VIT 스탯에 따라 회복량이 증가합니다."
         },
         {
             id: "mana_rebound",
-            name: "마나 리바운드",
+            name: "마나 리덕션",
             name_en: "Mana Rebound",
             tier_value: "[10⚪ / 20🟢 / 30🔵 / 50🟣 / 100🟠]",
-            description: "공격이 빗나갈(MISS) 경우 100 MP를 회복합니다. 발동 위력은 티어에 따라 다릅니다."
+            description: "명중 공격이 빗나갈(MISS) 경우 100 MP를 회복합니다. 발동 위력은 티어에 따라 다릅니다."
         },
         {
             id: "mega_power_rebound",
-            name: "메가 파워 리바운드",
+            name: "기간트 파워 리덕션",
             name_en: "Mega Power Rebound",
-            description: "공격이 빗나갈(MISS) 경우 90초간 ATK가 [100 × Tier], 크리티컬 확률이 [25 + 25 × Tier] 증가하지만, 명중이 9999 감소합니다."
+            description: "명중 판정의 공격이 빗나갈(MISS) 경우 90초간 ATK가 [100 × Tier], 크리티컬 확률이 [25 + 25 × Tier] 증가하지만, 명중이 9999 감소합니다."
         },
         {
             id: "nimble",
@@ -382,61 +382,61 @@
         },
         {
             id: "power_rebound",
-            name: "파워 리바운드",
+            name: "파워 리덕션",
             name_en: "Power Rebound",
-            description: "공격이 빗나갈(MISS) 경우 30초간 ATK가 [10 × Tier] 증가합니다. (최대 10 중첩)"
+            description: "명중 공격이 빗나갈(MISS) 경우 30초간 ATK가 [10 × Tier] 증가합니다. (최대 10 중첩)"
         },
         {
             id: "precision",
-            name: "프리시전",
+            name: "애큐러시",
             name_en: "Precision",
             description: "대상에게 데미지를 입히면 6초간 명중(Accuracy)이 [1 × Tier] 증가합니다. (최대 30 중첩)"
         },
         {
             id: "spirit_blow",
-            name: "스피릿 블로우",
+            name: "소울 블로우",
             name_en: "Spirit Blow",
             formula: "AGI 비례 MP 회복: +총 AGI / (90 - 15 × Tier)",
             description: "대상에게 데미지를 입히면 [2 × Tier] MP를 회복합니다. AGI 스탯에 따라 회복량이 증가합니다. (6초마다 1회 발동)"
         },
         {
             id: "spirit_shot",
-            name: "스피릿 샷",
+            name: "소울 샷",
             name_en: "Spirit Shot",
             formula: "DEX 비례 MP 회복: +총 DEX / (90 - 15 × Tier)",
             description: "대상에게 데미지를 입히면 [2 × Tier] MP를 회복합니다. DEX 스탯에 따라 회복량이 증가합니다. (6초마다 1회 발동)"
         },
         {
             id: "vengeful_life",
-            name: "벤지풀 라이프",
+            name: "리벤지 라이프",
             name_en: "Vengeful Life",
             description: "대상에게 데미지를 입으면 180초간 MaxHP가 [50 × 2^(Tier-1)] 증가합니다. (최대 [140 - 20 × Tier] 중첩)"
         },
         {
             id: "vengeful_magica",
-            name: "벤지풀 매지카",
+            name: "리벤지 마기카",
             name_en: "Vengeful Magica",
             tier_value: "증가량: [10⚪|15🟢|30🔵|60🟣|90🟠] / 최대 중첩: [90⚪|60🟢|30🔵|15🟣|10🟠]",
-            description: "대상에게 데미지를 입으면 30초간 MATK가 증가합니다. 티어별로 증가량과 최대 중첩수가 다릅니다."
+            description: "대상에게 데미지를 받으면 30초간 MATK가 증가합니다. 티어별로 증가량과 최대 중첩수가 다릅니다."
         },
         {
             id: "vengeful_mana",
-            name: "벤지풀 마나",
+            name: "리벤지 마나",
             name_en: "Vengeful Mana",
             description: "대상에게 데미지를 입으면 180초간 MaxMP가 [5 × 2^(Tier-1)] 증가합니다. (최대 [35 - 5 × Tier] 중첩)"
         },
         {
             id: "vengeful_power",
-            name: "벤지풀 파워",
+            name: "리벤지 파워",
             name_en: "Vengeful Power",
             tier_value: "증가량: [10⚪|15🟢|30🔵|60🟣|90🟠] / 최대 중첩: [90⚪|60🟢|30🔵|15🟣|10🟠]",
             description: "대상에게 데미지를 입으면 30초간 ATK가 증가합니다. 티어별로 증가량과 최대 중첩수가 다릅니다."
         },
         {
             id: "vengeful_samurai",
-            name: "벤지풀 사무라이",
+            name: "리벤지 사무라이",
             name_en: "Vengeful Samurai",
-            description: "대상에게 데미지를 입으면 9초간 발도 공격력(Unsheathe)이 100 증가합니다. (최대 [1 × Tier] 중첩)"
+            description: "대상에게 데미지를 입으면 9초간 발도 공격력(Unsheathe)이 100 증가합니다. 최대 2스택 (최대 [1 × Tier] 중첩)"
         }
     ]
 };
