@@ -488,7 +488,7 @@ const skillFileMap: Record<string, Record<string, string>> = {
     },
     '특수/책': {
         '닌자': 'skills_ninja',
-        '인술': 'skills_ninjutsu',
+        '네크로맨서': 'skills_Necromancer',
         '민스트럴': 'skills_minstrel',
         '댄서': 'skills_dancer',
         '다크파워': 'skills_darkpower',
