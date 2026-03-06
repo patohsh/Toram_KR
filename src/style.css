@@ -1204,15 +1204,163 @@ body.dark-mode .trait-tier-val {
 .guide-list-container {
     display: flex;
     flex-direction: column;
-    gap: 25px;
+    gap: 10px;
 }
 
+/* 가이드 카드 - 아코디언 스타일 */
 .guide-card {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
-    border-radius: 10px;
+    border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    transition: border-color 0.2s;
+}
+    .guide-card:hover {
+        border-color: var(--accent-pink);
+    }
+
+/* 제목 헤더 (항상 보임) */
+.guide-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    cursor: pointer;
+    user-select: none;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+    .guide-card-header:hover {
+        background: rgba(255, 0, 127, 0.05);
+    }
+
+/* 제목 + 작성자/날짜 영역 */
+.guide-card-title-area {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    min-width: 0;
+}
+
+.guide-card-title {
+    font-size: 1rem;
+    font-weight: bold;
+    color: var(--accent-light);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.guide-card-meta {
+    font-size: 0.78rem;
+    color: #888;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* 우측 아이콘 영역 (▼ + 삭제) */
+.guide-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+/* 펼치기 화살표 */
+.guide-toggle-icon {
+    font-size: 0.9rem;
+    color: var(--accent-pink);
+    transition: transform 0.3s ease;
+    display: inline-block;
+    width: 20px;
+    text-align: center;
+}
+
+.guide-card.open .guide-toggle-icon {
+    transform: rotate(180deg);
+}
+
+/* 본문 내용 (접힘/펼침) */
+.guide-card-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease, padding 0.3s ease;
+    padding: 0 18px;
+    border-top: 0px solid var(--border-color);
+}
+
+.guide-card.open .guide-card-body {
+    max-height: 2000px;
+    padding: 15px 18px 18px 18px;
+    border-top: 1px dashed var(--border-color);
+}
+
+.guide-card-content {
+    color: var(--text-main);
+    white-space: pre-wrap;
+    line-height: 1.75;
+    font-size: 0.95rem;
+}
+
+/* 삭제 버튼 */
+.btn-delete-post {
+    background: transparent !important;
+    border: 1px solid #ff4444 !important;
+    color: #ff4444 !important;
+    padding: 3px 10px !important;
+    border-radius: 10px !important;
+    cursor: pointer !important;
+    font-size: 0.75rem !important;
+    box-shadow: none !important;
+    transition: background 0.2s !important;
+}
+
+    .btn-delete-post:hover {
+        background: rgba(255, 68, 68, 0.15) !important;
+        transform: none !important;
+    }
+
+/* --- 검색창 + 글쓰기 버튼 정렬 수정 --- */
+.guide-search-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+    .guide-search-row .search-input {
+        flex: 1;
+        margin: 0;
+        min-width: 0;
+        width: auto;
+        max-width: none;
+    }
+
+/* 모바일 대응 */
+@media (max-width: 600px) {
+    .guide-card-title {
+        font-size: 0.93rem;
+    }
+
+    .guide-search-row {
+        flex-wrap: wrap;
+    }
+
+        .guide-search-row .search-input {
+            width: 100%;
+        }
+
+    .guide-card-header {
+        padding: 12px 14px;
+    }
+
+    .guide-card.open .guide-card-body {
+        padding: 12px 14px 14px 14px;
+    }
 }
 
 .guide-img {
