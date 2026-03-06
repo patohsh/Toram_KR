@@ -1,5 +1,8 @@
 ﻿// src/main.ts
 import './style.css';
+import { db } from './firebase';
+import { collection, addDoc, getDocs, query, orderBy, serverTimestamp, where } from 'firebase/firestore';
+
 // =================================================
 // 0. 전역 상태 및 라우팅 설정 (신규 추가)
 // =================================================
@@ -1782,9 +1785,49 @@ const GUIDE_TABS = [
     { id: 'empty', name: '(준비중)', file: '' } // 공란
 ];
 
-let currentGuideTab = 'menu'; // 현재 선택된 탭
-let guideDataCache: Record<string, any[]> = {}; // 데이터 캐싱
+const ADMIN_PASSWORD_HASH = import.meta.env.VITE_ADMIN_PASSWORD_HASH;
 
+let currentGuideTab = 'menu'; // 현재 선택된 탭
+let guideFirestoreCache: Record<string, any[]> = {};
+
+// =================================================
+// [유틸] SHA-256 해시 생성
+// =================================================
+async function sha256(text: string): Promise<string> {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(text);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(hashBuffer))
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+}
+
+function escapeHtml(text: string): string {
+    return text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function showMsg(el: HTMLElement, msg: string, type: 'error' | 'success') {
+    el.innerText = msg;
+    el.style.color = type === 'error' ? '#ff4444' : '#44ff88';
+}
+
+function clearWriteForm() {
+    ['write-nickname', 'write-title', 'write-password'].forEach(id => {
+        (document.getElementById(id) as HTMLInputElement).value = '';
+    });
+    (document.getElementById('write-content') as HTMLTextAreaElement).value = '';
+    document.getElementById('content-counter')!.innerText = '0';
+    document.getElementById('write-message')!.innerText = '';
+}
+
+// =================================================
+// [렌더링] 뉴비 가이드 페이지
+// =================================================
 function renderGuidePage() {
     app.innerHTML = `
     <div class="nav-bar">
@@ -1793,143 +1836,410 @@ function renderGuidePage() {
     </div>
 
     <div class="container">
-      
-      <!-- 1. 상단 탭 (포스트잇 스타일) -->
+
+      <!-- 탭 -->
       <div class="guide-tabs">
         ${GUIDE_TABS.map(tab => `
-          <button class="guide-tab-btn ${tab.id === currentGuideTab ? 'active' : ''}" 
-                  data-id="${tab.id}" 
-                  ${!tab.file ? 'disabled' : ''}>
+          <button class="guide-tab-btn ${tab.id === currentGuideTab ? 'active' : ''}" data-id="${tab.id}">
             ${tab.name}
           </button>
         `).join('')}
       </div>
 
-      <!-- 2. 검색창 -->
-      <div class="search-container" style="background:transparent; border:none; padding:0; margin-bottom:20px;">
-        <input type="text" id="guide-search" class="search-input" placeholder="제목 또는 내용 검색...">
+      <!-- 검색 + 글쓰기 버튼 -->
+      <div style="display:flex; gap:10px; align-items:center; margin-bottom:15px; flex-wrap:wrap;">
+        <input type="text" id="guide-search" class="search-input"
+          placeholder="제목 또는 내용 검색..."
+          style="flex:1; margin:0; min-width:180px;">
+        <button id="btn-open-write" style="
+          background:linear-gradient(135deg,var(--accent-pink),#ff6b9d);
+          color:white; border:none; padding:10px 20px;
+          border-radius:20px; font-size:0.9rem; cursor:pointer;
+          white-space:nowrap; box-shadow:0 4px 12px rgba(255,0,127,0.3);">
+          ✏️ 가이드 작성
+        </button>
       </div>
 
-      <!-- 3. 가이드 리스트 -->
+      <!-- 글쓰기 폼 (기본 숨김) -->
+      <div id="guide-write-form" style="display:none; background:var(--card-bg);
+        border:1px solid var(--border-color); border-radius:15px; padding:25px; margin-bottom:25px;">
+
+        <h3 style="margin:0 0 20px 0; color:var(--accent-pink);">✏️ 가이드 작성</h3>
+
+        <!-- 카테고리 -->
+        <div style="margin-bottom:14px;">
+          <label style="display:block; margin-bottom:6px; color:var(--accent-light); font-weight:bold;">카테고리 *</label>
+          <select id="write-category" style="width:100%; padding:10px; border-radius:8px;
+            background:var(--input-bg); color:white; border:1px solid var(--border-color);">
+            ${GUIDE_TABS.map(t => `<option value="${t.id}">${t.name}</option>`).join('')}
+          </select>
+        </div>
+
+        <!-- 닉네임 -->
+        <div style="margin-bottom:14px;">
+          <label style="display:block; margin-bottom:6px; color:var(--accent-light); font-weight:bold;">
+            작성자 닉네임 * <span style="color:#888;font-size:0.8rem;">(최대 20자)</span>
+          </label>
+          <input type="text" id="write-nickname" maxlength="20" placeholder="닉네임 입력"
+            style="width:100%; padding:10px; border-radius:8px;
+            background:var(--input-bg); color:white; border:1px solid var(--border-color); box-sizing:border-box;">
+        </div>
+
+        <!-- 제목 -->
+        <div style="margin-bottom:14px;">
+          <label style="display:block; margin-bottom:6px; color:var(--accent-light); font-weight:bold;">
+            제목 * <span style="color:#888;font-size:0.8rem;">(최대 50자)</span>
+          </label>
+          <input type="text" id="write-title" maxlength="50" placeholder="가이드 제목"
+            style="width:100%; padding:10px; border-radius:8px;
+            background:var(--input-bg); color:white; border:1px solid var(--border-color); box-sizing:border-box;">
+        </div>
+
+        <!-- 내용 -->
+        <div style="margin-bottom:14px;">
+          <label style="display:block; margin-bottom:6px; color:var(--accent-light); font-weight:bold;">
+            내용 * <span style="color:#888;font-size:0.8rem;">(최대 2000자)</span>
+          </label>
+          <textarea id="write-content" maxlength="2000" rows="8"
+            placeholder="가이드 내용을 입력하세요&#10;줄바꿈도 그대로 표시됩니다."
+            style="width:100%; padding:10px; border-radius:8px;
+            background:var(--input-bg); color:white; border:1px solid var(--border-color);
+            resize:vertical; box-sizing:border-box; font-family:inherit;"></textarea>
+          <div style="text-align:right; color:#888; font-size:0.8rem; margin-top:3px;">
+            <span id="content-counter">0</span> / 2000
+          </div>
+        </div>
+
+        <!-- 삭제용 비밀번호 -->
+        <div style="margin-bottom:20px;">
+          <label style="display:block; margin-bottom:6px; color:var(--accent-light); font-weight:bold;">
+            삭제용 비밀번호 * <span style="color:#888;font-size:0.8rem;">(나중에 본인 글 삭제 시 필요, 최소 4자)</span>
+          </label>
+          <input type="password" id="write-password" maxlength="20" placeholder="삭제용 비밀번호 설정"
+            style="width:100%; padding:10px; border-radius:8px;
+            background:var(--input-bg); color:white; border:1px solid var(--border-color); box-sizing:border-box;">
+        </div>
+
+        <!-- 버튼 -->
+        <div style="display:flex; gap:10px; justify-content:flex-end;">
+          <button id="btn-cancel-write" style="padding:10px 22px; border-radius:20px;
+            background:transparent; color:#888; border:1px solid #555; cursor:pointer;">취소</button>
+          <button id="btn-submit-write" style="padding:10px 22px; border-radius:20px;
+            background:linear-gradient(135deg,var(--accent-pink),#ff6b9d);
+            color:white; border:none; cursor:pointer; font-weight:bold;">게시하기</button>
+        </div>
+
+        <div id="write-message" style="margin-top:12px; text-align:center; font-size:0.9rem;"></div>
+      </div>
+
+      <!-- 가이드 리스트 -->
       <div id="guide-list" class="guide-list-container">
-        <div style="text-align:center; padding:50px; color:#888;">데이터 로딩 중...</div>
+        <div style="text-align:center; padding:50px; color:#888;">로딩 중...</div>
+      </div>
+    </div>
+
+    <!-- 삭제 확인 모달 -->
+    <div id="delete-modal" style="display:none; position:fixed; inset:0;
+      background:rgba(0,0,0,0.75); z-index:9999;
+      justify-content:center; align-items:center;">
+      <div style="background:var(--card-bg); border:1px solid var(--border-color);
+        border-radius:15px; padding:30px; width:90%; max-width:380px;">
+        <h3 style="margin:0 0 15px 0; color:#ff4444;">🗑️ 게시글 삭제</h3>
+        <p style="color:#aaa; margin-bottom:15px; font-size:0.9rem; line-height:1.6;">
+          작성 시 설정한 비밀번호를 입력해주세요.<br>
+          <span style="color:#ff8c8c; font-size:0.85rem;">※ 관리자 비밀번호로도 삭제 가능합니다.</span>
+        </p>
+        <input type="password" id="delete-password-input" placeholder="비밀번호 입력"
+          style="width:100%; padding:10px; border-radius:8px; background:var(--input-bg);
+          color:white; border:1px solid var(--border-color); box-sizing:border-box; margin-bottom:8px;">
+        <div id="delete-message" style="font-size:0.85rem; margin-bottom:14px; min-height:18px;"></div>
+        <div style="display:flex; gap:10px; justify-content:flex-end;">
+          <button id="btn-delete-cancel" style="padding:8px 18px; border-radius:15px;
+            background:transparent; color:#888; border:1px solid #555; cursor:pointer;">취소</button>
+          <button id="btn-delete-confirm" style="padding:8px 18px; border-radius:15px;
+            background:#ff4444; color:white; border:none; cursor:pointer; font-weight:bold;">삭제</button>
+        </div>
       </div>
     </div>
   `;
 
-    document.getElementById('back-home')?.addEventListener('click', renderHomePage);
+    // ── 이벤트 바인딩 ─────────────────────────────
+    document.getElementById('back-home')?.addEventListener('click', () => navigate('home'));
 
-    // 탭 클릭 이벤트
     document.querySelectorAll('.guide-tab-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const target = e.target as HTMLElement;
-            if (target.getAttribute('disabled') !== null) return;
-
-            // UI 업데이트
             document.querySelectorAll('.guide-tab-btn').forEach(b => b.classList.remove('active'));
             target.classList.add('active');
-
-            // 데이터 로드
             currentGuideTab = target.dataset.id!;
-            loadGuideData(currentGuideTab);
+            loadGuideFromFirestore(currentGuideTab);
         });
     });
 
-    // 검색 이벤트
     document.getElementById('guide-search')?.addEventListener('input', (e) => {
-        const keyword = (e.target as HTMLInputElement).value.trim();
-        renderGuideItems(keyword);
+        renderGuideItems((e.target as HTMLInputElement).value.trim());
     });
 
-    // 초기 로드
-    loadGuideData(currentGuideTab);
+    document.getElementById('btn-open-write')?.addEventListener('click', () => {
+        const form = document.getElementById('guide-write-form')!;
+        const isOpen = form.style.display !== 'none';
+        form.style.display = isOpen ? 'none' : 'block';
+        if (!isOpen) {
+            (document.getElementById('write-category') as HTMLSelectElement).value = currentGuideTab;
+        }
+    });
+
+    document.getElementById('btn-cancel-write')?.addEventListener('click', () => {
+        document.getElementById('guide-write-form')!.style.display = 'none';
+        clearWriteForm();
+    });
+
+    document.getElementById('write-content')?.addEventListener('input', (e) => {
+        document.getElementById('content-counter')!.innerText =
+            String((e.target as HTMLTextAreaElement).value.length);
+    });
+
+    document.getElementById('btn-submit-write')?.addEventListener('click', submitGuidePost);
+    document.getElementById('btn-delete-cancel')?.addEventListener('click', closeDeleteModal);
+
+    loadGuideFromFirestore(currentGuideTab);
 }
 
-async function loadGuideData(tabId: string) {
+// =================================================
+// [로드] Firestore에서 가이드 불러오기
+// =================================================
+async function loadGuideFromFirestore(tabId: string) {
     const container = document.getElementById('guide-list')!;
-
-    // 캐시에 있으면 바로 사용
-    if (guideDataCache[tabId]) {
-        renderGuideItems('');
-        return;
-    }
-
-    container.innerHTML = '<div style="text-align:center; padding:50px;">로딩 중...</div>';
-
-    const tabInfo = GUIDE_TABS.find(t => t.id === tabId);
-    if (!tabInfo || !tabInfo.file) {
-        container.innerHTML = '<div style="text-align:center; padding:50px;">준비 중인 컨텐츠입니다.</div>';
-        return;
-    }
+    container.innerHTML = '<div style="text-align:center;padding:50px;color:#888;">로딩 중...</div>';
 
     try {
-        // guideDB 폴더에서 파일 로드
-        const res = await fetch(`guideDB/${tabInfo.file}`);
-        if (!res.ok) throw new Error('File not found');
-        const text = await res.text();
+        const { collection, getDocs, query, orderBy, where } = await import('firebase/firestore');
+        const { db } = await import('./firebase');
 
-        // JS 파일 파싱 (const data = [...] 형태)
-        const eqIndex = text.indexOf('=');
-        let jsonContent = text.substring(eqIndex + 1).trim();
-        if (jsonContent.endsWith(';')) jsonContent = jsonContent.slice(0, -1);
+        const q = query(
+            collection(db, 'guides'),
+            where('category', '==', tabId),
+            orderBy('createdAt', 'desc')
+        );
 
-        const data = new Function(`return ${jsonContent}`)();
-
-        // 캐시 저장 및 렌더링
-        guideDataCache[tabId] = data;
+        const snapshot = await getDocs(q);
+        guideFirestoreCache[tabId] = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
         renderGuideItems('');
 
-    } catch (err) {
+    } catch (err: any) {
         console.error(err);
-        container.innerHTML = `<div style="text-align:center; color:#ff4444;">가이드 데이터를 불러올 수 없습니다.<br>(${tabInfo.file})</div>`;
+        const indexUrl = err?.message?.match(/https:\/\/\S+/)?.[0];
+        container.innerHTML = `
+            <div style="text-align:center;color:#ff4444;padding:30px;">
+                데이터를 불러오지 못했습니다.<br>
+                ${indexUrl
+                ? `<a href="${indexUrl}" target="_blank"
+                        style="color:#4af;font-size:0.85rem;text-decoration:underline;">
+                        👉 여기를 클릭해서 Firestore 인덱스를 생성해주세요
+                       </a>`
+                : `<span style="font-size:0.8rem;color:#aaa;">${err}</span>`}
+            </div>`;
     }
 }
 
+// =================================================
+// [렌더링] 가이드 카드 목록
+// =================================================
 function renderGuideItems(keyword: string) {
     const container = document.getElementById('guide-list');
     if (!container) return;
-
     container.innerHTML = '';
 
-    const data = guideDataCache[currentGuideTab] || [];
-    const lowerKey = keyword.toLowerCase();
-
-    const filtered = data.filter((item: any) => {
-        return item.title.toLowerCase().includes(lowerKey) || item.description.toLowerCase().includes(lowerKey);
-    });
+    const data = guideFirestoreCache[currentGuideTab] || [];
+    const lk = keyword.toLowerCase();
+    const filtered = lk
+        ? data.filter((item: any) =>
+            item.title?.toLowerCase().includes(lk) ||
+            item.content?.toLowerCase().includes(lk))
+        : data;
 
     if (filtered.length === 0) {
-        container.innerHTML = '<div style="text-align:center; padding:30px; color:#888;">검색 결과가 없습니다.</div>';
+        container.innerHTML = `<div style="text-align:center;padding:50px;color:#888;">
+            ${keyword ? '검색 결과가 없습니다.' : '아직 작성된 가이드가 없습니다. 첫 번째 가이드를 작성해보세요! 🌸'}
+        </div>`;
         return;
     }
-
     filtered.forEach((item: any) => {
         const card = document.createElement('div');
         card.className = 'guide-card';
 
-        // 제목 화살표 변환
-        const steps = item.title.split('-').map((s: string) => s.trim());
-        const titleHtml = steps.join(' <span style="color:var(--accent-pink);">▶</span> ');
-
-        // ★ 수정됨: 이미지가 있으면 <img> 태그 생성, 없으면 빈 문자열
-        // onerror 제거: 이미지가 깨져도 엑박이나 빈 공간이 보여야 오류를 인지함.
-        // 만약 이미지가 정말 없을 때만 숨기고 싶다면, 데이터에 image 필드가 있는지 체크하는 것만으로 충분.
-
-        let imgContent = '';
-        if (item.image) {
-            // 이미지가 있으면 꽉 채워서 보여줌
-            imgContent = `<div class="guide-img-box"><img src="GuideImg/${item.image}" alt="${item.title}"></div>`;
+        // 날짜 포맷
+        let dateStr = '';
+        if (item.createdAt?.toDate) {
+            const d = item.createdAt.toDate();
+            dateStr = `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
         }
 
         card.innerHTML = `
-      ${imgContent}
-      <div class="guide-content">
-        <div class="guide-title-box">${titleHtml}</div>
-        <div class="guide-desc">${item.description.replace(/\n/g, '<br>')}</div>
-      </div>
-    `;
+        <!-- 헤더 (항상 보임, 클릭 시 펼침) -->
+            <div class="guide-card-header">
+                <div class="guide-card-title-area">
+                    <div class="guide-card-title">${escapeHtml(item.title || '제목 없음')}</div>
+                    <div class="guide-card-meta">
+                        <span>✍️ ${escapeHtml(item.nickname || '익명')}</span>
+                        ${dateStr ? `<span>📅 ${dateStr}</span>` : ''}
+                    </div>
+                </div>
+                <div class="guide-card-actions">
+                    <button class="btn-delete-post" data-id="${item.id}">🗑️ 삭제</button>
+                    <span class="guide-toggle-icon">▼</span>
+                </div>
+            </div>
+
+            <!-- 본문 (접힘/펼침) -->
+            <div class="guide-card-body">
+                <div class="guide-card-content">${escapeHtml(item.content || '')}</div>
+            </div>
+        `;
+
+        // 헤더 클릭 시 펼치기/접기
+        const header = card.querySelector('.guide-card-header')!;
+        header.addEventListener('click', (e) => {
+            // 삭제 버튼 클릭은 무시
+            if ((e.target as HTMLElement).classList.contains('btn-delete-post')) return;
+            card.classList.toggle('open');
+        });
+
+        // 삭제 버튼
+        card.querySelector('.btn-delete-post')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openDeleteModal(item.id, item.passwordHash);
+        });
+
         container.appendChild(card);
     });
+}
+
+// =================================================
+// [제출] 게시글 작성
+// =================================================
+async function submitGuidePost() {
+    const nickname = (document.getElementById('write-nickname') as HTMLInputElement).value.trim();
+    const title = (document.getElementById('write-title') as HTMLInputElement).value.trim();
+    const content = (document.getElementById('write-content') as HTMLTextAreaElement).value.trim();
+    const category = (document.getElementById('write-category') as HTMLSelectElement).value;
+    const password = (document.getElementById('write-password') as HTMLInputElement).value;
+    const msgEl = document.getElementById('write-message')!;
+    const submitBtn = document.getElementById('btn-submit-write') as HTMLButtonElement;
+
+    if (!nickname) { showMsg(msgEl, '❌ 닉네임을 입력해주세요.', 'error'); return; }
+    if (!title) { showMsg(msgEl, '❌ 제목을 입력해주세요.', 'error'); return; }
+    if (!content) { showMsg(msgEl, '❌ 내용을 입력해주세요.', 'error'); return; }
+    if (!password) { showMsg(msgEl, '❌ 삭제용 비밀번호를 설정해주세요.', 'error'); return; }
+    if (password.length < 4) { showMsg(msgEl, '❌ 비밀번호는 최소 4자 이상이어야 합니다.', 'error'); return; }
+
+    submitBtn.disabled = true;
+    submitBtn.innerText = '게시 중...';
+
+    try {
+        const { collection, addDoc, serverTimestamp } = await import('firebase/firestore');
+        const { db } = await import('./firebase');
+
+        const passwordHash = await sha256(password);
+
+        await addDoc(collection(db, 'guides'), {
+            category,
+            nickname,
+            title,
+            content,
+            passwordHash,
+            createdAt: serverTimestamp(),
+        });
+
+        showMsg(msgEl, '✅ 게시글이 등록되었습니다!', 'success');
+        clearWriteForm();
+
+        delete guideFirestoreCache[category];
+        currentGuideTab = category;
+        document.querySelectorAll('.guide-tab-btn').forEach(b => {
+            b.classList.toggle('active', (b as HTMLElement).dataset.id === category);
+        });
+
+        setTimeout(() => {
+            document.getElementById('guide-write-form')!.style.display = 'none';
+            msgEl.innerText = '';
+            loadGuideFromFirestore(category);
+        }, 1200);
+
+    } catch (err) {
+        console.error(err);
+        showMsg(msgEl, '❌ 등록 실패. 잠시 후 다시 시도해주세요.', 'error');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = '게시하기';
+    }
+}
+
+// =================================================
+// [삭제] 모달
+// =================================================
+let pendingDeleteId: string | null = null;
+let pendingDeleteHash: string | null = null;
+
+function openDeleteModal(docId: string, passwordHash: string | null) {
+    pendingDeleteId = docId;
+    pendingDeleteHash = passwordHash;
+    document.getElementById('delete-modal')!.style.display = 'flex';
+    (document.getElementById('delete-password-input') as HTMLInputElement).value = '';
+    document.getElementById('delete-message')!.innerText = '';
+
+    const confirmBtn = document.getElementById('btn-delete-confirm')!;
+    const newBtn = confirmBtn.cloneNode(true) as HTMLElement;
+    confirmBtn.replaceWith(newBtn);
+    newBtn.addEventListener('click', confirmDelete);
+}
+
+function closeDeleteModal() {
+    document.getElementById('delete-modal')!.style.display = 'none';
+    pendingDeleteId = null;
+    pendingDeleteHash = null;
+}
+
+async function confirmDelete() {
+    const input = (document.getElementById('delete-password-input') as HTMLInputElement).value;
+    const msgEl = document.getElementById('delete-message')!;
+    const btn = document.getElementById('btn-delete-confirm') as HTMLButtonElement;
+
+    if (!input) { showMsg(msgEl, '❌ 비밀번호를 입력해주세요.', 'error'); return; }
+    if (!pendingDeleteId) return;
+
+    btn.disabled = true;
+    btn.innerText = '삭제 중...';
+
+    try {
+        const inputHash = await sha256(input);
+        const isOwner = pendingDeleteHash && inputHash === pendingDeleteHash;
+        const isAdmin = inputHash === ADMIN_PASSWORD_HASH;
+
+        if (!isOwner && !isAdmin) {
+            showMsg(msgEl, '❌ 비밀번호가 올바르지 않습니다.', 'error');
+            btn.disabled = false;
+            btn.innerText = '삭제';
+            return;
+        }
+
+        const { deleteDoc, doc } = await import('firebase/firestore');
+        const { db } = await import('./firebase');
+
+        await deleteDoc(doc(db, 'guides', pendingDeleteId));
+
+        guideFirestoreCache[currentGuideTab] = (guideFirestoreCache[currentGuideTab] || [])
+            .filter((item: any) => item.id !== pendingDeleteId);
+
+        closeDeleteModal();
+        renderGuideItems('');
+
+    } catch (err) {
+        console.error(err);
+        showMsg(msgEl, '❌ 삭제 실패. 다시 시도해주세요.', 'error');
+        btn.disabled = false;
+        btn.innerText = '삭제';
+    }
 }
 
 
