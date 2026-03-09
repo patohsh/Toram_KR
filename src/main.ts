@@ -2268,7 +2268,7 @@ function renderInfoPage() {
         <ul style="padding-left:20px; color:var(--text-dim);">
           <li>데이터 제공: 스왈로 </li>
           <li>이미지 도움: cat </li>
-          <li>디자인 조언: last night C</li>
+          <li>디자인 조언: last night</li>
         </ul>
       </div>
 
@@ -2291,11 +2291,11 @@ function renderInfoPage() {
           <div class="link-icon">🛡️</div>
           <div>Coryn Club</div>
         </a>
-        <a href="https://discord.com" target="_blank" class="link-box">
+        <a href="https://patohsh.github.io/patohsi/index.html" target="_blank" class="link-box">
           <div class="link-icon">💬</div>
-          <div>Discord</div>
+          <div>patohsi</div>
         </a>
-        <a href="https://youtube.com" target="_blank" class="link-box">
+        <a href="https://www.youtube.com/@patohsi" target="_blank" class="link-box">
           <div class="link-icon">▶️</div>
           <div>YouTube</div>
         </a>
