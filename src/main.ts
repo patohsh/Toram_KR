@@ -1782,7 +1782,8 @@ const GUIDE_TABS = [
     { id: 'raid', name: '레이드', file: 'raid.js' },
     { id: 'myroom', name: '마이룸', file: 'myroom.js' },
     { id: 'boss', name: '특수보스', file: 'boss.js' },
-    { id: 'empty', name: '(준비중)', file: '' } // 공란
+    { id: 'job', name: '직업 가이드' },
+    { id: 'empty', name: '(준비중)', file: '' } // 공란 file은 필요없지만 이후를 위해 남겨둠.
 ];
 
 const ADMIN_PASSWORD_HASH = import.meta.env.VITE_ADMIN_PASSWORD_HASH;
