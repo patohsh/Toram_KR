@@ -82,6 +82,7 @@
         { name: "서리뱀", name_en: "White Viper", image: "27-White Viper.jpg" },
         { name: "야타가라스", name_en: "Yatagarasu", image: "27-Yatagarasu.jpg" },
         { name: "요자쿠라 카타나", name_en: "Yozakura Katana", image: "27-Yozakura Katana.jpg" },
-        { name: "흑희도", name_en: "black katana", image: "흑희도.jpg" }
+        { name: "흑희도", name_en: "black katana", image: "흑희도.jpg" },
+        { name: "금평도", stats: ["ATK:262", "땅속성", "바람속성 대미지+10%", "발도공격+12%", "DEX+12%", "최대 MP+400", "공격속도+1100", "마법 배리어+6000", "배리어 속도 +15%" ], image: "금평도.jpg" }
     ]
 };

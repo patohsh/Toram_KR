@@ -765,7 +765,8 @@
         { name: "수호견 머리띠", name_en: "Komainu Headband", image: "수호견 머리띠.jpg" },
         { name: "앤티크 벨트", name_en: "", image: "앤티크벨트.jpg" },
         { name: "블랙 하트 리본", name_en: "", image: "블랙하트리본.jpg" },
-        { name: "혼 크라운", stats: ["크리티컬률+25","공격 MP 회복+15","드랍율+1%"], image: "crown.jpg" },
+        { name: "혼 크라운", stats: ["크리티컬률+25", "공격 MP 회복+15", "드랍율+1%"], image: "crown.jpg" },
+        { name: "컵케이크 헤드", stats: [""], name_en: "cupcake hand", image: "cup_ck.jpg" },
         { name: "업데이트 예정", name_en: "update", image: "update.jpg" }
 
     ]
