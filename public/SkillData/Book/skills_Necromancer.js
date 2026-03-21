@@ -131,6 +131,11 @@ const NecromancerList = {
       `
         },
         {
+            id: "x",
+            name: " ",
+            tier: 2,
+        },
+        {
             id: "Blood_Siphon",
             name: "블러드 스틸",
             tier: 3,
@@ -262,7 +267,7 @@ const NecromancerList = {
       `
         },
         {
-            id: "Skull_Shaker",
+            id: "Demonic_Pact",
             name: "서먼 데모닉",
             tier: 4,
             type: "Ex skill", // 제작/패시브 성격
