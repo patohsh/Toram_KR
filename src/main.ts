@@ -224,20 +224,33 @@ async function loadHomeStats() {
 
 async function loadOfficialNotice() {
     const container = document.getElementById('notice-list'); if (!container) return;
+    const TARGET_URL = 'https://kr.toram.jp/information/?type_code=all';
     try {
-        const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://en.toram.jp/information/?type_code=all')}`);
-        const data = await res.json();
-        const doc2 = new DOMParser().parseFromString(data.contents, 'text/html');
-        const links = Array.from(doc2.querySelectorAll('a[href*="information_id"]')).slice(0,5);
+        // corsproxy.io 사용 (HTML 콘텐츠 지원)
+        const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(TARGET_URL)}`;
+        const res = await fetch(proxyUrl);
+        if (!res.ok) throw new Error('proxy failed');
+        const html = await res.text();
+        const doc2 = new DOMParser().parseFromString(html, 'text/html');
+
+        // 공지 링크 추출 (다양한 셀렉터 시도)
+        const links = Array.from(doc2.querySelectorAll('a[href*="information_id"]')).slice(0, 5);
         if (links.length === 0) throw new Error('no items');
+
         container.innerHTML = links.map(link => {
-            const title = link.textContent?.trim() || '';
-            const href = 'https://en.toram.jp' + (link.getAttribute('href') || '');
-            const isEvent = title.toLowerCase().includes('event');
-            return `<div class="notice-item"><span class="notice-badge ${isEvent?'badge-event':'badge-notice'}">${isEvent?'이벤트':'공지'}</span><a href="${href}" target="_blank" class="notice-link">${title.slice(0,45)}${title.length>45?'...':''}</a></div>`;
+            const title = link.textContent?.trim().replace(/\s+/g, ' ') || '';
+            const href = link.getAttribute('href') || '#';
+            const fullHref = href.startsWith('http') ? href : 'https://kr.toram.jp/information/' + href;
+            const isEvent = title.includes('이벤트') || title.toLowerCase().includes('event');
+            const label = isEvent ? '이벤트' : '공지';
+            const cls = isEvent ? 'badge-event' : 'badge-notice';
+            return `<div class="notice-item"><span class="notice-badge ${cls}">${label}</span><a href="${fullHref}" target="_blank" class="notice-link">${title.slice(0, 45)}${title.length > 45 ? '...' : ''}</a></div>`;
         }).join('');
     } catch {
-        container.innerHTML = `<div class="notice-item"><span class="notice-badge badge-notice">공지</span><a href="https://kr.toram.jp/information/?type_code=all" target="_blank" class="notice-link">토람 공식 공지 보러가기</a></div><div style="font-size:0.78rem;color:#888;margin-top:6px;">자동 로드 실패 - 직접 확인해주세요</div>`;
+        // 실패 시 정적 링크로 대체
+        container.innerHTML = `
+            <div class="notice-item"><span class="notice-badge badge-notice">공지</span><a href="${TARGET_URL}" target="_blank" class="notice-link">토람 공식 공지 확인하기</a></div>
+            <div style="font-size:0.78rem;color:var(--text-dim);margin-top:6px;">자동 로드 실패 · 직접 확인해주세요</div>`;
     }
 }
 
@@ -266,23 +279,34 @@ async function loadVisitStats() {
     try {
         const now = new Date();
         const yearMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-        const q = query(collection(db, 'pageStats'), where('yearMonth', '==', yearMonth), orderBy('count', 'desc'));
+        // orderBy 제거 → 복합 인덱스 불필요, 클라이언트에서 정렬
+        const q = query(collection(db, 'pageStats'), where('yearMonth', '==', yearMonth));
         const snap = await getDocs(q);
-        if (snap.empty) { container.innerHTML = '<div style="color:#888;font-size:0.82rem;">아직 방문 데이터가 없습니다.</div>'; return; }
-        const total = snap.docs.reduce((s, d) => s + (d.data().count || 0), 0);
-        const rows = snap.docs.map((d, i) => {
-            const data = d.data();
+        if (snap.empty) {
+            container.innerHTML = '<div style="color:var(--text-dim);font-size:0.82rem;padding:8px 0;">이달 방문 데이터가 없습니다.<br><span style="font-size:0.75rem;">페이지를 둘러보면 자동으로 기록돼요!</span></div>';
+            return;
+        }
+        // 클라이언트 정렬
+        const docs = snap.docs
+            .map(d => d.data())
+            .sort((a, b) => (b.count || 0) - (a.count || 0));
+        const total = docs.reduce((s, d) => s + (d.count || 0), 0);
+        const medals = ['🥇','🥈','🥉'];
+        const rows = docs.map((data, i) => {
             const pct = total > 0 ? Math.round((data.count / total) * 100) : 0;
-            const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}.`;
+            const rank = medals[i] || `${i+1}.`;
             return `<div class="visit-row">
-                <span class="visit-rank">${medal}</span>
+                <span class="visit-rank">${rank}</span>
                 <span class="visit-name">${data.name || data.page}</span>
                 <div class="visit-bar-wrap"><div class="visit-bar" style="width:${pct}%"></div></div>
                 <span class="visit-count">${(data.count||0).toLocaleString()}회</span>
             </div>`;
         }).join('');
         container.innerHTML = `<div class="visit-total">이달 총 방문: <strong>${total.toLocaleString()}회</strong></div>${rows}`;
-    } catch { container.innerHTML = '<div style="color:#888;font-size:0.82rem;">통계를 불러오지 못했습니다.</div>'; }
+    } catch(err) {
+        console.error('방문 통계 오류:', err);
+        container.innerHTML = '<div style="color:var(--text-dim);font-size:0.82rem;">통계를 불러오지 못했습니다.</div>';
+    }
 }
 
 async function initSlider() {
