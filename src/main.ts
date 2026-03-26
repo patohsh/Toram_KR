@@ -1,16 +1,15 @@
-﻿// src/main.ts
+// src/main.ts
 import './style.css';
 import { db } from './firebase';
-import { collection, addDoc, getDocs, query, orderBy, serverTimestamp, where } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, serverTimestamp, where, deleteDoc, doc, addDoc, limit, increment, setDoc, getDoc } from 'firebase/firestore';
 
 // =================================================
-// 0. 전역 상태 및 라우팅 설정 (신규 추가)
+// 0. 타입 및 라우팅
 // =================================================
-
-// 페이지 키 타입 정의
 type PageKey = 'home' | 'schedule' | 'crysta' | 'skill' | 'ability' | 'registlet' | 'food' | 'equip' | 'guide' | 'info';
 
-// 라우터 맵: 페이지 키와 렌더링 함수를 매핑
+const app = document.querySelector<HTMLDivElement>('#app')!;
+
 const routes: Record<PageKey, () => void> = {
     home: renderHomePage,
     schedule: renderSchedulePage,
@@ -24,47 +23,48 @@ const routes: Record<PageKey, () => void> = {
     info: renderInfoPage
 };
 
-// [기능] 페이지 이동 (History API 사용)
-function navigate(page: PageKey) {
-    // 현재 페이지와 같으면 무시 (중복 쌓임 방지)
-    if (history.state && history.state.page === page) return;
+// 방문 통계 추적 대상 페이지
+const TRACK_PAGES: PageKey[] = ['home','crysta','skill','ability','registlet','food','equip','guide','schedule'];
+const PAGE_NAMES: Record<string, string> = {
+    home:'홈', crysta:'크리스타', skill:'스킬', ability:'어빌리티',
+    registlet:'레지스트릿', food:'요리', equip:'장비', guide:'뉴비가이드', schedule:'이벤트'
+};
 
-    // 히스토리 스택에 추가
-    history.pushState({ page }, '', `#${page}`);
-
-    // 해당 페이지 렌더링
-    routes[page]();
-
-    // 페이지 이동 시 스크롤 최상단으로
-    window.scrollTo(0, 0);
+async function trackVisit(page: PageKey) {
+    if (!TRACK_PAGES.includes(page)) return;
+    try {
+        const now = new Date();
+        const yearMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+        const statRef = doc(db, 'pageStats', `${yearMonth}_${page}`);
+        await setDoc(statRef, {
+            page, yearMonth,
+            count: increment(1),
+            name: PAGE_NAMES[page] || page
+        }, { merge: true });
+    } catch {}
 }
 
-// [기능] 뒤로가기 핸들러 (PopState)
+function navigate(page: PageKey) {
+    if (history.state && history.state.page === page) return;
+    history.pushState({ page }, '', `#${page}`);
+    routes[page]();
+    window.scrollTo(0, 0);
+    trackVisit(page);
+}
+
 window.addEventListener('popstate', (event) => {
-    if (event.state && event.state.page) {
-        // 히스토리에 상태가 있으면 해당 페이지 렌더링
-        const page = event.state.page as PageKey;
-        if (routes[page]) routes[page]();
-    } else {
-        // 상태가 없으면(초기 진입 등) 홈으로
-        renderHomePage();
-    }
+    const modal = document.getElementById('image-modal');
+    if (modal && modal.style.display === 'flex') { modal.style.display = 'none'; return; }
+    if (event.state?.page) { const p = event.state.page as PageKey; if (routes[p]) routes[p](); }
+    else renderHomePage();
 });
 
-// [기능] PC 마우스 백버튼 이벤트 (mouseup)
 function initMouseBackEvent() {
-    window.addEventListener('mouseup', (e) => {
-        // e.button === 3 : Browser Back Button (마우스 엄지 버튼 뒤로)
-        // e.button === 4 : Browser Forward Button
-        if (e.button === 3) {
-            e.preventDefault(); // 기본 동작 방지 (일부 브라우저)
-            history.back();
-        }
-    });
+    window.addEventListener('mouseup', (e) => { if (e.button === 3) { e.preventDefault(); history.back(); } });
 }
 
 // =================================================
-// 1. 토람 이벤트 스케줄 데이터
+// 1. 이벤트 스케줄 데이터
 // =================================================
 const eventSchedule = [
     { month: "연초", title: "신년맞이 이벤트" },
@@ -83,77 +83,224 @@ const eventSchedule = [
 ];
 
 // =================================================
-// 2. 앱 라우팅 및 렌더링
+// [Page 1] 홈 화면
 // =================================================
+const HOME_SLIDE_IMAGES: string[] = [
+    'HomeImg/slide_01.png','HomeImg/slide_02.png','HomeImg/slide_03.png',
+    'HomeImg/slide_04.png','HomeImg/slide_05.png','HomeImg/slide_06.png',
+    'HomeImg/slide_07.png','HomeImg/slide_08.png','HomeImg/slide_09.png','HomeImg/slide_10.png',
+];
+const POPULAR_TAGS = ['연격','크리티컬','STR%','ATK%','블레이드','매직','슛','발도','레지스트릿','MATK%','안정률'];
+let slideTimer: ReturnType<typeof setInterval> | null = null;
 
-const app = document.querySelector<HTMLDivElement>('#app')!;
-
-// --- [Page 1] 홈 화면 ---
 function renderHomePage() {
+    if (slideTimer) { clearInterval(slideTimer); slideTimer = null; }
     app.innerHTML = `
-    <div class="home-container">
-      <h1 class="home-title">🌸 토람 종합 정보정리 가이드</h1>
-      
-      <div class="menu-grid">
-        <!-- 이벤트 스케줄 (구 옵션부여) -->
-        <div class="menu-card" id="go-schedule">
-          <div class="menu-icon">📅</div>
-          <div class="menu-text">이벤트 스케줄</div>
+    <div class="home-wrap">
+      <div class="hero-banner">
+        <div class="hero-left">
+          <div class="hero-title">🌸 토람 종합 정보 가이드</div>
+          <div class="hero-sub">토람 온라인 한국어 다중 정보 검색 사이트</div>
+          <div class="hero-stats">
+            <div class="stat-pill">💎 크리스타 <span class="stat-num" id="stat-crysta">...</span></div>
+            <div class="stat-pill">🛡️ 장비 <span class="stat-num" id="stat-equip">...</span></div>
+            <div class="stat-pill">💍 레지스트릿 <span class="stat-num" id="stat-reg">...</span></div>
+          </div>
         </div>
-        
-        <div class="menu-card" id="go-crysta">
-          <div class="menu-icon">💎</div>
-          <div class="menu-text">크리스타 검색</div>
-        </div>
-        
-        <div class="menu-card" id="go-skill">
-          <div class="menu-icon">📖</div>
-          <div class="menu-text">스킬 정보</div>
-        </div>
-
-        <div class="menu-card" id="go-ability">
-          <div class="menu-icon">🔮</div>
-          <div class="menu-text">장비 어빌리티</div>
-        </div>
-
-        <div class="menu-card" id="go-registlet">
-          <div class="menu-icon">💍</div>
-          <div class="menu-text">레지스트릿</div>
-        </div>
-
-        <div class="menu-card" id="go-food">
-          <div class="menu-icon">🍳</div>
-          <div class="menu-text">요리 주소</div>
-        </div>
-
-        <div class="menu-card" id="go-equip">
-          <div class="menu-icon">🛡️</div>
-          <div class="menu-text">장비 검색</div>
-        </div>
-
-        <div class="menu-card" id="go-guide">
-          <div class="menu-icon">📘</div>
-          <div class="menu-text">뉴비 가이드</div>
-        </div>
-
-        <div class="menu-card" id="go-info">
-          <div class="menu-icon">⭐</div>
-          <div class="menu-text">참가자</div>
+        <div class="hero-mascot">
+          <img src="mascot.png" alt="마스코트" onerror="this.style.display='none'">
         </div>
       </div>
-    </div>
-  `;
-    // 이벤트 바인딩 (navigate 함수 사용)
-    document.getElementById('go-schedule')?.addEventListener('click', () => navigate('schedule'));
-    document.getElementById('go-crysta')?.addEventListener('click', () => navigate('crysta'));
-    document.getElementById('go-skill')?.addEventListener('click', () => navigate('skill'));
-    document.getElementById('go-ability')?.addEventListener('click', () => navigate('ability'));
-    document.getElementById('go-registlet')?.addEventListener('click', () => navigate('registlet'));
-    document.getElementById('go-food')?.addEventListener('click', () => navigate('food'));
-    document.getElementById('go-equip')?.addEventListener('click', () => navigate('equip'));
-    document.getElementById('go-guide')?.addEventListener('click', () => navigate('guide'));
-    document.getElementById('go-info')?.addEventListener('click', () => navigate('info'));
+
+      <div class="section-label">⚡ 빠른 검색</div>
+      <div class="quick-search-grid">
+        <div class="qs-card"><div class="qs-label">💎 크리스타</div><input type="text" id="qs-crysta" class="qs-input" placeholder="크리스타 이름..."><button class="qs-btn" id="qs-btn-crysta">검색</button></div>
+        <div class="qs-card"><div class="qs-label">🛡️ 장비</div><input type="text" id="qs-equip" class="qs-input" placeholder="장비 이름..."><button class="qs-btn" id="qs-btn-equip">검색</button></div>
+        <div class="qs-card"><div class="qs-label">💍 레지스트릿</div><input type="text" id="qs-reg" class="qs-input" placeholder="레지스트릿 이름..."><button class="qs-btn" id="qs-btn-reg">검색</button></div>
+        <div class="qs-card"><div class="qs-label">🍳 요리 주소</div><input type="text" id="qs-food" class="qs-input" placeholder="요리 이름..."><button class="qs-btn" id="qs-btn-food">검색</button></div>
+      </div>
+
+      <div class="home-grid2">
+        <div class="home-card">
+          <div class="home-card-title">📢 토람 공식 공지</div>
+          <div id="notice-list"><div class="home-loading">불러오는 중...</div></div>
+        </div>
+        <div class="home-card">
+          <div class="home-card-title">📘 최근 가이드 <span class="new-badge">NEW</span></div>
+          <div id="recent-guide-list"><div class="home-loading">불러오는 중...</div></div>
+        </div>
+      </div>
+
+      <div class="section-label">🎮 바로가기</div>
+      <div class="shortcut-grid">
+        <div class="sc-card" data-page="schedule"><div class="sc-icon">📅</div><div class="sc-txt">이벤트</div></div>
+        <div class="sc-card" data-page="crysta"><div class="sc-icon">💎</div><div class="sc-txt">크리스타</div></div>
+        <div class="sc-card" data-page="skill"><div class="sc-icon">📖</div><div class="sc-txt">스킬</div></div>
+        <div class="sc-card" data-page="ability"><div class="sc-icon">🔮</div><div class="sc-txt">어빌리티</div></div>
+        <div class="sc-card" data-page="registlet"><div class="sc-icon">💍</div><div class="sc-txt">레지스트릿</div></div>
+        <div class="sc-card" data-page="food"><div class="sc-icon">🍳</div><div class="sc-txt">요리</div></div>
+        <div class="sc-card" data-page="equip"><div class="sc-icon">🛡️</div><div class="sc-txt">장비</div></div>
+        <div class="sc-card" data-page="guide"><div class="sc-icon">📘</div><div class="sc-txt">뉴비가이드</div></div>
+        <div class="sc-card" data-page="info"><div class="sc-icon">⭐</div><div class="sc-txt">참가자</div></div>
+      </div>
+
+      <div class="home-card" style="margin-bottom:14px;">
+        <div class="home-card-title">🔍 인기 검색어</div>
+        <div class="tag-row">${POPULAR_TAGS.map(t => `<span class="pop-tag" data-tag="${t}">${t}</span>`).join('')}</div>
+      </div>
+
+      <div class="home-card" style="margin-bottom:14px;">
+        <div class="home-card-title">🖼️ 갤러리</div>
+        <div class="img-slider-wrap">
+          <div class="img-slider" id="home-slider"><div class="slider-placeholder">public/HomeImg/ 폴더에 slide_01.png ~ slide_10.png 를 넣어주세요</div></div>
+          <div class="slider-dots" id="slider-dots"></div>
+        </div>
+      </div>
+
+    </div>`;
+
+    // 바로가기
+    document.querySelectorAll('.sc-card').forEach(c => c.addEventListener('click', () => navigate((c as HTMLElement).dataset.page as PageKey)));
+
+    // 빠른 검색
+    document.getElementById('qs-btn-crysta')?.addEventListener('click', () => {
+        const q = (document.getElementById('qs-crysta') as HTMLInputElement).value.trim();
+        if (q) { navigate('crysta'); setTimeout(() => { const el = document.getElementById('nameInput') as HTMLInputElement; if (el) { el.value = q; el.dispatchEvent(new Event('input')); } }, 150); }
+    });
+    document.getElementById('qs-btn-equip')?.addEventListener('click', () => {
+        const q = (document.getElementById('qs-equip') as HTMLInputElement).value.trim();
+        if (q) { navigate('equip'); setTimeout(() => { const el = document.getElementById('equip-search') as HTMLInputElement; if (el) { el.value = q; el.dispatchEvent(new Event('input')); } }, 150); }
+    });
+    document.getElementById('qs-btn-reg')?.addEventListener('click', () => {
+        const q = (document.getElementById('qs-reg') as HTMLInputElement).value.trim();
+        if (q) { navigate('registlet'); setTimeout(() => { const el = document.getElementById('reg-name-input') as HTMLInputElement; if (el) { el.value = q; el.dispatchEvent(new Event('input')); } }, 150); }
+    });
+    document.getElementById('qs-btn-food')?.addEventListener('click', () => {
+        const q = (document.getElementById('qs-food') as HTMLInputElement).value.trim();
+        navigate('food');
+        setTimeout(() => { const el = document.getElementById('food-search-input') as HTMLInputElement; if (el) { el.value = q; el.dispatchEvent(new Event('input')); } }, 150);
+    });
+
+    ['qs-crysta','qs-equip','qs-reg','qs-food'].forEach(id => {
+        document.getElementById(id)?.addEventListener('keypress', (e) => { if (e.key === 'Enter') (document.getElementById('qs-btn-' + id.replace('qs-','')) as HTMLButtonElement)?.click(); });
+    });
+
+    // 인기 태그
+    document.querySelectorAll('.pop-tag').forEach(tag => {
+        tag.addEventListener('click', () => {
+            const q = (tag as HTMLElement).dataset.tag || '';
+            navigate('crysta');
+            setTimeout(() => { const el = document.getElementById('nameInput') as HTMLInputElement; if (el) { el.value = q; el.dispatchEvent(new Event('input')); } }, 150);
+        });
+    });
+
+    loadHomeStats();
+    loadOfficialNotice();
+    loadRecentGuides();
+    initSlider();
+    loadVisitStats();
 }
+
+async function loadHomeStats() {
+    try {
+        const cats = ['normal','weapon','armor','hat','ring','enhanced_normal','enhanced_weapon','enhanced_armor','enhanced_hat','enhanced_ring'];
+        const results = await Promise.all(cats.map(async c => {
+            try { if (crystaCache[c]) return crystaCache[c].length; const r = await fetch(`CrystaData/${c}.json`); if (!r.ok) return 0; const d = await r.json(); crystaCache[c] = d; return d.length; } catch { return 0; }
+        }));
+        const el = document.getElementById('stat-crysta'); if (el) el.textContent = results.reduce((a,b)=>a+b,0).toLocaleString();
+    } catch {}
+    try {
+        const cats = ['Handed_Sword','Two_Handed_Sword','bow','bowgun','staff','magicdevice','knuckle','halberd','katana','armor','additional','shield'];
+        const results = await Promise.all(cats.map(async c => {
+            try { const r = await fetch(`Equipment/${c}/${c}.js`); if (!r.ok) return 0; const t = await r.text(); const eq = t.indexOf('='); let j = t.substring(eq+1).trim(); if (j.endsWith(';')) j=j.slice(0,-1); const d = new Function(`return ${j}`)(); const items = d.items||d; return Array.isArray(items)?items.length:0; } catch { return 0; }
+        }));
+        const el = document.getElementById('stat-equip'); if (el) el.textContent = results.reduce((a,b)=>a+b,0).toLocaleString();
+    } catch {}
+    try {
+        const r = await fetch('registlet/registlet_list.js');
+        if (r.ok) { const t = await r.text(); const obj = new Function(`return ${t.substring(t.indexOf('{'))}`)(); const el = document.getElementById('stat-reg'); if (el && obj?.items) el.textContent = obj.items.length.toLocaleString(); }
+    } catch {}
+}
+
+async function loadOfficialNotice() {
+    const container = document.getElementById('notice-list'); if (!container) return;
+    try {
+        const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://en.toram.jp/information/?type_code=all')}`);
+        const data = await res.json();
+        const doc2 = new DOMParser().parseFromString(data.contents, 'text/html');
+        const links = Array.from(doc2.querySelectorAll('a[href*="information_id"]')).slice(0,5);
+        if (links.length === 0) throw new Error('no items');
+        container.innerHTML = links.map(link => {
+            const title = link.textContent?.trim() || '';
+            const href = 'https://en.toram.jp' + (link.getAttribute('href') || '');
+            const isEvent = title.toLowerCase().includes('event');
+            return `<div class="notice-item"><span class="notice-badge ${isEvent?'badge-event':'badge-notice'}">${isEvent?'이벤트':'공지'}</span><a href="${href}" target="_blank" class="notice-link">${title.slice(0,45)}${title.length>45?'...':''}</a></div>`;
+        }).join('');
+    } catch {
+        container.innerHTML = `<div class="notice-item"><span class="notice-badge badge-notice">공지</span><a href="https://en.toram.jp/information/" target="_blank" class="notice-link">토람 공식 공지 보러가기</a></div><div style="font-size:0.78rem;color:#888;margin-top:6px;">자동 로드 실패 - 직접 확인해주세요</div>`;
+    }
+}
+
+async function loadRecentGuides() {
+    const container = document.getElementById('recent-guide-list'); if (!container) return;
+    try {
+        const q = query(collection(db, 'guides'), orderBy('createdAt', 'desc'), limit(3));
+        const snap = await getDocs(q);
+        if (snap.empty) { container.innerHTML = '<div style="color:#888;font-size:0.85rem;padding:8px 0;">아직 가이드가 없습니다.</div>'; return; }
+        const names: Record<string,string> = { menu:'메뉴', money:'돈벌기', raid:'레이드', myroom:'마이룸', boss:'특수보스', job:'직업' };
+        container.innerHTML = snap.docs.map(d => {
+            const data = d.data();
+            let dateStr = '';
+            if (data.createdAt?.toDate) { const dt = data.createdAt.toDate(); dateStr = `${dt.getFullYear()}.${String(dt.getMonth()+1).padStart(2,'0')}.${String(dt.getDate()).padStart(2,'0')}`; }
+            return `<div class="guide-preview-item" data-category="${data.category}"><span class="guide-cat-badge">${names[data.category]||data.category}</span><div class="guide-preview-title">${escapeHtml(data.title||'')}</div><div class="guide-preview-meta">✍️ ${escapeHtml(data.nickname||'익명')} · ${dateStr}</div></div>`;
+        }).join('');
+        container.querySelectorAll('.guide-preview-item').forEach(item => {
+            item.addEventListener('click', () => { currentGuideTab = (item as HTMLElement).dataset.category||'menu'; navigate('guide'); });
+        });
+    } catch { container.innerHTML = '<div style="color:#888;font-size:0.85rem;">가이드를 불러오지 못했습니다.</div>'; }
+}
+
+async function loadVisitStats() {
+    const container = document.getElementById('visit-stats');
+    if (!container) return;
+    try {
+        const now = new Date();
+        const yearMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+        const q = query(collection(db, 'pageStats'), where('yearMonth', '==', yearMonth), orderBy('count', 'desc'));
+        const snap = await getDocs(q);
+        if (snap.empty) { container.innerHTML = '<div style="color:#888;font-size:0.82rem;">아직 방문 데이터가 없습니다.</div>'; return; }
+        const total = snap.docs.reduce((s, d) => s + (d.data().count || 0), 0);
+        const rows = snap.docs.map((d, i) => {
+            const data = d.data();
+            const pct = total > 0 ? Math.round((data.count / total) * 100) : 0;
+            const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}.`;
+            return `<div class="visit-row">
+                <span class="visit-rank">${medal}</span>
+                <span class="visit-name">${data.name || data.page}</span>
+                <div class="visit-bar-wrap"><div class="visit-bar" style="width:${pct}%"></div></div>
+                <span class="visit-count">${(data.count||0).toLocaleString()}회</span>
+            </div>`;
+        }).join('');
+        container.innerHTML = `<div class="visit-total">이달 총 방문: <strong>${total.toLocaleString()}회</strong></div>${rows}`;
+    } catch { container.innerHTML = '<div style="color:#888;font-size:0.82rem;">통계를 불러오지 못했습니다.</div>'; }
+}
+
+async function initSlider() {
+    const slider = document.getElementById('home-slider'); const dotsEl = document.getElementById('slider-dots');
+    if (!slider || !dotsEl) return;
+    const valid: string[] = [];
+    await Promise.all(HOME_SLIDE_IMAGES.map(src => new Promise<void>(res => { const img = new Image(); img.onload = () => { valid.push(src); res(); }; img.onerror = () => res(); img.src = src; })));
+    if (valid.length === 0) return;
+    let cur = 0;
+    const render = () => {
+        slider.innerHTML = `<img src="${valid[cur]}" class="slider-img" alt="갤러리">`;
+        dotsEl.innerHTML = valid.map((_,i) => `<span class="slider-dot ${i===cur?'active':''}"></span>`).join('');
+        dotsEl.querySelectorAll('.slider-dot').forEach((d,i) => d.addEventListener('click', () => { cur=i; render(); reset(); }));
+    };
+    const reset = () => { if (slideTimer) clearInterval(slideTimer); slideTimer = setInterval(() => { cur=(cur+1)%valid.length; render(); }, 5000); };
+    render(); reset();
+}
+
 // --- [Page 2] 이벤트 스케줄 페이지 ---
 function renderSchedulePage() {
     const listHtml = eventSchedule.map(item => `
@@ -214,54 +361,71 @@ function renderCrystaPage() {
         <input type="checkbox" id="enhanced_ring" value="enhanced_ring"> <label for="enhanced_ring">반지(강화)</label>
       </div>
 
-      <!-- 옵션 필터 -->
+      <!-- 옵션 필터 버튼 그룹 -->
+      <div style="width:100%;">
+        <div style="text-align:center; margin-bottom:8px; color:var(--text-dim); font-size:0.85rem;">옵션 선택</div>
+        <div class="option-btn-group" id="option-btn-group">
+          <button class="opt-btn active" data-val="none">전체</button>
+          <button class="opt-btn" data-val="STR%">STR%</button>
+          <button class="opt-btn" data-val="STR">STR</button>
+          <button class="opt-btn" data-val="DEX%">DEX%</button>
+          <button class="opt-btn" data-val="DEX">DEX</button>
+          <button class="opt-btn" data-val="INT%">INT%</button>
+          <button class="opt-btn" data-val="INT">INT</button>
+          <button class="opt-btn" data-val="AGI%">AGI%</button>
+          <button class="opt-btn" data-val="AGI">AGI</button>
+          <button class="opt-btn" data-val="VIT%">VIT%</button>
+          <button class="opt-btn" data-val="VIT">VIT</button>
+          <button class="opt-btn" data-val="ATK%">ATK%</button>
+          <button class="opt-btn" data-val="ATK">ATK</button>
+          <button class="opt-btn" data-val="MATK%">MATK%</button>
+          <button class="opt-btn" data-val="MATK">MATK</button>
+          <button class="opt-btn" data-val="크리티컬률%">크리%</button>
+          <button class="opt-btn" data-val="크리티컬률">크리</button>
+          <button class="opt-btn" data-val="크리티컬데미지%">크뎀%</button>
+          <button class="opt-btn" data-val="크리티컬데미지">크뎀</button>
+          <button class="opt-btn" data-val="최대HP%">HP%</button>
+          <button class="opt-btn" data-val="최대HP">HP</button>
+          <button class="opt-btn" data-val="최대MP%">MP%</button>
+          <button class="opt-btn" data-val="최대MP">MP</button>
+          <button class="opt-btn" data-val="공격속도%">공속%</button>
+          <button class="opt-btn" data-val="공격속도">공속</button>
+          <button class="opt-btn" data-val="시전속도%">시전%</button>
+          <button class="opt-btn" data-val="행동속도%">행동%</button>
+          <button class="opt-btn" data-val="안정률%">안정률</button>
+          <button class="opt-btn" data-val="명중%">명중%</button>
+          <button class="opt-btn" data-val="명중">명중</button>
+          <button class="opt-btn" data-val="절대명중%">절명%</button>
+          <button class="opt-btn" data-val="회피%">회피%</button>
+          <button class="opt-btn" data-val="회피">회피</button>
+          <button class="opt-btn" data-val="물리내성%">물내%</button>
+          <button class="opt-btn" data-val="마법내성%">마내%</button>
+          <button class="opt-btn" data-val="이상내성%">이내%</button>
+          <button class="opt-btn" data-val="근거리위력%">근위%</button>
+          <button class="opt-btn" data-val="원거리위력%">원위%</button>
+          <button class="opt-btn" data-val="발도공격%">발도%</button>
+          <button class="opt-btn" data-val="어그로%">어그로%</button>
+          <button class="opt-btn" data-val="마법배리어">마배리</button>
+          <button class="opt-btn" data-val="물리배리어">물배리</button>
+          <button class="opt-btn" data-val="비율배리어%">비배%</button>
+          <button class="opt-btn" data-val="공격MP회복%">공MP%</button>
+          <button class="opt-btn" data-val="공격MP회복">공MP</button>
+          <button class="opt-btn" data-val="MP자연회복%">MP회%</button>
+          <button class="opt-btn" data-val="HP자연회복%">HP회%</button>
+        </div>
+      </div>
+
+      <!-- 수치 필터 -->
       <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:center; width:100%;">
-        <select id="optionType" style="padding:8px; border-radius:5px; background:var(--input-bg); color:white; border:1px solid var(--border-color);">
-          <option value="none">옵션 선택 (전체)</option>
-          <option value="STR%">STR %</option> <option value="STR">STR (고정)</option>
-          <option value="DEX%">DEX %</option> <option value="DEX">DEX (고정)</option>
-          <option value="INT%">INT %</option> <option value="INT">INT (고정)</option>
-          <option value="AGI%">AGI %</option> <option value="AGI">AGI (고정)</option>
-          <option value="VIT%">VIT %</option> <option value="VIT">VIT (고정)</option>
-          <option value="ATK%">ATK %</option> <option value="ATK">ATK (고정)</option>
-          <option value="MATK%">MATK %</option> <option value="MATK">MATK (고정)</option>
-          <option value="크리티컬률%">크리티컬률 %</option> <option value="크리티컬률">크리티컬률 (고정)</option>
-          <option value="크리티컬데미지%">크리티컬데미지 %</option> <option value="크리티컬데미지">크리티컬데미지 (고정)</option>
-          <option value="최대HP%">최대HP %</option> <option value="최대HP">최대HP (고정)</option>
-          <option value="최대MP%">최대MP %</option> <option value="최대MP">최대MP (고정)</option>
-          <option value="공격속도%">공격속도 %</option> <option value="공격속도">공격속도 (고정)</option>
-          <option value="시전속도%">시전속도 %</option> <option value="시전속도">시전속도 (고정)</option>
-          <option value="행동속도%">행동속도 %</option> <option value="행동속도">행동속도 (고정)</option>
-          <option value="안정률%">안정률 %</option>
-          <option value="명중%">명중 %</option> <option value="명중">명중 (고정)</option>
-          <option value="절대명중%">절대명중 %</option>
-          <option value="회피%">회피 %</option> <option value="회피">회피 (고정)</option>
-          <option value="물리내성%">물리내성 %</option>
-          <option value="마법내성%">마법내성 %</option>
-          <option value="이상내성%">이상내성 %</option>
-          <option value="근거리위력%">근거리위력 %</option>
-          <option value="원거리위력%">원거리위력 %</option>
-          <option value="발도공격%">발도공격 %</option>
-          <option value="어그로%">어그로 %</option>
-          <option value="마법배리어">마법배리어</option> 
-          <option value="물리배리어">물리배리어</option>
-          <option value="비율배리어%">비율배리어 %</option>
-          <option value="공격MP회복%">공격MP회복 %</option>
-          <option value="공격MP회복">공격MP회복</option>
-          <option value="MP자연회복%">MP자연회복 %</option>
-          <option value="HP자연회복%">HP자연회복 %</option>
-
-        </select>
-
-        <select id="symbol" style="padding:8px; border-radius:5px; background:var(--input-bg); color:white; border:1px solid var(--border-color);">
+        <select id="symbol" style="padding:8px; border-radius:5px; background:var(--input-bg); color:var(--text-main); border:1px solid var(--border-color);">
           <option value="=">같음 (=)</option>
           <option value=">">큼 (>)</option>
           <option value="<">작음 (<)</option>
           <option value=">=">크거나 같음 (>=)</option>
           <option value="<=">작거나 같음 (<=)</option>
         </select>
-
-        <input type="number" id="valueInput" placeholder="수치 입력" style="width:80px; padding:8px;">
+        <input type="number" id="valueInput" placeholder="수치 입력" style="width:90px; padding:8px;">
+        <input type="hidden" id="optionType" value="none">
       </div>
     </div>
 
@@ -279,7 +443,7 @@ function renderCrystaPage() {
     document.getElementById('back-home')?.addEventListener('click', renderHomePage);
 
     // 실시간 검색 이벤트 연결
-    const inputs = ['nameInput', 'optionType', 'symbol', 'valueInput'];
+    const inputs = ['nameInput', 'symbol', 'valueInput'];
     inputs.forEach(id => {
         document.getElementById(id)?.addEventListener('input', performSearch);
         document.getElementById(id)?.addEventListener('change', performSearch);
@@ -291,6 +455,17 @@ function renderCrystaPage() {
     });
 
     document.getElementById('randomButton')?.addEventListener('click', performRandomPick);
+
+    // 옵션 버튼 그룹 이벤트
+    document.querySelectorAll('.opt-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const val = (btn as HTMLElement).dataset.val || 'none';
+            (document.getElementById('optionType') as HTMLInputElement).value = val;
+            performSearch();
+        });
+    });
 
     // 초기 검색 실행
     performSearch();
@@ -416,16 +591,18 @@ function renderSearchResults(data: any[]) {
 
     container.innerHTML = data.map(item => {
         const imgSrc = imageMap[item._category] || 'CrystaImg/normal.png';
-        // 옵션 텍스트 줄바꿈 처리
-        const formattedOption = item.option.replace(/&/g, '<br>');
+        const formattedOption = item.option.replace(/&/g, ' · ');
 
         return `
       <div class="crysta-item">
-        <img src="${imgSrc}" alt="icon" onerror="this.src='CrystaImg/normal.png'">
-        <h3>${item.name}</h3>
-        <p style="margin-top:5px; font-size:0.9em; color:var(--text-main); font-weight:500;">${formattedOption}</p>
-
-        ${item.enhance ? `<p style="margin-top:5px; font-size:0.8em; color:var(--accent-light);">[강화 전: ${item.enhance}]</p>` : ''}
+        <div class="crysta-left">
+          <img src="${imgSrc}" alt="icon" onerror="this.src='CrystaImg/normal.png'">
+          <div class="crysta-name">${item.name}</div>
+        </div>
+        <div class="crysta-right">
+          <div class="crysta-option">${formattedOption}</div>
+          ${item.enhance ? `<div class="crysta-enhance">강화 전: ${item.enhance}</div>` : ''}
+        </div>
       </div>
     `;
     }).join('');
@@ -1700,14 +1877,6 @@ function renderPagination() {
 
     container.appendChild(createBtn('Next', () => { equipCurrentPage++; renderEquipGrid(); renderPagination(); }, equipCurrentPage === totalPages));
 }
-// ★ [신규 추가] 브라우저 뒤로가기 버튼(혹은 제스처) 발생 시 모달이 열려있다면 모달만 닫음
-window.addEventListener('popstate', () => {
-    const modal = document.getElementById('image-modal');
-    if (modal && modal.style.display === 'flex') {
-        modal.style.display = 'none';
-    }
-});
-
 // =================================================
 // [기능] 낮/밤 테마 토글 (Day/Night Switch)
 // =================================================
@@ -1777,13 +1946,12 @@ function toggleTheme() {
 
 // 가이드 카테고리 설정
 const GUIDE_TABS = [
-    { id: 'menu', name: '메뉴 (기본)', file: 'guideData.js' },
-    { id: 'money', name: '돈 벌기', file: 'money.js' },
-    { id: 'raid', name: '레이드', file: 'raid.js' },
-    { id: 'myroom', name: '마이룸', file: 'myroom.js' },
-    { id: 'boss', name: '특수보스', file: 'boss.js' },
+    { id: 'menu', name: '메뉴 (기본)' },
+    { id: 'money', name: '돈 벌기' },
+    { id: 'raid', name: '레이드' },
+    { id: 'myroom', name: '마이룸' },
+    { id: 'boss', name: '특수보스' },
     { id: 'job', name: '직업 가이드' },
-    { id: 'empty', name: '(준비중)', file: '' } // 공란 file은 필요없지만 이후를 위해 남겨둠.
 ];
 
 const ADMIN_PASSWORD_HASH = import.meta.env.VITE_ADMIN_PASSWORD_HASH;
@@ -2014,8 +2182,6 @@ async function loadGuideFromFirestore(tabId: string) {
     container.innerHTML = '<div style="text-align:center;padding:50px;color:#888;">로딩 중...</div>';
 
     try {
-        const { collection, getDocs, query, orderBy, where } = await import('firebase/firestore');
-        const { db } = await import('./firebase');
 
         const q = query(
             collection(db, 'guides'),
@@ -2138,8 +2304,6 @@ async function submitGuidePost() {
     submitBtn.innerText = '게시 중...';
 
     try {
-        const { collection, addDoc, serverTimestamp } = await import('firebase/firestore');
-        const { db } = await import('./firebase');
 
         const passwordHash = await sha256(password);
 
@@ -2223,9 +2387,6 @@ async function confirmDelete() {
             btn.innerText = '삭제';
             return;
         }
-
-        const { deleteDoc, doc } = await import('firebase/firestore');
-        const { db } = await import('./firebase');
 
         await deleteDoc(doc(db, 'guides', pendingDeleteId));
 
