@@ -237,7 +237,7 @@ async function loadOfficialNotice() {
             return `<div class="notice-item"><span class="notice-badge ${isEvent?'badge-event':'badge-notice'}">${isEvent?'이벤트':'공지'}</span><a href="${href}" target="_blank" class="notice-link">${title.slice(0,45)}${title.length>45?'...':''}</a></div>`;
         }).join('');
     } catch {
-        container.innerHTML = `<div class="notice-item"><span class="notice-badge badge-notice">공지</span><a href="https://en.toram.jp/information/" target="_blank" class="notice-link">토람 공식 공지 보러가기</a></div><div style="font-size:0.78rem;color:#888;margin-top:6px;">자동 로드 실패 - 직접 확인해주세요</div>`;
+        container.innerHTML = `<div class="notice-item"><span class="notice-badge badge-notice">공지</span><a href="https://kr.toram.jp/information/?type_code=all" target="_blank" class="notice-link">토람 공식 공지 보러가기</a></div><div style="font-size:0.78rem;color:#888;margin-top:6px;">자동 로드 실패 - 직접 확인해주세요</div>`;
     }
 }
 
