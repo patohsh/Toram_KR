@@ -1985,3 +1985,22 @@ body.dark-mode .sc-card:hover { background: rgba(60,20,80,0.9); }
 /* 크리스타 카드 h3 제거 (새 레이아웃에서 사용 안함) */
 .crysta-item h3 { display: none; }
 .crysta-item p { display: none; }
+
+/* ── 가이드 수정 버튼 */
+.btn-edit-post {
+    background: transparent !important;
+    border: 1.5px solid var(--accent-pink) !important;
+    color: var(--accent-pink) !important;
+    padding: 3px 10px !important;
+    border-radius: 10px !important;
+    cursor: pointer !important;
+    font-size: 0.75rem !important;
+    box-shadow: none !important;
+    font-weight: 600 !important;
+    transition: all 0.2s !important;
+}
+.btn-edit-post:hover {
+    background: rgba(216,112,147,0.12) !important;
+    transform: none !important;
+    box-shadow: none !important;
+}

@@ -1,7 +1,7 @@
 // src/main.ts
 import './style.css';
 import { db } from './firebase';
-import { collection, getDocs, query, orderBy, serverTimestamp, where, deleteDoc, doc, addDoc, limit, increment, setDoc, getDoc } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, serverTimestamp, where, deleteDoc, doc, addDoc, limit, increment, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 
 // =================================================
 // 0. 타입 및 라우팅
@@ -105,6 +105,7 @@ function renderHomePage() {
             <div class="stat-pill">💎 크리스타 <span class="stat-num" id="stat-crysta">...</span></div>
             <div class="stat-pill">🛡️ 장비 <span class="stat-num" id="stat-equip">...</span></div>
             <div class="stat-pill">💍 레지스트릿 <span class="stat-num" id="stat-reg">...</span></div>
+            <div class="stat-pill">👥 이달 방문 <span class="stat-num" id="stat-visits">...</span></div>
           </div>
         </div>
         <div class="hero-mascot">
@@ -224,34 +225,46 @@ async function loadHomeStats() {
 
 async function loadOfficialNotice() {
     const container = document.getElementById('notice-list'); if (!container) return;
-    const TARGET_URL = 'https://kr.toram.jp/information/?type_code=all';
-    try {
-        // corsproxy.io 사용 (HTML 콘텐츠 지원)
-        const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(TARGET_URL)}`;
-        const res = await fetch(proxyUrl);
-        if (!res.ok) throw new Error('proxy failed');
-        const html = await res.text();
-        const doc2 = new DOMParser().parseFromString(html, 'text/html');
+    const BASE = 'https://kr.toram.jp';
+    const TARGET_URL = `${BASE}/information/?type_code=all`;
+    // 프록시 여러 개 순서대로 시도
+    const PROXIES = [
+        (u: string) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+        (u: string) => `https://corsproxy.io/?url=${encodeURIComponent(u)}`,
+        (u: string) => `https://thingproxy.freeboard.io/fetch/${u}`,
+    ];
 
-        // 공지 링크 추출 (다양한 셀렉터 시도)
-        const links = Array.from(doc2.querySelectorAll('a[href*="information_id"]')).slice(0, 5);
-        if (links.length === 0) throw new Error('no items');
+    for (const makeProxy of PROXIES) {
+        try {
+            const res = await fetch(makeProxy(TARGET_URL), { signal: AbortSignal.timeout(6000) });
+            if (!res.ok) continue;
+            const html = await res.text();
+            if (!html || html.length < 100) continue;
 
-        container.innerHTML = links.map(link => {
-            const title = link.textContent?.trim().replace(/\s+/g, ' ') || '';
-            const href = link.getAttribute('href') || '#';
-            const fullHref = href.startsWith('http') ? href : 'https://kr.toram.jp/information/' + href;
-            const isEvent = title.includes('이벤트') || title.toLowerCase().includes('event');
-            const label = isEvent ? '이벤트' : '공지';
-            const cls = isEvent ? 'badge-event' : 'badge-notice';
-            return `<div class="notice-item"><span class="notice-badge ${cls}">${label}</span><a href="${fullHref}" target="_blank" class="notice-link">${title.slice(0, 45)}${title.length > 45 ? '...' : ''}</a></div>`;
-        }).join('');
-    } catch {
-        // 실패 시 정적 링크로 대체
-        container.innerHTML = `
-            <div class="notice-item"><span class="notice-badge badge-notice">공지</span><a href="${TARGET_URL}" target="_blank" class="notice-link">토람 공식 공지 확인하기</a></div>
-            <div style="font-size:0.78rem;color:var(--text-dim);margin-top:6px;">자동 로드 실패 · 직접 확인해주세요</div>`;
+            const doc2 = new DOMParser().parseFromString(html, 'text/html');
+            const links = Array.from(doc2.querySelectorAll('a[href*="information_id"]')).slice(0, 5);
+            if (links.length === 0) continue;
+
+            container.innerHTML = links.map(link => {
+                const title = (link.textContent || '').trim().replace(/\s+/g, ' ');
+                const rawHref = link.getAttribute('href') || '';
+                // href가 절대경로면 그대로, 상대경로면 BASE 붙이기
+                const fullHref = rawHref.startsWith('http')
+                    ? rawHref
+                    : rawHref.startsWith('/')
+                        ? `${BASE}${rawHref}`
+                        : `${BASE}/information/${rawHref}`;
+                const isEvent = title.includes('이벤트') || title.toLowerCase().includes('event');
+                const cls = isEvent ? 'badge-event' : 'badge-notice';
+                const label = isEvent ? '이벤트' : '공지';
+                const short = title.length > 45 ? title.slice(0, 45) + '...' : title;
+                return `<div class="notice-item"><span class="notice-badge ${cls}">${label}</span><a href="${fullHref}" target="_blank" class="notice-link">${short}</a></div>`;
+            }).join('');
+            return; // 성공하면 종료
+        } catch { continue; }
     }
+    // 모든 프록시 실패
+    container.innerHTML = `<div class="notice-item"><span class="notice-badge badge-notice">공지</span><a href="${TARGET_URL}" target="_blank" class="notice-link">토람 공식 공지 확인하기 →</a></div><div style="font-size:0.75rem;color:var(--text-dim);margin-top:5px;">자동 로드 실패 · 직접 확인해주세요</div>`;
 }
 
 async function loadRecentGuides() {
@@ -284,6 +297,8 @@ async function loadVisitStats() {
         const snap = await getDocs(q);
         if (snap.empty) {
             container.innerHTML = '<div style="color:var(--text-dim);font-size:0.82rem;padding:8px 0;">이달 방문 데이터가 없습니다.<br><span style="font-size:0.75rem;">페이지를 둘러보면 자동으로 기록돼요!</span></div>';
+            const heroEl0 = document.getElementById('stat-visits');
+            if (heroEl0) heroEl0.textContent = '0';
             return;
         }
         // 클라이언트 정렬
@@ -303,6 +318,9 @@ async function loadVisitStats() {
             </div>`;
         }).join('');
         container.innerHTML = `<div class="visit-total">이달 총 방문: <strong>${total.toLocaleString()}회</strong></div>${rows}`;
+        // 히어로 배너 방문자 수치 업데이트
+        const heroEl = document.getElementById('stat-visits');
+        if (heroEl) heroEl.textContent = total.toLocaleString();
     } catch(err) {
         console.error('방문 통계 오류:', err);
         container.innerHTML = '<div style="color:var(--text-dim);font-size:0.82rem;">통계를 불러오지 못했습니다.</div>';
@@ -2277,6 +2295,7 @@ function renderGuideItems(keyword: string) {
                     </div>
                 </div>
                 <div class="guide-card-actions">
+                    <button class="btn-edit-post" data-id="${item.id}">✏️ 수정</button>
                     <button class="btn-delete-post" data-id="${item.id}">🗑️ 삭제</button>
                     <span class="guide-toggle-icon">▼</span>
                 </div>
@@ -2294,6 +2313,12 @@ function renderGuideItems(keyword: string) {
             // 삭제 버튼 클릭은 무시
             if ((e.target as HTMLElement).classList.contains('btn-delete-post')) return;
             card.classList.toggle('open');
+        });
+
+        // 수정 버튼
+        card.querySelector('.btn-edit-post')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openEditModal(item);
         });
 
         // 삭제 버튼
@@ -2362,6 +2387,101 @@ async function submitGuidePost() {
         submitBtn.disabled = false;
         submitBtn.innerText = '게시하기';
     }
+}
+
+// =================================================
+// [수정] 모달
+// =================================================
+function openEditModal(item: any) {
+    // 기존 수정 모달 있으면 제거
+    document.getElementById('edit-modal')?.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'edit-modal';
+    modal.style.cssText = 'display:flex; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:9999; justify-content:center; align-items:center;';
+    modal.innerHTML = `
+        <div style="background:var(--card-bg); border:1px solid var(--border-color); border-radius:15px; padding:28px; width:90%; max-width:480px; max-height:90vh; overflow-y:auto;">
+            <h3 style="margin:0 0 18px; color:var(--accent-pink);">✏️ 가이드 수정</h3>
+
+            <div style="margin-bottom:12px;">
+                <label style="display:block; margin-bottom:5px; font-size:0.85rem; color:var(--accent-light); font-weight:bold;">제목</label>
+                <input type="text" id="edit-title" maxlength="50" value="${escapeHtml(item.title||'')}"
+                    style="width:100%; padding:9px; border-radius:8px; background:var(--input-bg); color:var(--text-main); border:1px solid var(--border-color); box-sizing:border-box;">
+            </div>
+
+            <div style="margin-bottom:12px;">
+                <label style="display:block; margin-bottom:5px; font-size:0.85rem; color:var(--accent-light); font-weight:bold;">내용</label>
+                <textarea id="edit-content" maxlength="2000" rows="7"
+                    style="width:100%; padding:9px; border-radius:8px; background:var(--input-bg); color:var(--text-main); border:1px solid var(--border-color); resize:vertical; box-sizing:border-box; font-family:inherit;">${escapeHtml(item.content||'')}</textarea>
+            </div>
+
+            <div style="margin-bottom:18px;">
+                <label style="display:block; margin-bottom:5px; font-size:0.85rem; color:var(--accent-light); font-weight:bold;">
+                    비밀번호 확인 <span style="color:#888; font-size:0.78rem;">(작성 시 설정한 비밀번호)</span>
+                </label>
+                <input type="password" id="edit-password" placeholder="비밀번호 입력"
+                    style="width:100%; padding:9px; border-radius:8px; background:var(--input-bg); color:var(--text-main); border:1px solid var(--border-color); box-sizing:border-box;">
+            </div>
+
+            <div id="edit-message" style="font-size:0.85rem; margin-bottom:12px; min-height:18px;"></div>
+
+            <div style="display:flex; gap:10px; justify-content:flex-end;">
+                <button id="btn-edit-cancel" style="padding:8px 18px; border-radius:15px; background:transparent; color:#888; border:1px solid #555; cursor:pointer; box-shadow:none;">취소</button>
+                <button id="btn-edit-confirm" style="padding:8px 18px; border-radius:15px; background:var(--accent-pink); color:white; border:none; cursor:pointer; font-weight:bold;">저장</button>
+            </div>
+        </div>`;
+
+    document.body.appendChild(modal);
+
+    document.getElementById('btn-edit-cancel')?.addEventListener('click', () => modal.remove());
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+
+    document.getElementById('btn-edit-confirm')?.addEventListener('click', async () => {
+        const newTitle = (document.getElementById('edit-title') as HTMLInputElement).value.trim();
+        const newContent = (document.getElementById('edit-content') as HTMLTextAreaElement).value.trim();
+        const password = (document.getElementById('edit-password') as HTMLInputElement).value;
+        const msgEl = document.getElementById('edit-message')!;
+        const btn = document.getElementById('btn-edit-confirm') as HTMLButtonElement;
+
+        if (!newTitle) { showMsg(msgEl, '❌ 제목을 입력해주세요.', 'error'); return; }
+        if (!newContent) { showMsg(msgEl, '❌ 내용을 입력해주세요.', 'error'); return; }
+        if (!password) { showMsg(msgEl, '❌ 비밀번호를 입력해주세요.', 'error'); return; }
+
+        btn.disabled = true;
+        btn.innerText = '저장 중...';
+
+        try {
+            const inputHash = await sha256(password);
+            const isOwner = item.passwordHash && inputHash === item.passwordHash;
+            const isAdmin = inputHash === ADMIN_PASSWORD_HASH;
+
+            if (!isOwner && !isAdmin) {
+                showMsg(msgEl, '❌ 비밀번호가 올바르지 않습니다.', 'error');
+                btn.disabled = false; btn.innerText = '저장';
+                return;
+            }
+
+            const { updateDoc, doc: fsDoc } = await import('firebase/firestore');
+            await updateDoc(fsDoc(db, 'guides', item.id), {
+                title: newTitle,
+                content: newContent,
+            });
+
+            // 캐시 업데이트
+            const cached = guideFirestoreCache[currentGuideTab];
+            if (cached) {
+                const idx = cached.findIndex((c: any) => c.id === item.id);
+                if (idx !== -1) { cached[idx].title = newTitle; cached[idx].content = newContent; }
+            }
+
+            modal.remove();
+            renderGuideItems('');
+        } catch (err) {
+            console.error(err);
+            showMsg(msgEl, '❌ 수정 실패. 다시 시도해주세요.', 'error');
+            btn.disabled = false; btn.innerText = '저장';
+        }
+    });
 }
 
 // =================================================
