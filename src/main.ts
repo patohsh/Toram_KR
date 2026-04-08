@@ -32,16 +32,40 @@ const PAGE_NAMES: Record<string, string> = {
 
 async function trackVisit(page: PageKey) {
     if (!TRACK_PAGES.includes(page)) return;
+
     try {
-        const now = new Date();
-        const yearMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-        const statRef = doc(db, 'pageStats', `${yearMonth}_${page}`);
-        await setDoc(statRef, {
-            page, yearMonth,
-            count: increment(1),
-            name: PAGE_NAMES[page] || page
-        }, { merge: true });
-    } catch {}
+        const today = new Date().toLocaleDateString('sv-SE');
+        const statRef = doc(db, 'pageStats', page);
+
+        const snap = await getDoc(statRef);
+
+        if (!snap.exists()) {
+            await setDoc(statRef, {
+                page,
+                date: today,
+                count: 1,
+                name: PAGE_NAMES[page] || page
+            });
+            return;
+        }
+
+        const data = snap.data();
+
+        if (data.date === today) {
+            await updateDoc(statRef, {
+                count: increment(1)
+            });
+        } else {
+            // 날짜 바뀌면 초기화
+            await setDoc(statRef, {
+                page,
+                date: today,
+                count: 1,
+                name: PAGE_NAMES[page] || page
+            });
+        }
+
+    } catch { }
 }
 
 function navigate(page: PageKey) {
