@@ -1294,7 +1294,7 @@ body.dark-mode .trait-tier-val {
 }
 
 .guide-card.open .guide-card-body {
-    max-height: 2000px;
+    max-height: 2700px;
     padding: 15px 18px 18px 18px;
     border-top: 1px dashed var(--border-color);
 }
