@@ -94,6 +94,7 @@
         { name: "곰 너클", name_en: "White Bear Knuckles", image: "13-White Bear Knuckles.jpg" },
         { name: "윈드 슬레이어 차크람", name_en: "Wind Slayer Chakram", image: "13-Wind Slayer Chakram.jpg" },
         { name: "요자쿠라 너클", name_en: "Yozakura Knuckles", image: "13-Yozakura Knuckles.jpg" },
+        { name: "클라비에 피스트", image: "클라비에.jpg", stats: ["이벤트", "ATK:687(80%)","빛속성" , "어둠속성데미지+10%", "ATK+12%","AGI+12%", "물리관통+30%", "명중+200","ATK업(STR100%)" ] },
         { name: "자이프 사디크", name_en: "Zaif Sadik", image: "13-Zaif Sadik.jpg" }
     ]
 };

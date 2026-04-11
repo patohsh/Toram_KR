@@ -80,8 +80,9 @@
         { name: "타테츠바", name_en: "Tatetsuba", image: "27-Tatetsuba.jpg" },
         { name: "츠키카게 사쿠야", name_en: "Tsukikage-Sakuya", image: "27-Tsukikage-Sakuya.jpg" },
         { name: "서리뱀", name_en: "White Viper", image: "27-White Viper.jpg" },
-        { name: "야타가라스", name_en: "Yatagarasu", image: "27-Yatagarasu.jpg" },
+        { name: "신수 까마귀", name_en: "Yatagarasu", image: "27-Yatagarasu.jpg" },
         { name: "요자쿠라 카타나", name_en: "Yozakura Katana", image: "27-Yozakura Katana.jpg" },
+        { name: "마그 블레이드", stats: ["ATK:274", "빛속성", "어둠속성 대미지+10%", "ATK+12%", "AGI+12%", "물리관통+30%", "명중+200", "ATK 업(AGI250%)"], image: "마그.jpg" },
         { name: "흑희도", name_en: "black katana", image: "흑희도.jpg" },
         { name: "금평도", stats: ["ATK:262", "땅속성", "바람속성 대미지+10%", "발도공격+12%", "DEX+12%", "최대 MP+400", "공격속도+1100", "마법 배리어+6000", "배리어 속도 +15%" ], image: "금평도.jpg" }
     ]

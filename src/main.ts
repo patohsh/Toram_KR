@@ -230,7 +230,15 @@ async function loadHomeStats() {
     try {
         const cats = ['normal','weapon','armor','hat','ring','enhanced_normal','enhanced_weapon','enhanced_armor','enhanced_hat','enhanced_ring'];
         const results = await Promise.all(cats.map(async c => {
-            try { if (crystaCache[c]) return crystaCache[c].length; const r = await fetch(`CrystaData/${c}.json`); if (!r.ok) return 0; const d = await r.json(); crystaCache[c] = d; return d.length; } catch { return 0; }
+            try {
+                if (crystaCache[c]) return crystaCache[c].length;
+                const r = await fetch(`CrystaData/${c}.json`);
+
+                if (!r.ok) return 0;
+                const d = await r.json(); crystaCache[c] = d;
+
+                return d.length;
+            } catch { return 0; }
         }));
         const el = document.getElementById('stat-crysta'); if (el) el.textContent = results.reduce((a,b)=>a+b,0).toLocaleString();
     } catch {}
@@ -420,11 +428,11 @@ function renderCrystaPage() {
         <input type="checkbox" id="hat" value="hat" checked> <label for="hat">모자</label>
         <input type="checkbox" id="ring" value="ring" checked> <label for="ring">반지</label>
         
-        <input type="checkbox" id="enhanced_normal" value="enhanced_normal"> <label for="enhanced_normal">노말(강화)</label>
-        <input type="checkbox" id="enhanced_weapon" value="enhanced_weapon"> <label for="enhanced_weapon">무기(강화)</label>
-        <input type="checkbox" id="enhanced_armor" value="enhanced_armor"> <label for="enhanced_armor">갑옷(강화)</label>
-        <input type="checkbox" id="enhanced_hat" value="enhanced_hat"> <label for="enhanced_hat">모자(강화)</label>
-        <input type="checkbox" id="enhanced_ring" value="enhanced_ring"> <label for="enhanced_ring">반지(강화)</label>
+        <input type="checkbox" id="enhanced_normal" value="enhanced_normal" checked > <label for="enhanced_normal">노말(강화)</label>
+        <input type="checkbox" id="enhanced_weapon" value="enhanced_weapon" checked > <label for="enhanced_weapon">무기(강화)</label>
+        <input type="checkbox" id="enhanced_armor" value="enhanced_armor" checked > <label for="enhanced_armor">갑옷(강화)</label>
+        <input type="checkbox" id="enhanced_hat" value="enhanced_hat" checked > <label for="enhanced_hat">모자(강화)</label>
+        <input type="checkbox" id="enhanced_ring" value="enhanced_ring" checked > <label for="enhanced_ring">반지(강화)</label>
       </div>
 
       <!-- 옵션 필터 버튼 그룹 -->
