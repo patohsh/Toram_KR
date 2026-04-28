@@ -12,17 +12,4 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-
-// Analytics 초기화 (브라우저 + 지원 체크)
-let analytics: ReturnType<typeof getAnalytics> | undefined;
-
-if (typeof window !== "undefined") {
-    isSupported().then((yes) => {
-        if (yes) {
-            analytics = getAnalytics(app);
-        }
-    });
-}
-
-
 export const db = getFirestore(app);
