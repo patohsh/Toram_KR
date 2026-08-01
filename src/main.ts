@@ -2,11 +2,12 @@
 import './style.css';
 import { db } from './firebase';
 import { collection, getDocs, query, orderBy, serverTimestamp, where, deleteDoc, doc, addDoc, limit, increment, setDoc, getDoc, updateDoc } from 'firebase/firestore';
+import { renderEnchantPage } from './enchant/ui';
 
 // =================================================
 // 0. 타입 및 라우팅
 // =================================================
-type PageKey = 'home' | 'schedule' | 'crysta' | 'skill' | 'ability' | 'registlet' | 'food' | 'equip' | 'guide' | 'info';
+type PageKey = 'home' | 'schedule' | 'crysta' | 'skill' | 'ability' | 'registlet' | 'food' | 'equip' | 'guide' | 'info' | 'enchant';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
 
@@ -20,14 +21,15 @@ const routes: Record<PageKey, () => void> = {
     food: renderFoodPage,
     equip: renderEquipmentPage,
     guide: renderGuidePage,
-    info: renderInfoPage
+    info: renderInfoPage,
+    enchant: renderEnchantPage
 };
 
 // 방문 통계 추적 대상 페이지
-const TRACK_PAGES: PageKey[] = ['home','crysta','skill','ability','registlet','food','equip','guide','schedule'];
+const TRACK_PAGES: PageKey[] = ['home','crysta','skill','ability','registlet','food','equip','guide','schedule','enchant'];
 const PAGE_NAMES: Record<string, string> = {
     home:'홈', crysta:'크리스타', skill:'스킬', ability:'어빌리티',
-    registlet:'레지스트릿', food:'요리', equip:'장비', guide:'뉴비가이드', schedule:'이벤트'
+    registlet:'레지스트릿', food:'요리', equip:'장비', guide:'뉴비가이드', schedule:'이벤트', enchant:'옵션부여 계산기'
 };
 
 async function trackVisit(page: PageKey) {
@@ -166,6 +168,7 @@ function renderHomePage() {
         <div class="sc-card" data-page="food"><div class="sc-icon">🍳</div><div class="sc-txt">요리</div></div>
         <div class="sc-card" data-page="equip"><div class="sc-icon">🛡️</div><div class="sc-txt">장비</div></div>
         <div class="sc-card" data-page="guide"><div class="sc-icon">📘</div><div class="sc-txt">뉴비가이드</div></div>
+        <div class="sc-card" data-page="enchant"><div class="sc-icon">🧪</div><div class="sc-txt">옵션부여 계산기</div></div>
         <div class="sc-card" data-page="info"><div class="sc-icon">⭐</div><div class="sc-txt">참가자</div></div>
       </div>
 
@@ -454,6 +457,8 @@ function renderCrystaPage() {
           <button class="opt-btn" data-val="ATK">ATK</button>
           <button class="opt-btn" data-val="MATK%">MATK%</button>
           <button class="opt-btn" data-val="MATK">MATK</button>
+          <button class="opt-btn" data-val="물리관통">물리관통</button>
+          <button class="opt-btn" data-val="마법관통">마법관통</button>
           <button class="opt-btn" data-val="크리티컬률%">크리%</button>
           <button class="opt-btn" data-val="크리티컬률">크리</button>
           <button class="opt-btn" data-val="크리티컬데미지%">크뎀%</button>
@@ -466,6 +471,8 @@ function renderCrystaPage() {
           <button class="opt-btn" data-val="공격속도">공속</button>
           <button class="opt-btn" data-val="시전속도%">시전%</button>
           <button class="opt-btn" data-val="행동속도%">행동%</button>
+          <button class="opt-btn" data-val="물리관통%">물리관통%</button>
+          <button class="opt-btn" data-val="마법관통%">마법관통%</button>
           <button class="opt-btn" data-val="안정률%">안정률</button>
           <button class="opt-btn" data-val="명중%">명중%</button>
           <button class="opt-btn" data-val="명중">명중</button>
@@ -2026,6 +2033,7 @@ const GUIDE_TABS = [
     { id: 'myroom', name: '마이룸' },
     { id: 'boss', name: '특수보스' },
     { id: 'job', name: '직업 가이드' },
+    { id: 'enchant_share', name: '옵션부여 공유' },
 ];
 
 const ADMIN_PASSWORD_HASH = import.meta.env.VITE_ADMIN_PASSWORD_HASH;
@@ -2052,6 +2060,13 @@ function escapeHtml(text: string): string {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
+}
+
+// 이스케이프된 텍스트 안의 URL을 클릭 가능한 링크로 바꾸고 줄바꿈을 <br>로 변환한다.
+function linkifyEscapedText(escapedText: string): string {
+    return escapedText
+        .replace(/(https?:\/\/[^\s<]+)/g, url => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`)
+        .replace(/\n/g, '<br>');
 }
 
 function showMsg(el: HTMLElement, msg: string, type: 'error' | 'success') {
@@ -2335,7 +2350,7 @@ function renderGuideItems(keyword: string) {
 
             <!-- 본문 (접힘/펼침) -->
             <div class="guide-card-body">
-                <div class="guide-card-content">${escapeHtml(item.content || '')}</div>
+                <div class="guide-card-content">${linkifyEscapedText(escapeHtml(item.content || ''))}</div>
             </div>
         `;
 

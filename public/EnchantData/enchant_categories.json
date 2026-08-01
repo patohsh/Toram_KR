@@ -1,0 +1,1748 @@
+{
+  "materialTypes": [
+    "금속",
+    "수품",
+    "목재",
+    "포목",
+    "약품",
+    "마소"
+  ],
+  "categories": [
+    {
+      "title": "기본 능력치 강화",
+      "weaponOnly": false,
+      "items": [
+        {
+          "id": "str",
+          "name": "STR",
+          "materialType": 1,
+          "conditions": [],
+          "constant": {
+            "potentialCost": 5,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/10",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": {
+            "potentialCost": 10,
+            "limit": null,
+            "extraLimit": null,
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          }
+        },
+        {
+          "id": "dex",
+          "name": "DEX",
+          "materialType": 4,
+          "conditions": [],
+          "constant": {
+            "potentialCost": 5,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/10",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": {
+            "potentialCost": 10,
+            "limit": null,
+            "extraLimit": null,
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          }
+        },
+        {
+          "id": "int",
+          "name": "INT",
+          "materialType": 2,
+          "conditions": [],
+          "constant": {
+            "potentialCost": 5,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/10",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": {
+            "potentialCost": 10,
+            "limit": null,
+            "extraLimit": null,
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          }
+        },
+        {
+          "id": "agi",
+          "name": "AGI",
+          "materialType": 3,
+          "conditions": [],
+          "constant": {
+            "potentialCost": 5,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/10",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": {
+            "potentialCost": 10,
+            "limit": null,
+            "extraLimit": null,
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          }
+        },
+        {
+          "id": "vit",
+          "name": "VIT",
+          "materialType": 0,
+          "conditions": [],
+          "constant": {
+            "potentialCost": 5,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/10",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": {
+            "potentialCost": 10,
+            "limit": null,
+            "extraLimit": null,
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          }
+        }
+      ]
+    },
+    {
+      "title": "HP・MP 강화",
+      "weaponOnly": false,
+      "items": [
+        {
+          "id": "max_hp",
+          "name": "최대 HP",
+          "materialType": 0,
+          "conditions": [],
+          "constant": {
+            "potentialCost": 3,
+            "limit": 20,
+            "extraLimit": {
+              "max": "CLv/10",
+              "min": null
+            },
+            "unitValue": [
+              10,
+              160
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": {
+            "potentialCost": 10,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/30",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          }
+        },
+        {
+          "id": "max_mp",
+          "name": "최대 MP",
+          "materialType": 2,
+          "conditions": [],
+          "constant": {
+            "potentialCost": 6,
+            "limit": 15,
+            "extraLimit": {
+              "max": "CLv/20",
+              "min": "0"
+            },
+            "unitValue": [
+              10,
+              10
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": null
+        },
+        {
+          "id": "natural_hp_regen",
+          "name": "자연 HP 회복",
+          "materialType": 0,
+          "conditions": [
+            {
+              "when": "mainWeapon",
+              "constant": {
+                "potentialCost": 10
+              },
+              "multiplier": {
+                "potentialCost": 20
+              }
+            }
+          ],
+          "constant": {
+            "potentialCost": 5,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/10",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": {
+            "potentialCost": 10,
+            "limit": null,
+            "extraLimit": null,
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          }
+        },
+        {
+          "id": "natural_mp_regen",
+          "name": "자연 MP 회복",
+          "materialType": 2,
+          "conditions": [
+            {
+              "when": "mainWeapon",
+              "constant": {
+                "potentialCost": 20
+              },
+              "multiplier": {
+                "potentialCost": 40
+              }
+            }
+          ],
+          "constant": {
+            "potentialCost": 10,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/20",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": {
+            "potentialCost": 20,
+            "limit": null,
+            "extraLimit": null,
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          }
+        }
+      ]
+    },
+    {
+      "title": "공격력 강화",
+      "weaponOnly": false,
+      "items": [
+        {
+          "id": "atk",
+          "name": "ATK",
+          "materialType": 1,
+          "conditions": [
+            {
+              "when": "bodyArmor",
+              "constant": {
+                "potentialCost": 6
+              },
+              "multiplier": {
+                "potentialCost": 20
+              }
+            }
+          ],
+          "constant": {
+            "potentialCost": 3,
+            "limit": 20,
+            "extraLimit": {
+              "max": "CLv/10",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": {
+            "potentialCost": 10,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/20",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          }
+        },
+        {
+          "id": "matk",
+          "name": "MATK",
+          "materialType": 2,
+          "conditions": [
+            {
+              "when": "bodyArmor",
+              "constant": {
+                "potentialCost": 6
+              },
+              "multiplier": {
+                "potentialCost": 20
+              }
+            }
+          ],
+          "constant": {
+            "potentialCost": 3,
+            "limit": 20,
+            "extraLimit": {
+              "max": "CLv/10",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": {
+            "potentialCost": 10,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/20",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          }
+        },
+        {
+          "id": "physical_pierce",
+          "name": "물리 관통",
+          "materialType": 1,
+          "conditions": [
+            {
+              "when": "bodyArmor",
+              "constant": {
+                "potentialCost": 40
+              },
+              "multiplier": null
+            }
+          ],
+          "constant": {
+            "potentialCost": 20,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/25",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": null
+        },
+        {
+          "id": "magic_pierce",
+          "name": "마법 관통",
+          "materialType": 2,
+          "conditions": [
+            {
+              "when": "bodyArmor",
+              "constant": {
+                "potentialCost": 40
+              },
+              "multiplier": null
+            }
+          ],
+          "constant": {
+            "potentialCost": 20,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/25",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": null
+        },
+        {
+          "id": "stability",
+          "name": "안정률",
+          "materialType": 4,
+          "conditions": [],
+          "constant": {
+            "potentialCost": 20,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/60",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": null
+        }
+      ]
+    },
+    {
+      "title": "방어력 강화",
+      "weaponOnly": false,
+      "items": [
+        {
+          "id": "def",
+          "name": "DEF",
+          "materialType": 0,
+          "conditions": [
+            {
+              "when": "mainWeapon",
+              "constant": {
+                "potentialCost": 6
+              },
+              "multiplier": {
+                "potentialCost": 20
+              }
+            }
+          ],
+          "constant": {
+            "potentialCost": 3,
+            "limit": 20,
+            "extraLimit": {
+              "max": "CLv/10",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              10
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": {
+            "potentialCost": 10,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/30",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          }
+        },
+        {
+          "id": "mdef",
+          "name": "MDEF",
+          "materialType": 0,
+          "conditions": [
+            {
+              "when": "mainWeapon",
+              "constant": {
+                "potentialCost": 6
+              },
+              "multiplier": {
+                "potentialCost": 20
+              }
+            }
+          ],
+          "constant": {
+            "potentialCost": 3,
+            "limit": 20,
+            "extraLimit": {
+              "max": "CLv/10",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              10
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": {
+            "potentialCost": 10,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/30",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          }
+        },
+        {
+          "id": "physical_resistance",
+          "name": "물리 내성",
+          "materialType": 0,
+          "conditions": [
+            {
+              "when": "mainWeapon",
+              "constant": {
+                "potentialCost": 20
+              },
+              "multiplier": null
+            }
+          ],
+          "constant": {
+            "potentialCost": 10,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/30",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": null
+        },
+        {
+          "id": "magic_resistance",
+          "name": "마법 내성",
+          "materialType": 2,
+          "conditions": [
+            {
+              "when": "mainWeapon",
+              "constant": {
+                "potentialCost": 20
+              },
+              "multiplier": null
+            }
+          ],
+          "constant": {
+            "potentialCost": 10,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/30",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": null
+        },
+        {
+          "id": "reduce_dmg_foe_epicenter",
+          "name": "적 중심 범위 피해 경감",
+          "materialType": 0,
+          "conditions": [
+            {
+              "when": "mainWeapon",
+              "constant": {
+                "potentialCost": 12
+              },
+              "multiplier": null
+            }
+          ],
+          "constant": {
+            "potentialCost": 6,
+            "limit": 0,
+            "extraLimit": {
+              "max": "CLv/10",
+              "min": "0"
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": 15,
+            "convertThreshold": null
+          },
+          "multiplier": null
+        },
+        {
+          "id": "reduce_player_epicenter",
+          "name": "플레이어 중심 범위 피해 경감",
+          "materialType": 0,
+          "conditions": [
+            {
+              "when": "mainWeapon",
+              "constant": {
+                "potentialCost": 12
+              },
+              "multiplier": null
+            }
+          ],
+          "constant": {
+            "potentialCost": 6,
+            "limit": 0,
+            "extraLimit": {
+              "max": "CLv/10",
+              "min": "0"
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": 15,
+            "convertThreshold": null
+          },
+          "multiplier": null
+        },
+        {
+          "id": "reduce_dmg_straight_line",
+          "name": "직선상 피해 경감",
+          "materialType": 1,
+          "conditions": [
+            {
+              "when": "mainWeapon",
+              "constant": {
+                "potentialCost": 12
+              },
+              "multiplier": null
+            }
+          ],
+          "constant": {
+            "potentialCost": 6,
+            "limit": 0,
+            "extraLimit": {
+              "max": "CLv/10",
+              "min": "0"
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": 15,
+            "convertThreshold": null
+          },
+          "multiplier": null
+        },
+        {
+          "id": "reduce_dmg_charge",
+          "name": "돌진 피해 경감",
+          "materialType": 1,
+          "conditions": [
+            {
+              "when": "mainWeapon",
+              "constant": {
+                "potentialCost": 12
+              },
+              "multiplier": null
+            }
+          ],
+          "constant": {
+            "potentialCost": 6,
+            "limit": 0,
+            "extraLimit": {
+              "max": "CLv/10",
+              "min": "0"
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": 15,
+            "convertThreshold": null
+          },
+          "multiplier": null
+        },
+        {
+          "id": "reduce_dmg_meteor",
+          "name": "유성 피해 경감",
+          "materialType": 4,
+          "conditions": [
+            {
+              "when": "mainWeapon",
+              "constant": {
+                "potentialCost": 8
+              },
+              "multiplier": null
+            }
+          ],
+          "constant": {
+            "potentialCost": 4,
+            "limit": 0,
+            "extraLimit": {
+              "max": "CLv/10",
+              "min": "0"
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": 10,
+            "convertThreshold": null
+          },
+          "multiplier": null
+        },
+        {
+          "id": "reduce_dmg_bullet",
+          "name": "탄속 피해 경감",
+          "materialType": 2,
+          "conditions": [
+            {
+              "when": "mainWeapon",
+              "constant": {
+                "potentialCost": 8
+              },
+              "multiplier": null
+            }
+          ],
+          "constant": {
+            "potentialCost": 4,
+            "limit": 0,
+            "extraLimit": {
+              "max": "CLv/10",
+              "min": "0"
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": 10,
+            "convertThreshold": null
+          },
+          "multiplier": null
+        },
+        {
+          "id": "reduce_dmg_bowling",
+          "name": "볼링 피해 경감",
+          "materialType": 2,
+          "conditions": [
+            {
+              "when": "mainWeapon",
+              "constant": {
+                "potentialCost": 8
+              },
+              "multiplier": null
+            }
+          ],
+          "constant": {
+            "potentialCost": 4,
+            "limit": 0,
+            "extraLimit": {
+              "max": "CLv/10",
+              "min": "0"
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": 10,
+            "convertThreshold": null
+          },
+          "multiplier": null
+        },
+        {
+          "id": "reduce_dmg_floor",
+          "name": "지면 피해 경감",
+          "materialType": 4,
+          "conditions": [
+            {
+              "when": "mainWeapon",
+              "constant": {
+                "potentialCost": 8
+              },
+              "multiplier": null
+            }
+          ],
+          "constant": {
+            "potentialCost": 4,
+            "limit": 0,
+            "extraLimit": {
+              "max": "CLv/10",
+              "min": "0"
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": 10,
+            "convertThreshold": null
+          },
+          "multiplier": null
+        }
+      ]
+    },
+    {
+      "title": "명중 강화",
+      "weaponOnly": false,
+      "items": [
+        {
+          "id": "accuracy",
+          "name": "명중",
+          "materialType": 4,
+          "conditions": [
+            {
+              "when": "bodyArmor",
+              "constant": {
+                "potentialCost": 20
+              },
+              "multiplier": {
+                "potentialCost": 40
+              }
+            }
+          ],
+          "constant": {
+            "potentialCost": 10,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/15",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              2
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": {
+            "potentialCost": 20,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/55",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          }
+        }
+      ]
+    },
+    {
+      "title": "회피 강화",
+      "weaponOnly": false,
+      "items": [
+        {
+          "id": "dodge",
+          "name": "회피",
+          "materialType": 3,
+          "conditions": [
+            {
+              "when": "mainWeapon",
+              "constant": {
+                "potentialCost": 20
+              },
+              "multiplier": {
+                "potentialCost": 40
+              }
+            }
+          ],
+          "constant": {
+            "potentialCost": 10,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/15",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              2
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": {
+            "potentialCost": 20,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/55",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          }
+        }
+      ]
+    },
+    {
+      "title": "속도 강화",
+      "weaponOnly": false,
+      "items": [
+        {
+          "id": "aspd",
+          "name": "ASPD",
+          "materialType": 3,
+          "conditions": [],
+          "constant": {
+            "potentialCost": 1,
+            "limit": 20,
+            "extraLimit": {
+              "max": "CLv/10",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              16
+            ],
+            "materialCost": 1.5,
+            "convertThreshold": null
+          },
+          "multiplier": {
+            "potentialCost": 1,
+            "limit": 20,
+            "extraLimit": {
+              "max": "CLv/55",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          }
+        },
+        {
+          "id": "cspd",
+          "name": "CSPD",
+          "materialType": 4,
+          "conditions": [],
+          "constant": {
+            "potentialCost": 1,
+            "limit": 20,
+            "extraLimit": {
+              "max": "CLv/10",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              16
+            ],
+            "materialCost": 1.5,
+            "convertThreshold": null
+          },
+          "multiplier": {
+            "potentialCost": 1,
+            "limit": 20,
+            "extraLimit": {
+              "max": "CLv/55",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          }
+        }
+      ]
+    },
+    {
+      "title": "크리티컬 강화",
+      "weaponOnly": false,
+      "items": [
+        {
+          "id": "critical_rate",
+          "name": "크리티컬율",
+          "materialType": 5,
+          "conditions": [],
+          "constant": {
+            "potentialCost": 1,
+            "limit": 20,
+            "extraLimit": {
+              "max": "CLv/10",
+              "min": "0"
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": {
+            "potentialCost": 1,
+            "limit": 20,
+            "extraLimit": {
+              "max": "CLv/10",
+              "min": "0"
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          }
+        },
+        {
+          "id": "critical_damage",
+          "name": "크리티컬 대미지",
+          "materialType": 5,
+          "conditions": [],
+          "constant": {
+            "potentialCost": 3,
+            "limit": 20,
+            "extraLimit": {
+              "max": "CLv/30",
+              "min": "0"
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": {
+            "potentialCost": 10,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/55",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          }
+        }
+      ]
+    },
+    {
+      "title": "속성 강화",
+      "weaponOnly": false,
+      "items": [
+        {
+          "id": "stronger_against_fire",
+          "name": "화속성 강화",
+          "materialType": 5,
+          "conditions": [
+            {
+              "when": "bodyArmor",
+              "constant": {
+                "potentialCost": 10
+              },
+              "multiplier": null
+            }
+          ],
+          "constant": {
+            "potentialCost": 5,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/30",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": null
+        },
+        {
+          "id": "stronger_against_water",
+          "name": "수속성 강화",
+          "materialType": 5,
+          "conditions": [
+            {
+              "when": "bodyArmor",
+              "constant": {
+                "potentialCost": 10
+              },
+              "multiplier": null
+            }
+          ],
+          "constant": {
+            "potentialCost": 5,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/30",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": null
+        },
+        {
+          "id": "stronger_against_earth",
+          "name": "지속성 강화",
+          "materialType": 5,
+          "conditions": [
+            {
+              "when": "bodyArmor",
+              "constant": {
+                "potentialCost": 10
+              },
+              "multiplier": null
+            }
+          ],
+          "constant": {
+            "potentialCost": 5,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/30",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": null
+        },
+        {
+          "id": "stronger_against_wind",
+          "name": "풍속성 강화",
+          "materialType": 5,
+          "conditions": [
+            {
+              "when": "bodyArmor",
+              "constant": {
+                "potentialCost": 10
+              },
+              "multiplier": null
+            }
+          ],
+          "constant": {
+            "potentialCost": 5,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/30",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": null
+        },
+        {
+          "id": "stronger_against_light",
+          "name": "광속성 강화",
+          "materialType": 5,
+          "conditions": [
+            {
+              "when": "bodyArmor",
+              "constant": {
+                "potentialCost": 10
+              },
+              "multiplier": null
+            }
+          ],
+          "constant": {
+            "potentialCost": 5,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/30",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": null
+        },
+        {
+          "id": "stronger_against_dark",
+          "name": "암속성 강화",
+          "materialType": 5,
+          "conditions": [
+            {
+              "when": "bodyArmor",
+              "constant": {
+                "potentialCost": 10
+              },
+              "multiplier": null
+            }
+          ],
+          "constant": {
+            "potentialCost": 5,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/30",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": null
+        },
+        {
+          "id": "fire_resistance",
+          "name": "화속성 내성",
+          "materialType": 5,
+          "conditions": [
+            {
+              "when": "mainWeapon",
+              "constant": {
+                "potentialCost": 10
+              },
+              "multiplier": null
+            }
+          ],
+          "constant": {
+            "potentialCost": 5,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/15",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": null
+        },
+        {
+          "id": "water_resistance",
+          "name": "수속성 내성",
+          "materialType": 5,
+          "conditions": [
+            {
+              "when": "mainWeapon",
+              "constant": {
+                "potentialCost": 10
+              },
+              "multiplier": null
+            }
+          ],
+          "constant": {
+            "potentialCost": 5,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/15",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": null
+        },
+        {
+          "id": "earth_resistance",
+          "name": "지속성 내성",
+          "materialType": 5,
+          "conditions": [
+            {
+              "when": "mainWeapon",
+              "constant": {
+                "potentialCost": 10
+              },
+              "multiplier": null
+            }
+          ],
+          "constant": {
+            "potentialCost": 5,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/15",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": null
+        },
+        {
+          "id": "wind_resistance",
+          "name": "풍속성 내성",
+          "materialType": 5,
+          "conditions": [
+            {
+              "when": "mainWeapon",
+              "constant": {
+                "potentialCost": 10
+              },
+              "multiplier": null
+            }
+          ],
+          "constant": {
+            "potentialCost": 5,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/15",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": null
+        },
+        {
+          "id": "light_resistance",
+          "name": "광속성 내성",
+          "materialType": 5,
+          "conditions": [
+            {
+              "when": "mainWeapon",
+              "constant": {
+                "potentialCost": 10
+              },
+              "multiplier": null
+            }
+          ],
+          "constant": {
+            "potentialCost": 5,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/15",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": null
+        },
+        {
+          "id": "dark_resistance",
+          "name": "암속성 내성",
+          "materialType": 5,
+          "conditions": [
+            {
+              "when": "mainWeapon",
+              "constant": {
+                "potentialCost": 10
+              },
+              "multiplier": null
+            }
+          ],
+          "constant": {
+            "potentialCost": 5,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/15",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": null
+        }
+      ]
+    },
+    {
+      "title": "특수 강화",
+      "weaponOnly": false,
+      "items": [
+        {
+          "id": "ailment_resistance",
+          "name": "상태이상 내성",
+          "materialType": 5,
+          "conditions": [],
+          "constant": {
+            "potentialCost": 20,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/55",
+              "min": null
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": null
+        },
+        {
+          "id": "guard_regenerate",
+          "name": "가드 회복",
+          "materialType": 5,
+          "conditions": [],
+          "constant": {
+            "potentialCost": 20,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/55",
+              "min": "0"
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": null
+        },
+        {
+          "id": "guard_power",
+          "name": "가드력",
+          "materialType": 5,
+          "conditions": [],
+          "constant": {
+            "potentialCost": 20,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/55",
+              "min": "0"
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": null
+        },
+        {
+          "id": "evasion_regenerate",
+          "name": "회피 게이지 회복",
+          "materialType": 5,
+          "conditions": [],
+          "constant": {
+            "potentialCost": 20,
+            "limit": null,
+            "extraLimit": {
+              "max": "CLv/55",
+              "min": "0"
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": null
+          },
+          "multiplier": null
+        },
+        {
+          "id": "aggro",
+          "name": "어그로",
+          "materialType": 5,
+          "conditions": [],
+          "constant": {
+            "potentialCost": 6,
+            "limit": 15,
+            "extraLimit": {
+              "max": "CLv/20",
+              "min": "0"
+            },
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": null,
+            "convertThreshold": 15
+          },
+          "multiplier": null
+        }
+      ]
+    },
+    {
+      "title": "속성각성",
+      "weaponOnly": true,
+      "items": [
+        {
+          "id": "element_fire",
+          "name": "화속성 부여",
+          "materialType": 5,
+          "conditions": [
+            {
+              "when": "originalElement",
+              "constant": {
+                "potentialCost": 10
+              },
+              "multiplier": null
+            }
+          ],
+          "constant": {
+            "potentialCost": 100,
+            "limit": 1,
+            "extraLimit": null,
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": 150,
+            "convertThreshold": null
+          },
+          "multiplier": null
+        },
+        {
+          "id": "element_water",
+          "name": "수속성 부여",
+          "materialType": 5,
+          "conditions": [
+            {
+              "when": "originalElement",
+              "constant": {
+                "potentialCost": 10
+              },
+              "multiplier": null
+            }
+          ],
+          "constant": {
+            "potentialCost": 100,
+            "limit": 1,
+            "extraLimit": null,
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": 150,
+            "convertThreshold": null
+          },
+          "multiplier": null
+        },
+        {
+          "id": "element_earth",
+          "name": "지속성 부여",
+          "materialType": 5,
+          "conditions": [
+            {
+              "when": "originalElement",
+              "constant": {
+                "potentialCost": 10
+              },
+              "multiplier": null
+            }
+          ],
+          "constant": {
+            "potentialCost": 100,
+            "limit": 1,
+            "extraLimit": null,
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": 150,
+            "convertThreshold": null
+          },
+          "multiplier": null
+        },
+        {
+          "id": "element_wind",
+          "name": "풍속성 부여",
+          "materialType": 5,
+          "conditions": [
+            {
+              "when": "originalElement",
+              "constant": {
+                "potentialCost": 10
+              },
+              "multiplier": null
+            }
+          ],
+          "constant": {
+            "potentialCost": 100,
+            "limit": 1,
+            "extraLimit": null,
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": 150,
+            "convertThreshold": null
+          },
+          "multiplier": null
+        },
+        {
+          "id": "element_light",
+          "name": "광속성 부여",
+          "materialType": 5,
+          "conditions": [
+            {
+              "when": "originalElement",
+              "constant": {
+                "potentialCost": 10
+              },
+              "multiplier": null
+            }
+          ],
+          "constant": {
+            "potentialCost": 100,
+            "limit": 1,
+            "extraLimit": null,
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": 150,
+            "convertThreshold": null
+          },
+          "multiplier": null
+        },
+        {
+          "id": "element_dark",
+          "name": "암속성 부여",
+          "materialType": 5,
+          "conditions": [
+            {
+              "when": "originalElement",
+              "constant": {
+                "potentialCost": 10
+              },
+              "multiplier": null
+            }
+          ],
+          "constant": {
+            "potentialCost": 100,
+            "limit": 1,
+            "extraLimit": null,
+            "unitValue": [
+              1,
+              1
+            ],
+            "materialCost": 150,
+            "convertThreshold": null
+          },
+          "multiplier": null
+        }
+      ]
+    }
+  ]
+}

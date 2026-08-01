@@ -1,6 +1,7 @@
 // src/firebase.ts
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
+import { getAnalytics, isSupported } from 'firebase/analytics';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -13,7 +14,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-// Analytics ÃÊ±âÈ­ (ºê¶ó¿ìÀú + Áö¿ø Ã¼Å©)
+// Analytics ì´ˆê¸°í™” (ë¸Œë¼ìš°ì € + ì§€ì› ì²´í¬)
 let analytics: ReturnType<typeof getAnalytics> | undefined;
 
 if (typeof window !== "undefined") {
