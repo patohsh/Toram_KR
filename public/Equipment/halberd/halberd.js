@@ -95,6 +95,8 @@
         { name: "윈드 블래스트 콘", name_en: "Windblast Cone Spear", image: "26-Windblast Cone Spear.jpg" },
         { name: "요자쿠라 언월도", name_en: "Yozakura Naginata", image: "26-Yozakura Naginata.jpg" },
         { name: "혁현의 창", name_en: "Hyeokhyeon's_Halberd", image: "Hyeokhyeon's_Halberd.jpg" },
-        { name: "슈트라이 스피어", name_en: "", image: "슈트라이스피어.jpg" }
+        { name: "슈트라이 스피어", name_en: "", image: "슈트라이스피어.jpg" },
+        { name: "빙람전아", stats: ["물속성","불속성 대미지+20%","ATK+12%", "공격속도+50%", "크리티컬률+50","부여정지(넘어짐)","중갑옷공속+50%"], image: "빙람전아.jpg" },
+
     ]
 };

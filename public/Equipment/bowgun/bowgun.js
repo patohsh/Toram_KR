@@ -85,6 +85,8 @@
         { name: "베지토스 보우건", name_en: "Vegitos Bowgun", image: "10-Vegitos Bowgun.jpg" },
         { name: "워 보우건", name_en: "War Bowgun", image: "10-War Bowgun.jpg" },
         { name: "요자쿠라 핸드건", name_en: "Yozakura Handgun", image: "10-Yozakura Handgun.jpg" },
-        { name: "자이비오 보우건", name_en: "Zyvio Bowgun", image: "10-Zyvio Bowgun.jpg" }
+        { name: "자이비오 보우건", name_en: "Zyvio Bowgun", image: "10-Zyvio Bowgun.jpg" },
+        { name: "시트리의 물총", stats: ["물속성", "마법관통+100%", "공격속도+1100", "시전속도+70%", "마법내성+40%", "도구속도-1s", "무적수단2s"], image: "시트리.jpg" }
+
     ]
 };

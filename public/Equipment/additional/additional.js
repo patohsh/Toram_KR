@@ -767,6 +767,7 @@
         { name: "블랙 하트 리본", name_en: "", image: "블랙하트리본.jpg" },
         { name: "혼 크라운", stats: ["크리티컬률+25", "공격 MP 회복+15", "드랍율+1%"], image: "crown.jpg" },
         { name: "컵케이크 헤드", stats: [""], name_en: "cupcake hand", image: "cup_ck.jpg" },
+        { name: "흰상어 특공복", stats: ["ATK+12%", "행동속도+5%", "불내성-15%", "양손검 행동속도+2%", "경갑옷 공격속도+25%"], image: ["흰상어특공복.jpg",] },
         { name: "업데이트 예정", name_en: "update", image: "update.jpg" }
 
     ]

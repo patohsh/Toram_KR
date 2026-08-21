@@ -112,7 +112,9 @@
         { name: "목검", name_en: "Wood Sword", image: "wood sword.png" },
         { name: "요자쿠라 소드", name_en: "Yozakura Sword", image: "yozakura sword.png" },
         { name: "자하크 세이버", stats: ["ATK:180(80%)", "빛속성, ATK+5%", "DEX+4%", "최대 HP+10%", "크리티컬률+5", "물리 배리어+1000", "비율 배리어 2%"], image: "zahhak sword.png" },
-        { name: "콘페이토 소드", stats: ["ATK:655(70%)", "물속성", "불속성 대미지+10%", "MATK+12%", "STR+12%", "명중+250", "공격속도+1100", "MATK업 (STR 200%)" ], image: "콘페이토소드.jpg" }
+        { name: "콘페이토 소드", stats: ["ATK:655(70%)", "물속성", "불속성 대미지+10%", "MATK+12%", "STR+12%", "명중+250", "공격속도+1100", "MATK업 (STR 200%)"], image: "콘페이토소드.jpg" },
+        { name: "히스토리아", stats: ["빛속성", "근거리 위력+12%", "크리티컬률+70","공격속도+1400", "물리내성+35%", "마법내성+35%", "중갑옷 비율 배리어7%", "어그로+70%"], image: "히스토리아.jpg" }
+
 
     ]
 };
