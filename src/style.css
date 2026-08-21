@@ -853,19 +853,42 @@ body.dark-mode .trait-tier-val {
 
 /* --- [장비 검색 페이지] --- */
 
-/* 3x3 그리드 레이아웃 */
+/* PC: 화면 전체 폭을 채우는 8열 그리드 (#app의 800px 제한을 벗어나 풀블리드, 위아래 스크롤).
+   실제 width/margin은 JS(sizeEquipGridColumns)가 스크롤바 오차 없이 px 단위로 정확히 계산해서 넣는다. */
+.equip-slider-wrap {
+    padding: 0 20px;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
 .equip-grid-container {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3열 고정 */
+    grid-template-columns: repeat(8, 1fr);
+    align-items: start; /* 카드 높이가 제각각이어도 옆 카드가 늘어나지 않게 */
     gap: 15px;
+    row-gap: 30px;
     min-height: 400px;
-    row-gap: 40px;
 }
 
-/* 반응형: 모바일에서는 1열 */
+/* 모바일: 2열 그리드, 세로 스크롤 그대로 유지 (풀블리드 해제) */
 @media (max-width: 600px) {
+    .equip-slider-wrap {
+        width: auto;
+        margin-left: 0;
+        margin-right: 0;
+        padding: 0;
+        overflow-x: visible;
+    }
     .equip-grid-container {
-        grid-template-columns: repeat(1, 1fr);
+        grid-template-columns: repeat(2, 1fr);
+        align-items: start;
+        row-gap: 20px;
+    }
+    /* 좁은 화면에서는 이미지 박스도 칸 너비에 맞춰 줄어들게 */
+    .equip-img-box {
+        width: 100%;
+        max-width: 150px;
+        height: auto;
+        aspect-ratio: 150 / 190;
     }
 }
 
@@ -880,7 +903,7 @@ body.dark-mode .trait-tier-val {
     align-items: center;
     text-align: center;
     transition: transform 0.2s, border-color 0.2s;
-    height: 100%;
+    min-width: 0; /* 그리드 트랙이 이미지 박스 고정폭보다 좁아져도 줄어들 수 있도록 */
     position: relative;
     backdrop-filter: var(--backdrop-blur);
 }
@@ -1006,9 +1029,11 @@ body.dark-mode .trait-tier-val {
     padding: 8px;
     border-radius: 6px;
     width: 100%;
+    box-sizing: border-box; /* padding/border가 카드 밖으로 삐져나가지 않도록 */
     text-align: left;
     border: 1px solid rgba(255, 204, 0, 0.2);
     line-height: 1.5;
+    word-break: break-word;
 }
 
 /* --- 확대 모달 스타일 (고유 애니메이션 적용) --- */

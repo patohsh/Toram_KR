@@ -457,8 +457,6 @@ function renderCrystaPage() {
           <button class="opt-btn" data-val="ATK">ATK</button>
           <button class="opt-btn" data-val="MATK%">MATK%</button>
           <button class="opt-btn" data-val="MATK">MATK</button>
-          <button class="opt-btn" data-val="물리관통">물리관통</button>
-          <button class="opt-btn" data-val="마법관통">마법관통</button>
           <button class="opt-btn" data-val="크리티컬률%">크리%</button>
           <button class="opt-btn" data-val="크리티컬률">크리</button>
           <button class="opt-btn" data-val="크리티컬데미지%">크뎀%</button>
@@ -471,8 +469,10 @@ function renderCrystaPage() {
           <button class="opt-btn" data-val="공격속도">공속</button>
           <button class="opt-btn" data-val="시전속도%">시전%</button>
           <button class="opt-btn" data-val="행동속도%">행동%</button>
-          <button class="opt-btn" data-val="물리관통%">물리관통%</button>
+                    <button class="opt-btn" data-val="물리관통%">물리관통%</button>
           <button class="opt-btn" data-val="마법관통%">마법관통%</button>
+                    <button class="opt-btn" data-val="물리관통">물리관통</button>
+          <button class="opt-btn" data-val="마법관통">마법관통</button>
           <button class="opt-btn" data-val="안정률%">안정률</button>
           <button class="opt-btn" data-val="명중%">명중%</button>
           <button class="opt-btn" data-val="명중">명중</button>
@@ -1539,8 +1539,6 @@ let filteredEquipData: any[] = [];
 let currentCategory = 'Handed_Sword';
 let currentSubTag = '전체';
 let isFarmingMode = false;
-let equipCurrentPage = 1;
-const ITEMS_PER_PAGE = 9;
 let modalImages: string[] = [];
 let modalCurrentIndex = 0;
 
@@ -1590,11 +1588,11 @@ function renderEquipmentPage() {
         <input type="text" id="equip-search" class="search-input" placeholder="이름 검색 (한글/영어)...">
       </div>
 
-      <div id="equip-grid" class="equip-grid-container">
-        <div style="grid-column:1/-1; text-align:center; padding:50px; color:#888;">데이터 로딩 중...</div>
+      <div class="equip-slider-wrap">
+        <div id="equip-grid" class="equip-grid-container">
+          <div style="grid-column:1/-1; text-align:center; padding:50px; color:#888;">데이터 로딩 중...</div>
+        </div>
       </div>
-
-      <div class="pagination" id="equip-pagination"></div>
     </div>
   `;
 
@@ -1603,9 +1601,8 @@ function renderEquipmentPage() {
     // 모드 전환
     document.getElementById('btn-toggle-mode')?.addEventListener('click', () => {
         isFarmingMode = !isFarmingMode;
-        currentCategory = isFarmingMode ? 'WeaponArmor' : 'Handed_Sword';
+        currentCategory = isFarmingMode ? 'Weapon' : 'Handed_Sword';
         currentSubTag = '전체';
-        equipCurrentPage = 1;
         renderEquipmentPage();
     });
 
@@ -1639,12 +1636,33 @@ function renderEquipmentPage() {
     loadEquipmentData(currentCategory);
 }
 
+/**
+ * PC에서는 그리드를 #app의 800px 제한 밖으로 화면 전체 폭까지 넓힌다 (8열 그리드가 들어갈 공간 확보).
+ * 100vw 대신 실제 측정값을 px로 계산해서 스크롤바 오차로 인한 여백 삐져나감을 막는다.
+ */
+function sizeEquipGridColumns() {
+    const wrap = document.querySelector<HTMLElement>('.equip-slider-wrap');
+    if (!wrap) return;
+
+    if (window.innerWidth <= 600) {
+        wrap.style.width = '';
+        wrap.style.marginLeft = '';
+        return;
+    }
+
+    wrap.style.width = '';
+    wrap.style.marginLeft = '';
+    const rect = wrap.getBoundingClientRect();
+    const viewportWidth = document.documentElement.clientWidth;
+    wrap.style.width = `${viewportWidth}px`;
+    wrap.style.marginLeft = `${-rect.left}px`;
+}
+window.addEventListener('resize', sizeEquipGridColumns);
+
 async function loadEquipmentData(categoryName: string) {
     const grid = document.getElementById('equip-grid')!;
-    const pagination = document.getElementById('equip-pagination')!;
 
     grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:50px;">데이터 로딩 중...</div>';
-    pagination.innerHTML = '';
 
     let filePath = '';
 
@@ -1760,10 +1778,9 @@ function filterEquipment(keyword: string) {
 
     filteredEquipData = filtered;
 
-    // 검색 결과가 바뀌었으니 1페이지로 초기화
-    equipCurrentPage = 1;
     renderEquipGrid();
-    renderPagination();
+    // 검색/필터가 바뀌면 슬라이더도 맨 처음으로 되돌린다
+    document.getElementById('equip-grid')?.scrollTo({ left: 0 });
 }
 
 function renderEquipGrid() {
@@ -1775,11 +1792,9 @@ function renderEquipGrid() {
         return;
     }
 
-    const start = (equipCurrentPage - 1) * ITEMS_PER_PAGE;
-    const pageItems = filteredEquipData.slice(start, start + ITEMS_PER_PAGE);
     const isNoImageCategory = isFarmingMode && ['Arrow', 'Dagger', 'Additional'].includes(currentCategory);
 
-    pageItems.forEach((item: any) => {
+    filteredEquipData.forEach((item: any) => {
         const card = document.createElement('div');
         card.className = 'equip-card';
 
@@ -1822,7 +1837,7 @@ function renderEquipGrid() {
                 <div class="equip-image-wrapper">
                     ${isMulti ? `<button class="slide-btn prev">◀</button>` : ''}
                     <div class="equip-img-box">
-                        <img src="${getFullImgPath(imgList[activeIdx])}" class="main-img" alt="${item.name}">
+                        <img src="${getFullImgPath(imgList[activeIdx])}" class="main-img" alt="${item.name}" loading="lazy">
                     </div>
                     ${isMulti ? `<button class="slide-btn next">▶</button>` : ''}
                     ${isMulti ? `<div class="img-counter">1 / ${imgList.length}</div>` : ''}
@@ -1874,6 +1889,8 @@ function renderEquipGrid() {
         }
         grid.appendChild(card);
     });
+
+    sizeEquipGridColumns();
 }
 function openImageModalWithSlide(imgList: string[], startIndex: number, title: string) {
     modalImages = imgList;
@@ -1934,30 +1951,6 @@ function openImageModalWithSlide(imgList: string[], startIndex: number, title: s
     history.pushState({ modalOpen: true }, '');
 }
 
-function renderPagination() {
-    const container = document.getElementById('equip-pagination')!;
-    container.innerHTML = '';
-
-    const totalPages = Math.ceil(filteredEquipData.length / ITEMS_PER_PAGE);
-    if (totalPages <= 1) return;
-
-    const createBtn = (text: string, onClick: () => void, disabled: boolean) => {
-        const btn = document.createElement('button');
-        btn.innerText = text;
-        btn.disabled = disabled;
-        btn.onclick = onClick;
-        return btn;
-    };
-
-    container.appendChild(createBtn('Prev', () => { equipCurrentPage--; renderEquipGrid(); renderPagination(); }, equipCurrentPage === 1));
-
-    const pageInfo = document.createElement('span');
-    pageInfo.className = 'page-info';
-    pageInfo.innerText = `${equipCurrentPage} / ${totalPages}`;
-    container.appendChild(pageInfo);
-
-    container.appendChild(createBtn('Next', () => { equipCurrentPage++; renderEquipGrid(); renderPagination(); }, equipCurrentPage === totalPages));
-}
 // =================================================
 // [기능] 낮/밤 테마 토글 (Day/Night Switch)
 // =================================================
