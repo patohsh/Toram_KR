@@ -104,6 +104,7 @@
         { name: "윈드 찬터 지팡이", name_en: "Windchanter Staff", image: "windchanter staff.png" },
         { name: "제로스의 지팡이", name_en: "Xellos' Staff", image: "xellos' staff.png" },
         { name: "요자쿠라 언월장", name_en: "Yozakura Crescent Staff", image: "yozakura crescent staff.png" },
-        { name: "아게이트 로드", name_en: "", image: "아게이트로드.jpg" }
+        { name: "루시아의 지팡이", stats: ["트불","ATK:730","어둠속성","빛속성 대미지+15%","MATK+12%","INT+12%","최대 MP+1000","시전속도+60%","마법관통+20%"], image: "루시아.jpg" },
+        { name: "아게이트 로드", stats: ["ATK:?",], image: "아게이트로드.jpg" }
     ]
 };

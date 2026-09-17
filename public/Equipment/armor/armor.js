@@ -12,6 +12,7 @@
         { name: "주년제의 축하 옷 IV", name_en: "Anniversary Festive Garb IV", image: ["8-Anniversary Festive Garb IV [Heavy-Female].jpg", "8-Anniversary Festive Garb IV [Normal-Female].jpg","8-Anniversary Festive Garb IV [Light-Female].jpg" ] },
         { name: "주년제의 축하 옷 V", name_en: "Anniversary Festive Garb V", image: "8-Anniversary Festive Garb V [Normal-Female].jpg" }, // 
         { name: "주년제의 축하 옷 VI", name_en: "Anniversary Festive Garb VI", image: "8-Anniversary Festive Garb VI [Normal-Female].jpg" }, // 파일명 규칙상 V가 생략된 경우 매핑
+        { name: "주년제의 축하 옷 VII", name_en: "Anniversary Festive Garb VII", image: "주년제11.jpg" },
         { name: "앤티크 메일", name_en: "Antique Mail", image: ["8-Antique Mail [Heavy-Female].jpg", "8-Antique Mail [Normal-Female].jpg","8-Antique Mail [Light-Female].jpg" ] },
         { name: "아쿠아 아머", name_en: "Aqua Garb", image: ["8-Aqua Garb [Heavy-Female].jpg", "8-Aqua Garb [Normal-Female].jpg","8-Aqua Garb [Light-Female].jpg" ] },
         { name: "아르니그마", name_en: "Armigma", image: ["8-Armigma [Heavy-Female].jpg", "8-Armigma [Normal-Female].jpg","8-Armigma [Light-Female].jpg" ] },
@@ -139,7 +140,9 @@
         { name: "겨울 의상 III", name_en: "Winter Outfit III", image: ["8-Winter Outfit III.jpg" ]},
         { name: "제가 슈트", name_en: "Zega Onesie", image: ["8-Zega Onesie [Light-Female].jpg","8-Zega Onesie [Heavy-Female].jpg","8-Zega Onesie [Normal-Female].jpg" ]},
         { name: "†어둠의 조직† 베트몬", name_en: "Dark Syndicate Vilment", image: ["8-†Dark Syndicate† Vilment [Heavy-Female].jpg", "8-†Dark Syndicate† Vilment [Normal-Female].jpg","8-†Dark Syndicate† Vilment [Light-Female].jpg" ]},
-        { name: "두아트 로브", name_en: "duart", image: "duatu.jpg", stats: "테스트용 스텟입니다<br>추후 수정 보안 예정." },
+        { name: "리플 웨어", image: ["리플.jpg"] },
+        { name: "이미우스 코트", image: ["이미우스.jpg"] },
+{ name: "두아트 로브", name_en: "duart", image: "duatu.jpg", stats: "테스트용 스텟입니다<br>추후 수정 보안 예정." },
 
     ]
 };

@@ -86,7 +86,7 @@
         { name: "명경지수의 톤파", name_en: "Tonfa of Cold Serenity", image: "13-Tonfa of Cold Serenity.jpg" },
         { name: "장난감 총", name_en: "Toy Gun", image: "13-Toy Gun.jpg" },
         { name: "트라이 클로", name_en: "Tri Claws", image: "13-Tri Claws.jpg" },
-        { name: "트리플 아이스크림", name_en: "Triple Ice Cream", image: "13-Triple Ice Cream.jpg" },
+        { name: "아이스 오브 트리플", name_en: "Triple Ice Cream", image: "13-Triple Ice Cream.jpg" },
         { name: "트윈 이글", name_en: "Twin Eagles", image: "13-Twin Eagles.jpg" },
         { name: "바이스 클로", name_en: "Vise Claws", image: "13-Vise Claws.jpg" },
         { name: "비스팔랑크스 (권갑)", name_en: "Visphalanx (Knuckle)", image: "13-Visphalanx (Knuckle).jpg" },
@@ -94,7 +94,9 @@
         { name: "곰 너클", name_en: "White Bear Knuckles", image: "13-White Bear Knuckles.jpg" },
         { name: "윈드 슬레이어 차크람", name_en: "Wind Slayer Chakram", image: "13-Wind Slayer Chakram.jpg" },
         { name: "요자쿠라 너클", name_en: "Yozakura Knuckles", image: "13-Yozakura Knuckles.jpg" },
-        { name: "클라비에 피스트", image: "클라비에.jpg", stats: ["이벤트", "ATK:687(80%)","빛속성" , "어둠속성데미지+10%", "ATK+12%","AGI+12%", "물리관통+30%", "명중+200","ATK업(STR100%)" ] },
-        { name: "자이프 사디크", name_en: "Zaif Sadik", image: "13-Zaif Sadik.jpg" }
+        { name: "클라비에 피스트", image: "클라비에.jpg", stats: ["이벤트", "ATK:687(80%)", "빛속성", "어둠속성대미지+10%", "ATK+12%", "AGI+12%", "물리관통+30%", "명중+200", "ATK업(STR100%)"] },
+        { name: "키르키르 펀치", image: "키르키르.jpg", stats: ["트불", "ATK:783(60%)", "어둠속성", "빛속성대미지+10%", "근거리위력+12%", "AGI+12%", "크리티컬률+100", "ATK업(STR100%)", "최대 MP-410"] },
+        { name: "자이프 사디크", name_en: "Zaif Sadik", image: "13-Zaif Sadik.jpg" },
+        { name: "손바라틀", image: "손바.jpg", stats: ["ATK:458", "땅속성", "ATK+12%", "공격속도+50%", "최대 MP+500", "MP 자연회복+30", "물리내성+20%", "비율 배리어 20%", "펫 획득 EXP+5%"] }
     ]
 };

@@ -90,7 +90,8 @@
         { name: "카타라 앵커윙", name_en: "Yozakura Wings", image: "카타라 앵커윙.jpg" },
         { name: "크루엘 윙", name_en: "Yozakura Wings", image: "크루엘 윙.jpg" },
         { name: "시드 윙", name_en: "Yozakura Wings", image: "시드 윙.jpg" },
-        { name: "쿠벨 윙", name_en: "물속성<br>불속성데미지+10%<br>MATK+12%<br>시전속도+1100<br>크리티컬률+35<br>무적수단(1초)<br>운석경감+30%", image: "쿠벨.jpg" }
+        { name: "리얼라이즈 아우터", stats: ["ATK:460", "마력속성","무속성 대미지+35%", "MATK+12%", "크리티컬률+100%", "시전속도+100%", "행동속도+10%", "공격MP회복-100%","DEF-100%","MDEF-10%"], image: "리얼라이즈아우터.jpg" },
+        { name: "쿠벨 윙", stats: ["물속성","불속성데미지+10%","MATK+12%","시전속도+1100","크리티컬률+35","무적수단(1초)","운석경감+30%"], image: "쿠벨.jpg" }
 
     ]
 };
