@@ -141,13 +141,14 @@ function renderHomePage() {
                 <button type="button" class="n4-find-btn" id="qs-btn">검색</button>
               </div>
             </section>
-          </div>
 
-          <aside class="n4-side">
-            <section class="n4-sec">
+            <section class="n4-sec n4-notice">
               <h2 class="n4-h"><span>토람 공식 공지</span></h2>
               <div id="notice-list"><div class="home-loading">불러오는 중...</div></div>
             </section>
+          </div>
+
+          <aside class="n4-side">
             <section class="n4-sec">
               <h2 class="n4-h"><span>최근 가이드</span> <span class="n4-new">NEW</span></h2>
               <div id="recent-guide-list"><div class="home-loading">불러오는 중...</div></div>

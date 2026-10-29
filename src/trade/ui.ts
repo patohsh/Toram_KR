@@ -177,6 +177,18 @@ async function checkAdmin(uid: string): Promise<boolean> {
     }
 }
 
+// 비밀번호 관리자나 브라우저 확장이 이 입력칸을 가입 양식으로 보고 이메일 별명 등을 제안하지 않게 한다.
+function hidePasswordManagers(root: ParentNode): void {
+    root.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input, textarea').forEach(el => {
+        el.setAttribute('data-lpignore', 'true');
+        el.setAttribute('data-1p-ignore', 'true');
+        el.setAttribute('data-bwignore', 'true');
+        el.setAttribute('data-protonpass-ignore', 'true');
+        el.setAttribute('data-form-type', 'other');
+        el.setAttribute('autocomplete', el.getAttribute('type') === 'password' ? 'new-password' : 'off');
+    });
+}
+
 export async function renderTradePage(): Promise<void> {
     const app = document.querySelector<HTMLDivElement>('#app')!;
     activeCategory = 'all';
@@ -243,6 +255,7 @@ export async function renderTradePage(): Promise<void> {
     </div>
   `;
 
+    hidePasswordManagers(app);
     document.getElementById('back-home')?.addEventListener('click', () => history.back());
 
     document.querySelectorAll<HTMLButtonElement>('#trade-tabs .skill-tab-btn').forEach(btn => {
@@ -330,6 +343,7 @@ function renderList(): void {
       </article>`;
     }).join('');
 
+    hidePasswordManagers(listEl);
     listEl.querySelectorAll<HTMLElement>('[data-toggle]').forEach(el => {
         el.addEventListener('click', () => toggleDetail(el.dataset.toggle!));
     });
@@ -415,6 +429,7 @@ async function renderManage(tradeId: string): Promise<void> {
       </div>
       <div class="trade-msg" id="claim-msg-${esc(tradeId)}"></div>`) + manageButtonsHtml(t);
 
+    hidePasswordManagers(box);
     box.querySelectorAll<HTMLButtonElement>('[data-status]').forEach(btn => {
         btn.addEventListener('click', () => {
             const [id, status] = btn.dataset.status!.split('|');
