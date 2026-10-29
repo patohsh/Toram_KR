@@ -72,8 +72,6 @@ async function hashPassword(password: string, tradeId: string): Promise<string> 
     return Array.from(new Uint8Array(bits)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-const claimed = new Set<string>();
-
 let trades: Trade[] = [];
 let activeCategory: Category | 'all' = 'all';
 let keyword = '';
@@ -361,55 +359,22 @@ function manageButtonsHtml(t: Trade): string {
       </div>`;
 }
 
-async function isClaimed(tradeId: string): Promise<boolean> {
-    if (claimed.has(tradeId)) return true;
-    if (!myUid) return false;
-    try {
-        const snap = await withTimeout(getDoc(doc(db, 'trades', tradeId, 'claims', myUid)), LOAD_TIMEOUT_MS);
-        if (snap.exists()) { claimed.add(tradeId); return true; }
-    } catch { /* 확인하지 못하면 관리 권한이 없는 것으로 본다 */ }
-    return false;
+// 비밀번호 없이 바로 관리할 수 있는 경우: 관리자, 또는 비밀번호를 정하지 않은 글의 작성자 브라우저
+function canManageDirectly(t: Trade): boolean {
+    return isAdmin || (!t.hasPassword && !!myUid && t.ownerUid === myUid);
 }
 
-async function renderManage(tradeId: string): Promise<void> {
-    const box = document.getElementById(`manage-${tradeId}`);
+// 비밀번호가 필요한 글은 매번 비밀번호를 확인한다.
+// 맞으면 Firebase에 "이번 한 번만" 관리 권한 문서(claims)를 만들고, 작업이 끝나면 바로 지운다.
+async function runManaged(tradeId: string, action: () => Promise<void>): Promise<void> {
     const t = trades.find(x => x.id === tradeId);
-    if (!box || !t) return;
+    if (!t) return;
+    if (canManageDirectly(t)) { await action(); return; }
 
-    const mine = !!myUid && t.ownerUid === myUid;
-    if (mine || isAdmin || await isClaimed(tradeId)) {
-        box.innerHTML = manageButtonsHtml(t);
-        box.querySelectorAll<HTMLButtonElement>('[data-status]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const [id, status] = btn.dataset.status!.split('|');
-                void changeStatus(id, status as Status);
-            });
-        });
-        box.querySelectorAll<HTMLButtonElement>('[data-delete]').forEach(btn => {
-            btn.addEventListener('click', () => void deleteTrade(btn.dataset.delete!));
-        });
-        return;
-    }
-
-    if (!t.hasPassword) { box.innerHTML = ''; return; }
-
-    box.innerHTML = `
-      <form class="trade-claim-form" autocomplete="off">
-        <input type="password" class="tc-pass" maxlength="${PASSWORD_MAX}" placeholder="작성자 비밀번호로 관리" autocomplete="off">
-        <button type="submit" class="trade-btn">관리하기</button>
-      </form>
-      <div class="trade-msg" id="claim-msg-${esc(tradeId)}"></div>`;
-    box.querySelector<HTMLFormElement>('.trade-claim-form')!.addEventListener('submit', (e) => {
-        e.preventDefault();
-        void claimTrade(tradeId);
-    });
-}
-
-async function claimTrade(tradeId: string): Promise<void> {
     const msg = document.getElementById(`claim-msg-${tradeId}`);
     const input = document.querySelector<HTMLInputElement>(`#manage-${CSS.escape(tradeId)} .tc-pass`);
     const password = input?.value.trim() ?? '';
-    if (password.length < PASSWORD_MIN) return setMsg(msg, `비밀번호는 ${PASSWORD_MIN}자 이상입니다.`, 'error');
+    if (password.length < PASSWORD_MIN) return setMsg(msg, `이 글의 삭제 비밀번호를 입력해 주세요. (${PASSWORD_MIN}자 이상)`, 'error');
 
     const wait = 3000 - (Date.now() - storedNumber('trade-last-claim'));
     if (wait > 0) return setMsg(msg, '잠시 후에 다시 시도해 주세요.', 'error');
@@ -419,17 +384,49 @@ async function claimTrade(tradeId: string): Promise<void> {
     if (!uid) return setMsg(msg, authFailureText('관리'), 'error');
     myUid = uid;
 
+    const claimRef = doc(db, 'trades', tradeId, 'claims', uid);
     try {
-        const hash = await hashPassword(password, tradeId);
-        await setDoc(doc(db, 'trades', tradeId, 'claims', uid), { hash, createdAt: serverTimestamp() });
-        claimed.add(tradeId);
-        await renderManage(tradeId);
-        await loadComments(tradeId);
+        await setDoc(claimRef, { hash: await hashPassword(password, tradeId), createdAt: serverTimestamp() });
     } catch (err) {
         const code = (err as { code?: string }).code;
         console.error('비밀번호 확인 실패:', err);
         setMsg(msg, code === 'permission-denied' ? '비밀번호가 맞지 않습니다.' : '확인하지 못했습니다. 잠시 후 다시 시도해 주세요.', 'error');
+        return;
     }
+
+    try {
+        await action();
+    } finally {
+        try { await deleteDoc(claimRef); } catch { /* 지우지 못해도 다음 작업은 비밀번호를 다시 확인한다 */ }
+    }
+}
+
+async function renderManage(tradeId: string): Promise<void> {
+    const box = document.getElementById(`manage-${tradeId}`);
+    const t = trades.find(x => x.id === tradeId);
+    if (!box || !t) return;
+
+    const direct = canManageDirectly(t);
+    if (!direct && !t.hasPassword) { box.innerHTML = ''; return; }
+
+    box.innerHTML = (direct ? '' : `
+      <div class="trade-claim-form">
+        <input type="password" class="tc-pass" maxlength="${PASSWORD_MAX}" placeholder="이 글의 삭제 비밀번호" autocomplete="off">
+      </div>
+      <div class="trade-msg" id="claim-msg-${esc(tradeId)}"></div>`) + manageButtonsHtml(t);
+
+    box.querySelectorAll<HTMLButtonElement>('[data-status]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const [id, status] = btn.dataset.status!.split('|');
+            void runManaged(id, () => changeStatus(id, status as Status));
+        });
+    });
+    box.querySelectorAll<HTMLButtonElement>('[data-delete]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.dataset.delete!;
+            if (confirm('이 글을 삭제할까요?')) void runManaged(id, () => deleteTradeNow(id));
+        });
+    });
 }
 
 async function loadComments(tradeId: string): Promise<void> {
@@ -439,7 +436,7 @@ async function loadComments(tradeId: string): Promise<void> {
         const snap = await withTimeout(getDocs(query(collection(db, 'trades', tradeId, 'comments'), orderBy('createdAt', 'asc'), limit(100))), LOAD_TIMEOUT_MS);
         const comments: TradeComment[] = snap.docs.map(d => ({ id: d.id, ...(d.data() as Omit<TradeComment, 'id'>) }));
         const trade = trades.find(t => t.id === tradeId);
-        const tradeManager = isAdmin || claimed.has(tradeId) || (!!myUid && trade?.ownerUid === myUid);
+        const tradeManager = isAdmin || (!!myUid && trade?.ownerUid === myUid);
         if (comments.length === 0) {
             box.innerHTML = '<div class="trade-empty">아직 댓글이 없습니다.</div>';
             return;
@@ -584,8 +581,7 @@ async function changeStatus(id: string, status: Status): Promise<void> {
     }
 }
 
-async function deleteTrade(id: string): Promise<void> {
-    if (!confirm('이 글을 삭제할까요?')) return;
+async function deleteTradeNow(id: string): Promise<void> {
     try {
         const batch = writeBatch(db);
         batch.delete(doc(db, 'trades', id));

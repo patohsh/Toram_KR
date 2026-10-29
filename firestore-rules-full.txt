@@ -56,14 +56,14 @@ service cloud.firestore {
         && okStr(request.resource.data.saleTime, 1, 40);
 
       allow update: if request.auth != null
-        && (resource.data.ownerUid == request.auth.uid
+        && ((resource.data.get('hasPassword', false) == false && resource.data.ownerUid == request.auth.uid)
             || isAdmin()
             || exists(/databases/$(database)/documents/trades/$(tradeId)/claims/$(request.auth.uid)))
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt'])
         && request.resource.data.status in ['selling', 'reserved', 'done'];
 
       allow delete: if request.auth != null
-        && (resource.data.ownerUid == request.auth.uid
+        && ((resource.data.get('hasPassword', false) == false && resource.data.ownerUid == request.auth.uid)
             || isAdmin()
             || exists(/databases/$(database)/documents/trades/$(tradeId)/claims/$(request.auth.uid)));
 
@@ -81,12 +81,12 @@ service cloud.firestore {
           && getAfter(/databases/$(database)/documents/trades/$(tradeId)).data.hasPassword == true;
 
         allow delete: if request.auth != null
-          && (get(/databases/$(database)/documents/trades/$(tradeId)).data.ownerUid == request.auth.uid
-              || isAdmin()
+          && (isAdmin()
               || exists(/databases/$(database)/documents/trades/$(tradeId)/claims/$(request.auth.uid)));
       }
 
-      // 비밀번호를 맞게 입력한 계정에 관리 권한을 준다. 해시가 secrets 문서와 같을 때만 만들 수 있다.
+      // 비밀번호를 맞게 입력한 계정에 "이번 한 번" 관리 권한을 준다. 해시가 secrets 문서와 같을 때만 만들 수 있고,
+      // 사이트가 작업을 마치면 바로 지운다. 그래서 비밀번호가 있는 글은 매번 비밀번호를 확인한다.
       match /claims/{claimUid} {
         allow read: if request.auth != null && request.auth.uid == claimUid;
         allow update: if false;
