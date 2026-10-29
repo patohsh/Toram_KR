@@ -2378,7 +2378,7 @@ function openEditModal(item: any) {
     modal.id = 'edit-modal';
     modal.style.cssText = 'display:flex; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:9999; justify-content:center; align-items:center;';
     modal.innerHTML = `
-        <div style="background:var(--card-bg); border:1px solid var(--border-color); border-radius:15px; padding:28px; width:90%; max-width:480px; max-height:90vh; overflow-y:auto;">
+        <div style="background:var(--card-bg); border:1px solid var(--border-color); border-radius:15px; padding:28px; width:94%; max-width:780px; max-height:92vh; overflow-y:auto;">
             <h3 style="margin:0 0 18px; color:var(--accent-pink);">✏️ 가이드 수정</h3>
 
             <div style="margin-bottom:12px;">
@@ -2389,8 +2389,8 @@ function openEditModal(item: any) {
 
             <div style="margin-bottom:12px;">
                 <label style="display:block; margin-bottom:5px; font-size:0.85rem; color:var(--accent-light); font-weight:bold;">내용</label>
-                <textarea id="edit-content" maxlength="2000" rows="7"
-                    style="width:100%; padding:9px; border-radius:8px; background:var(--input-bg); color:var(--text-main); border:1px solid var(--border-color); resize:vertical; box-sizing:border-box; font-family:inherit;">${escapeHtml(item.content||'')}</textarea>
+                <textarea id="edit-content" maxlength="2000" rows="16"
+                    style="width:100%; min-height:300px; padding:12px; line-height:1.6; font-size:0.95rem; border-radius:8px; background:var(--input-bg); color:var(--text-main); border:1px solid var(--border-color); resize:vertical; box-sizing:border-box; font-family:inherit;">${escapeHtml(item.content||'')}</textarea>
             </div>
 
             <div style="margin-bottom:18px;">
@@ -2412,7 +2412,7 @@ function openEditModal(item: any) {
     document.body.appendChild(modal);
 
     document.getElementById('btn-edit-cancel')?.addEventListener('click', () => modal.remove());
-    modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+    // 배경을 눌러도 닫지 않는다. 쓰던 내용이 사라지지 않게 취소 버튼으로만 닫는다.
 
     document.getElementById('btn-edit-confirm')?.addEventListener('click', async () => {
         const newTitle = (document.getElementById('edit-title') as HTMLInputElement).value.trim();
