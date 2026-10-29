@@ -1,0 +1,151 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 뉴비 가이드 게시글
+    match /guides/{document} {
+      allow read: if true;
+      allow create: if request.resource.data.title.size() < 100
+                    && request.resource.data.content.size() < 2000;
+      allow update: if true;
+      allow delete: if true;
+    }
+
+    // 페이지 방문 통계 (예전 방식. 지금 사이트는 쓰지 않음)
+    match /pageStats/{statId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // ===== 거래(홍보) 게시판 =====
+    function isAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    function cleanText(s) {
+      return !s.matches('(?is).*(https?:|ftp:|www\\.|\\.(com|net|kr|co|io|me|gg|tv|xyz|link|org|be|ly|app|dev|info|site|shop|cc|to|ai)).*')
+        && !s.matches('(?is).*(현거래|현금|계좌|입금|송금|이체|원화|페이팔|paypal|카카오페이|네이버페이|상품권|기프티콘|비트코인|리얼머니).*');
+    }
+
+    function okStr(v, minLen, maxLen) {
+      return v is string && v.size() >= minLen && v.size() <= maxLen && cleanText(v);
+    }
+
+    match /admins/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    match /trades/{tradeId} {
+      allow read: if true;
+
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasOnly(['category', 'title', 'body', 'price', 'gameNickname', 'location', 'saleTime', 'status', 'ownerUid', 'createdAt'])
+        && request.resource.data.keys().hasAll(['category', 'title', 'body', 'price', 'gameNickname', 'location', 'saleTime', 'status', 'ownerUid', 'createdAt'])
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.category in ['equip', 'material', 'socket', 'wanted']
+        && request.resource.data.status == 'selling'
+        && request.resource.data.createdAt == request.time
+        && okStr(request.resource.data.title, 2, 40)
+        && okStr(request.resource.data.body, 5, 500)
+        && okStr(request.resource.data.price, 1, 30)
+        && okStr(request.resource.data.gameNickname, 1, 20)
+        && okStr(request.resource.data.location, 1, 40)
+        && okStr(request.resource.data.saleTime, 1, 40);
+
+      allow update: if request.auth != null
+        && (resource.data.ownerUid == request.auth.uid || isAdmin())
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt'])
+        && request.resource.data.status in ['selling', 'reserved', 'done'];
+
+      allow delete: if request.auth != null
+        && (resource.data.ownerUid == request.auth.uid || isAdmin());
+
+      match /comments/{commentId} {
+        allow read: if true;
+
+        allow create: if request.auth != null
+          && request.resource.data.keys().hasOnly(['nickname', 'text', 'ownerUid', 'createdAt'])
+          && request.resource.data.keys().hasAll(['nickname', 'text', 'ownerUid', 'createdAt'])
+          && request.resource.data.ownerUid == request.auth.uid
+          && request.resource.data.createdAt == request.time
+          && okStr(request.resource.data.nickname, 1, 20)
+          && okStr(request.resource.data.text, 1, 200)
+          && exists(/databases/$(database)/documents/trades/$(tradeId));
+
+        allow delete: if request.auth != null
+          && (resource.data.ownerUid == request.auth.uid
+              || isAdmin()
+              || get(/databases/$(database)/documents/trades/$(tradeId)).data.ownerUid == request.auth.uid);
+
+        allow update: if false;
+      }
+    }
+
+    // ===== 방문 통계 (stats_daily: 하루, stats_monthly: 한 달) =====
+    // 누구나 읽을 수 있고, 쓰기는 "+1씩 올리는 요청"만 허용한다. 값을 바꾸거나 지우는 요청은 거절.
+    function statPageKeysOk(p) {
+      return p.keys().hasOnly(['home', 'schedule', 'crysta', 'skill', 'ability', 'registlet', 'food', 'equip', 'guide', 'info', 'enchant', 'trade']);
+    }
+
+    function statPageTotal(p) {
+      return p.get('home', 0) + p.get('schedule', 0) + p.get('crysta', 0) + p.get('skill', 0)
+        + p.get('ability', 0) + p.get('registlet', 0) + p.get('food', 0) + p.get('equip', 0)
+        + p.get('guide', 0) + p.get('info', 0) + p.get('enchant', 0) + p.get('trade', 0);
+    }
+
+    function statOnePage(p) {
+      return statPageKeysOk(p) && p.size() == 1 && statPageTotal(p) == 1;
+    }
+
+    function statPageStep(newP, oldP) {
+      return statPageKeysOk(newP)
+        && newP.diff(oldP).affectedKeys().size() == 1
+        && statPageTotal(newP) - statPageTotal(oldP) == 1;
+    }
+
+    match /stats_daily/{day} {
+      allow read: if true;
+
+      allow create: if day.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        && request.resource.data.keys().hasOnly(['date', 'month', 'visits', 'views', 'pages'])
+        && request.resource.data.keys().hasAll(['date', 'month', 'visits', 'views', 'pages'])
+        && request.resource.data.date == day
+        && request.resource.data.month == day[0:7]
+        && request.resource.data.visits in [0, 1]
+        && request.resource.data.views == 1
+        && statOnePage(request.resource.data.pages);
+
+      allow update: if request.resource.data.keys().hasOnly(['date', 'month', 'visits', 'views', 'pages'])
+        && request.resource.data.date == resource.data.date
+        && request.resource.data.month == resource.data.month
+        && (request.resource.data.visits - resource.data.visits) in [0, 1]
+        && request.resource.data.views - resource.data.views == 1
+        && statPageStep(request.resource.data.pages, resource.data.pages);
+
+      allow delete: if false;
+    }
+
+    match /stats_monthly/{month} {
+      allow read: if true;
+
+      allow create: if month.matches('^[0-9]{4}-[0-9]{2}$')
+        && request.resource.data.keys().hasOnly(['month', 'visits', 'views', 'pages'])
+        && request.resource.data.keys().hasAll(['month', 'visits', 'views', 'pages'])
+        && request.resource.data.month == month
+        && request.resource.data.visits in [0, 1]
+        && request.resource.data.views == 1
+        && statOnePage(request.resource.data.pages);
+
+      allow update: if request.resource.data.keys().hasOnly(['month', 'visits', 'views', 'pages'])
+        && request.resource.data.month == resource.data.month
+        && (request.resource.data.visits - resource.data.visits) in [0, 1]
+        && request.resource.data.views - resource.data.views == 1
+        && statPageStep(request.resource.data.pages, resource.data.pages);
+
+      allow delete: if false;
+    }
+
+  }
+}

@@ -1,9 +1,10 @@
 // src/main.ts
 import './style.css';
 import { db } from './firebase';
-import { collection, getDocs, query, orderBy, serverTimestamp, where, deleteDoc, doc, addDoc, limit, increment, setDoc, getDoc, updateDoc } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, serverTimestamp, where, deleteDoc, doc, addDoc, limit } from 'firebase/firestore';
 import { renderEnchantPage } from './enchant/ui';
 import { renderTradePage } from './trade/ui';
+import { recordPageView, loadVisitSummary, type VisitSummary } from './stats';
 
 // =================================================
 // 0. 타입 및 라우팅
@@ -27,64 +28,24 @@ const routes: Record<PageKey, () => void> = {
     trade: renderTradePage
 };
 
-// 방문 통계 추적 대상 페이지
-const TRACK_PAGES: PageKey[] = ['home','crysta','skill','ability','registlet','food','equip','guide','schedule','enchant','trade'];
 const PAGE_NAMES: Record<string, string> = {
     home:'홈', crysta:'크리스타', skill:'스킬', ability:'어빌리티',
     registlet:'레지스트릿', food:'요리', equip:'장비', guide:'뉴비가이드', schedule:'이벤트', enchant:'옵션부여 계산기', trade:'거래'
 };
-
-async function trackVisit(page: PageKey) {
-    if (!TRACK_PAGES.includes(page)) return;
-
-    try {
-        const today = new Date().toLocaleDateString('sv-SE');
-        const statRef = doc(db, 'pageStats', page);
-
-        const snap = await getDoc(statRef);
-
-        if (!snap.exists()) {
-            await setDoc(statRef, {
-                page,
-                date: today,
-                count: 1,
-                name: PAGE_NAMES[page] || page
-            });
-            return;
-        }
-
-        const data = snap.data();
-
-        if (data.date === today) {
-            await updateDoc(statRef, {
-                count: increment(1)
-            });
-        } else {
-            // 날짜 바뀌면 초기화
-            await setDoc(statRef, {
-                page,
-                date: today,
-                count: 1,
-                name: PAGE_NAMES[page] || page
-            });
-        }
-
-    } catch { }
-}
 
 function navigate(page: PageKey) {
     if (history.state && history.state.page === page) return;
     history.pushState({ page }, '', `#${page}`);
     routes[page]();
     window.scrollTo(0, 0);
-    trackVisit(page);
+    void recordPageView(page);
 }
 
 window.addEventListener('popstate', (event) => {
     const modal = document.getElementById('image-modal');
     if (modal && modal.style.display === 'flex') { modal.style.display = 'none'; return; }
-    if (event.state?.page) { const p = event.state.page as PageKey; if (routes[p]) routes[p](); }
-    else renderHomePage();
+    if (event.state?.page) { const p = event.state.page as PageKey; if (routes[p]) { routes[p](); void recordPageView(p); } }
+    else { renderHomePage(); void recordPageView('home'); }
 });
 
 function initMouseBackEvent() {
@@ -195,6 +156,10 @@ function renderHomePage() {
               <h2 class="n4-h"><span>최신 거래</span> <span class="n4-new">NEW</span></h2>
               <div id="recent-trade-list"><div class="home-loading">불러오는 중...</div></div>
             </section>
+            <section class="n4-sec">
+              <h2 class="n4-h"><span>방문 통계</span></h2>
+              <div id="visit-stats"><div class="home-loading">불러오는 중...</div></div>
+            </section>
           </aside>
         </div>
 
@@ -240,7 +205,29 @@ function renderHomePage() {
     loadOfficialNotice();
     loadRecentGuides();
     loadRecentTrades();
+    loadVisitStats();
     initSlider();
+}
+
+function renderVisitStats(container: HTMLElement, data: VisitSummary) {
+    const fmt = (n: number) => n.toLocaleString();
+    const top = data.topPages.length
+        ? data.topPages.map(([key, count]) => `${escapeHtml(PAGE_NAMES[key] || key)} <em>${fmt(count)}</em>`).join(' · ')
+        : '아직 기록이 없습니다';
+    container.innerHTML = `
+        <div class="n4-vs-row"><span>오늘 방문</span><b>${fmt(data.today)}</b></div>
+        <div class="n4-vs-row"><span>이번 달 방문</span><b>${fmt(data.month)}</b></div>
+        <div class="n4-vs-row"><span>이번 달 페이지뷰</span><b>${fmt(data.monthViews)}</b></div>
+        <div class="n4-vs-top"><span>인기 페이지</span> ${top}</div>`;
+}
+
+async function loadVisitStats() {
+    const container = document.getElementById('visit-stats');
+    if (!container) return;
+    const data = await loadVisitSummary();
+    if (!document.getElementById('visit-stats')) return;
+    if (!data) { container.innerHTML = '<div class="home-loading">통계를 불러오지 못했습니다.</div>'; return; }
+    renderVisitStats(container, data);
 }
 
 async function loadRecentTrades() {
@@ -2616,8 +2603,8 @@ initGlobalFeatures();
 // History 상태가 있으면 그 페이지로, 없으면 홈으로
 if (history.state && history.state.page) {
     const page = history.state.page as PageKey;
-    if (routes[page]) routes[page]();
-    else renderHomePage();
+    if (routes[page]) { routes[page](); void recordPageView(page); }
+    else { renderHomePage(); void recordPageView('home'); }
 } else {
     // 초기 URL 해시 확인 (예: #schedule)
     const hash = window.location.hash.replace('#', '') as PageKey;
@@ -2625,9 +2612,11 @@ if (history.state && history.state.page) {
         // 해시가 있으면 해당 페이지로 이동 및 히스토리 대체
         history.replaceState({ page: hash }, '', `#${hash}`);
         routes[hash]();
+        void recordPageView(hash);
     } else {
         // 기본 홈
         history.replaceState({ page: 'home' }, '', '#home');
         renderHomePage();
+        void recordPageView('home');
     }
 }

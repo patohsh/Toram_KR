@@ -1957,6 +1957,14 @@ body.dark-mode .n4-home {
 .n4-line-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .n4-line em { font-style: normal; font-size: 0.75rem; color: var(--n4-dim); flex-shrink: 0; }
 
+/* 방문 통계 */
+.n4-vs-row { display: flex; justify-content: space-between; align-items: baseline; padding: 6px 0; border-bottom: 1px dotted var(--n4-line); font-size: 0.85rem; }
+.n4-vs-row span { color: var(--n4-dim); }
+.n4-vs-row b { color: var(--n4-accent); font-size: 1.05rem; font-weight: 800; }
+.n4-vs-top { padding-top: 8px; font-size: 0.8rem; color: var(--n4-ink); line-height: 1.6; }
+.n4-vs-top > span { color: var(--n4-dim); margin-right: 4px; }
+.n4-vs-top em { font-style: normal; color: var(--n4-dim); font-size: 0.75rem; }
+
 .n4-gallery .img-slider { height: 260px; border: 3px solid var(--n4-paper); outline: 1.5px solid var(--n4-line); border-radius: 10px; background: var(--n4-input); }
 .n4-gallery .slider-dot { background: var(--n4-line); }
 .n4-gallery .slider-dot.active { background: var(--n4-accent); }
