@@ -2742,6 +2742,10 @@ body.dark-mode .trade-status-reserved { color: #f0c36a; }
 .trade-detail { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border-color); }
 .trade-body { font-size: 0.9rem; line-height: 1.7; color: var(--text-main); overflow-wrap: anywhere; }
 .trade-manage { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+.trade-manage-box { margin-top: 10px; }
+.trade-manage-box .trade-manage { margin-top: 0; }
+.trade-claim-form { display: flex; gap: 6px; }
+.trade-claim-form input { flex: 1; min-width: 0; box-sizing: border-box; background: var(--input-bg); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 8px; padding: 7px 10px; font-size: 0.85rem; text-align: left; }
 .trade-comments { margin-top: 12px; }
 .trade-comment { display: flex; gap: 8px; align-items: baseline; padding: 5px 0; border-bottom: 1px dotted var(--border-color); font-size: 0.85rem; }
 .trade-comment b { color: var(--accent-pink); flex-shrink: 0; }

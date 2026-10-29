@@ -3,7 +3,7 @@
 
 import { db, firebaseApp } from '../firebase';
 import {
-    addDoc, collection, deleteDoc, doc, getDoc, getDocs, limit, orderBy, query, serverTimestamp, updateDoc,
+    addDoc, collection, deleteDoc, doc, getDoc, getDocs, limit, orderBy, query, serverTimestamp, setDoc, updateDoc, writeBatch,
     type Timestamp,
 } from 'firebase/firestore';
 import { getAuth, signInAnonymously, type Auth } from 'firebase/auth';
@@ -23,6 +23,7 @@ interface Trade {
     saleTime: string;
     status: Status;
     ownerUid: string;
+    hasPassword?: boolean;
     createdAt: Timestamp | null;
 }
 
@@ -55,6 +56,23 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
         );
     });
 }
+
+const PASSWORD_MIN = 6;
+const PASSWORD_MAX = 30;
+
+// 비밀번호는 글마다 다른 소금(글 ID)을 섞어 PBKDF2로 해시한 값만 보낸다. 해시는 읽을 수 없는 문서(secrets)에 저장된다.
+async function hashPassword(password: string, tradeId: string): Promise<string> {
+    const enc = new TextEncoder();
+    const key = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
+    const bits = await crypto.subtle.deriveBits(
+        { name: 'PBKDF2', hash: 'SHA-256', salt: enc.encode(`toram-trade:${tradeId}`), iterations: 100_000 },
+        key,
+        256,
+    );
+    return Array.from(new Uint8Array(bits)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+const claimed = new Set<string>();
 
 let trades: Trade[] = [];
 let activeCategory: Category | 'all' = 'all';
@@ -105,6 +123,27 @@ function storeText(key: string, value: string): void {
 }
 
 let authInstance: Auth | null = null;
+let lastAuthCode = '';
+
+const AUTH_HINTS: Record<string, string> = {
+    'auth/operation-not-allowed': 'Firebase 콘솔 > Authentication > 로그인 방법에서 "익명"을 사용 설정해야 합니다.',
+    'auth/admin-restricted-operation': 'Firebase 콘솔 > Authentication > 로그인 방법에서 "익명"을 사용 설정해야 합니다.',
+    'auth/configuration-not-found': 'Firebase 콘솔 > Authentication에서 "시작하기"를 눌러 Authentication을 먼저 활성화해야 합니다.',
+    'auth/invalid-api-key': '사이트에 들어간 Firebase API 키(환경 변수)가 비어 있거나 잘못되었습니다.',
+    'auth/api-key-not-valid.-please-pass-a-valid-api-key.': '사이트에 들어간 Firebase API 키가 올바르지 않습니다.',
+    'auth/network-request-failed': '네트워크 연결을 확인해야 합니다.',
+};
+
+function rememberAuthError(err: unknown): void {
+    const code = (err as { code?: string } | null)?.code || String(err);
+    lastAuthCode = code;
+    console.error(`[거래 게시판] 로그인 실패 (${code}). ${AUTH_HINTS[code] ?? ''}`, err);
+}
+
+function authFailureText(what: string): string {
+    const code = lastAuthCode ? ` (오류 코드: ${lastAuthCode})` : '';
+    return `${what} 준비에 실패했습니다. 잠시 후 다시 시도해 주세요.${code}`;
+}
 
 function getAuthOrNull(): Auth | null {
     if (authInstance) return authInstance;
@@ -112,7 +151,7 @@ function getAuthOrNull(): Auth | null {
         authInstance = getAuth(firebaseApp);
         return authInstance;
     } catch (err) {
-        console.error('Firebase 인증을 사용할 수 없습니다:', err);
+        rememberAuthError(err);
         return null;
     }
 }
@@ -123,9 +162,10 @@ async function ensureAuth(): Promise<string | null> {
     if (auth.currentUser) return auth.currentUser.uid;
     try {
         const cred = await signInAnonymously(auth);
+        lastAuthCode = '';
         return cred.user.uid;
     } catch (err) {
-        console.error('익명 로그인 실패:', err);
+        rememberAuthError(err);
         return null;
     }
 }
@@ -189,6 +229,9 @@ export async function renderTradePage(): Promise<void> {
           </label>
           <label class="trade-span2">내용
             <textarea id="tf-body" maxlength="500" rows="4" placeholder="판매(구매)하는 장비·아이템과 조건을 적어 주세요. 링크와 현거래는 올릴 수 없습니다."></textarea>
+          </label>
+          <label class="trade-span2">삭제 비밀번호 (선택)
+            <input type="password" id="tf-password" maxlength="${PASSWORD_MAX}" placeholder="${PASSWORD_MIN}자 이상. 정해 두면 다른 기기에서도 글을 삭제·수정할 수 있습니다" autocomplete="new-password">
           </label>
         </div>
         <div class="trade-msg" id="trade-form-msg"></div>
@@ -261,8 +304,6 @@ function renderList(): void {
     }
 
     listEl.innerHTML = shown.map(t => {
-        const mine = !!myUid && t.ownerUid === myUid;
-        const canManage = mine || isAdmin;
         return `
       <article class="trade-card" data-id="${esc(t.id)}">
         <div class="trade-head" data-toggle="${esc(t.id)}">
@@ -279,13 +320,7 @@ function renderList(): void {
         </div>
         <div class="trade-detail" id="detail-${esc(t.id)}" style="display:none;">
           <div class="trade-body">${esc(t.body).replace(/\n/g, '<br>')}</div>
-          ${canManage ? `
-          <div class="trade-manage">
-            <button class="trade-btn" data-status="${esc(t.id)}|selling">${t.category === 'wanted' ? '구매중' : '판매중'}</button>
-            <button class="trade-btn" data-status="${esc(t.id)}|reserved">예약중</button>
-            <button class="trade-btn" data-status="${esc(t.id)}|done">${t.category === 'wanted' ? '구매완료' : '거래완료'}</button>
-            <button class="trade-btn trade-btn-danger" data-delete="${esc(t.id)}">삭제</button>
-          </div>` : ''}
+          <div class="trade-manage-box" id="manage-${esc(t.id)}"></div>
           <div class="trade-comments" id="comments-${esc(t.id)}"><div class="trade-empty">댓글 불러오는 중...</div></div>
           <form class="trade-comment-form" data-comment-form="${esc(t.id)}" autocomplete="off">
             <input type="text" class="tc-nick" maxlength="20" placeholder="닉네임" value="${esc(storedText('trade-nick'))}">
@@ -300,15 +335,6 @@ function renderList(): void {
     listEl.querySelectorAll<HTMLElement>('[data-toggle]').forEach(el => {
         el.addEventListener('click', () => toggleDetail(el.dataset.toggle!));
     });
-    listEl.querySelectorAll<HTMLButtonElement>('[data-status]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const [id, status] = btn.dataset.status!.split('|');
-            void changeStatus(id, status as Status);
-        });
-    });
-    listEl.querySelectorAll<HTMLButtonElement>('[data-delete]').forEach(btn => {
-        btn.addEventListener('click', () => void deleteTrade(btn.dataset.delete!));
-    });
     listEl.querySelectorAll<HTMLFormElement>('[data-comment-form]').forEach(f => {
         f.addEventListener('submit', (e) => { e.preventDefault(); void submitComment(f.dataset.commentForm!, f); });
     });
@@ -319,7 +345,91 @@ async function toggleDetail(id: string): Promise<void> {
     if (!detail) return;
     const open = detail.style.display !== 'none';
     detail.style.display = open ? 'none' : 'block';
-    if (!open) await loadComments(id);
+    if (!open) {
+        await renderManage(id);
+        await loadComments(id);
+    }
+}
+
+function manageButtonsHtml(t: Trade): string {
+    return `
+      <div class="trade-manage">
+        <button class="trade-btn" data-status="${esc(t.id)}|selling">${t.category === 'wanted' ? '구매중' : '판매중'}</button>
+        <button class="trade-btn" data-status="${esc(t.id)}|reserved">예약중</button>
+        <button class="trade-btn" data-status="${esc(t.id)}|done">${t.category === 'wanted' ? '구매완료' : '거래완료'}</button>
+        <button class="trade-btn trade-btn-danger" data-delete="${esc(t.id)}">삭제</button>
+      </div>`;
+}
+
+async function isClaimed(tradeId: string): Promise<boolean> {
+    if (claimed.has(tradeId)) return true;
+    if (!myUid) return false;
+    try {
+        const snap = await withTimeout(getDoc(doc(db, 'trades', tradeId, 'claims', myUid)), LOAD_TIMEOUT_MS);
+        if (snap.exists()) { claimed.add(tradeId); return true; }
+    } catch { /* 확인하지 못하면 관리 권한이 없는 것으로 본다 */ }
+    return false;
+}
+
+async function renderManage(tradeId: string): Promise<void> {
+    const box = document.getElementById(`manage-${tradeId}`);
+    const t = trades.find(x => x.id === tradeId);
+    if (!box || !t) return;
+
+    const mine = !!myUid && t.ownerUid === myUid;
+    if (mine || isAdmin || await isClaimed(tradeId)) {
+        box.innerHTML = manageButtonsHtml(t);
+        box.querySelectorAll<HTMLButtonElement>('[data-status]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const [id, status] = btn.dataset.status!.split('|');
+                void changeStatus(id, status as Status);
+            });
+        });
+        box.querySelectorAll<HTMLButtonElement>('[data-delete]').forEach(btn => {
+            btn.addEventListener('click', () => void deleteTrade(btn.dataset.delete!));
+        });
+        return;
+    }
+
+    if (!t.hasPassword) { box.innerHTML = ''; return; }
+
+    box.innerHTML = `
+      <form class="trade-claim-form" autocomplete="off">
+        <input type="password" class="tc-pass" maxlength="${PASSWORD_MAX}" placeholder="작성자 비밀번호로 관리" autocomplete="off">
+        <button type="submit" class="trade-btn">관리하기</button>
+      </form>
+      <div class="trade-msg" id="claim-msg-${esc(tradeId)}"></div>`;
+    box.querySelector<HTMLFormElement>('.trade-claim-form')!.addEventListener('submit', (e) => {
+        e.preventDefault();
+        void claimTrade(tradeId);
+    });
+}
+
+async function claimTrade(tradeId: string): Promise<void> {
+    const msg = document.getElementById(`claim-msg-${tradeId}`);
+    const input = document.querySelector<HTMLInputElement>(`#manage-${CSS.escape(tradeId)} .tc-pass`);
+    const password = input?.value.trim() ?? '';
+    if (password.length < PASSWORD_MIN) return setMsg(msg, `비밀번호는 ${PASSWORD_MIN}자 이상입니다.`, 'error');
+
+    const wait = 3000 - (Date.now() - storedNumber('trade-last-claim'));
+    if (wait > 0) return setMsg(msg, '잠시 후에 다시 시도해 주세요.', 'error');
+    storeNumber('trade-last-claim', Date.now());
+
+    const uid = myUid || await ensureAuth();
+    if (!uid) return setMsg(msg, authFailureText('관리'), 'error');
+    myUid = uid;
+
+    try {
+        const hash = await hashPassword(password, tradeId);
+        await setDoc(doc(db, 'trades', tradeId, 'claims', uid), { hash, createdAt: serverTimestamp() });
+        claimed.add(tradeId);
+        await renderManage(tradeId);
+        await loadComments(tradeId);
+    } catch (err) {
+        const code = (err as { code?: string }).code;
+        console.error('비밀번호 확인 실패:', err);
+        setMsg(msg, code === 'permission-denied' ? '비밀번호가 맞지 않습니다.' : '확인하지 못했습니다. 잠시 후 다시 시도해 주세요.', 'error');
+    }
 }
 
 async function loadComments(tradeId: string): Promise<void> {
@@ -329,13 +439,13 @@ async function loadComments(tradeId: string): Promise<void> {
         const snap = await withTimeout(getDocs(query(collection(db, 'trades', tradeId, 'comments'), orderBy('createdAt', 'asc'), limit(100))), LOAD_TIMEOUT_MS);
         const comments: TradeComment[] = snap.docs.map(d => ({ id: d.id, ...(d.data() as Omit<TradeComment, 'id'>) }));
         const trade = trades.find(t => t.id === tradeId);
-        const tradeOwner = !!myUid && trade?.ownerUid === myUid;
+        const tradeManager = isAdmin || claimed.has(tradeId) || (!!myUid && trade?.ownerUid === myUid);
         if (comments.length === 0) {
             box.innerHTML = '<div class="trade-empty">아직 댓글이 없습니다.</div>';
             return;
         }
         box.innerHTML = comments.map(c => {
-            const canDelete = isAdmin || tradeOwner || (!!myUid && c.ownerUid === myUid);
+            const canDelete = tradeManager || (!!myUid && c.ownerUid === myUid);
             return `<div class="trade-comment">
               <b>${esc(c.nickname)}</b>
               <span class="trade-comment-text">${esc(c.text)}</span>
@@ -382,6 +492,11 @@ async function submitTrade(): Promise<void> {
     if (!fields.price) return setMsg(msg, '가격/조건을 입력해 주세요. 협의라면 "협의"라고 적어 주세요.', 'error');
     if (fields.body.length < 5) return setMsg(msg, '내용을 5자 이상 입력해 주세요.', 'error');
 
+    const password = (document.getElementById('tf-password') as HTMLInputElement).value.trim();
+    if (password && (password.length < PASSWORD_MIN || password.length > PASSWORD_MAX)) {
+        return setMsg(msg, `삭제 비밀번호는 ${PASSWORD_MIN}~${PASSWORD_MAX}자로 정해 주세요. (쓰지 않으려면 비워 두세요)`, 'error');
+    }
+
     const labels: Record<keyof typeof fields, string> = {
         gameNickname: '게임 닉네임', location: '위치', saleTime: '판매 시간', title: '제목', price: '가격/조건', body: '내용',
     };
@@ -394,17 +509,24 @@ async function submitTrade(): Promise<void> {
     if (wait > 0) return setMsg(msg, `잠시 후에 다시 올려 주세요. (${Math.ceil(wait / 1000)}초)`, 'error');
 
     const uid = myUid || await ensureAuth();
-    if (!uid) return setMsg(msg, '글쓰기 준비에 실패했습니다. 잠시 후 다시 시도해 주세요.', 'error');
+    if (!uid) return setMsg(msg, authFailureText('글쓰기'), 'error');
     myUid = uid;
 
     try {
-        await addDoc(collection(db, 'trades'), {
+        const tradeRef = doc(collection(db, 'trades'));
+        const batch = writeBatch(db);
+        batch.set(tradeRef, {
             category,
             ...fields,
             status: 'selling' as Status,
             ownerUid: uid,
+            hasPassword: !!password,
             createdAt: serverTimestamp(),
         });
+        if (password) {
+            batch.set(doc(db, 'trades', tradeRef.id, 'secrets', 'pw'), { hash: await hashPassword(password, tradeRef.id) });
+        }
+        await batch.commit();
         storeNumber('trade-last-post', Date.now());
         storeText('trade-nick', fields.gameNickname);
         (document.getElementById('trade-form') as HTMLFormElement).reset();
@@ -431,7 +553,7 @@ async function submitComment(tradeId: string, form: HTMLFormElement): Promise<vo
     if (wait > 0) return setMsg(msg, `잠시 후에 다시 올려 주세요. (${Math.ceil(wait / 1000)}초)`, 'error');
 
     const uid = myUid || await ensureAuth();
-    if (!uid) return setMsg(msg, '댓글 준비에 실패했습니다. 잠시 후 다시 시도해 주세요.', 'error');
+    if (!uid) return setMsg(msg, authFailureText('댓글'), 'error');
     myUid = uid;
 
     try {
@@ -465,7 +587,10 @@ async function changeStatus(id: string, status: Status): Promise<void> {
 async function deleteTrade(id: string): Promise<void> {
     if (!confirm('이 글을 삭제할까요?')) return;
     try {
-        await deleteDoc(doc(db, 'trades', id));
+        const batch = writeBatch(db);
+        batch.delete(doc(db, 'trades', id));
+        if (trades.find(t => t.id === id)?.hasPassword) batch.delete(doc(db, 'trades', id, 'secrets', 'pw'));
+        await batch.commit();
         trades = trades.filter(t => t.id !== id);
         renderList();
     } catch (err) {
