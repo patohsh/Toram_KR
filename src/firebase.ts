@@ -25,3 +25,4 @@ if (typeof window !== "undefined") {
     });
 }
 export const db = getFirestore(app);
+export const firebaseApp = app;
